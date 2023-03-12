@@ -303,7 +303,7 @@ func TestParse_illegalLongOptIfIncludingInvalidChar(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, err.Get("Opt"), "abc%def")
+		assert.Equal(t, err.Get("Option"), "abc%def")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -334,7 +334,7 @@ func TestParse_illegalLongOptIfFirstCharIsNumber(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, err.Get("Opt"), "1abc")
+		assert.Equal(t, err.Get("Option"), "1abc")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -364,7 +364,7 @@ func TestParse_illegalLongOptIfFirstCharIsHyphen(t *testing.T) {
 
 	switch err.Reason().(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, err.Get("Opt"), "-aaa=123")
+		assert.Equal(t, err.Get("Option"), "-aaa=123")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -397,7 +397,7 @@ func TestParse_IllegalCharInShortOpt(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, err.Get("Opt"), "@")
+		assert.Equal(t, err.Get("Option"), "@")
 	default:
 		assert.Fail(t, err.Error())
 	}
