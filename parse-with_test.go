@@ -41,7 +41,7 @@ func testParseWith_zeroCfgAndOneLongOpt(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.UnconfiguredOption:
-		assert.Equal(t, err.Get("Opt"), "foo-bar")
+		assert.Equal(t, err.Get("Option"), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -63,7 +63,7 @@ func TestParseWith_zeroCfgAndOneShortOpt(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.UnconfiguredOption:
-		assert.Equal(t, err.Get("Opt"), "f")
+		assert.Equal(t, err.Get("Option"), "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -159,7 +159,7 @@ func TestParseWith_oneCfgAndOneDifferentLongOpt(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.UnconfiguredOption:
-		assert.Equal(t, err.Get("Opt"), "boo-far")
+		assert.Equal(t, err.Get("Option"), "boo-far")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -183,7 +183,7 @@ func TestParseWith_oneCfgAndOneDifferentShortOpt(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.UnconfiguredOption:
-		assert.Equal(t, err.Get("Opt"), "b")
+		assert.Equal(t, err.Get("Option"), "b")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -361,7 +361,7 @@ func TestParseWith_oneCfgHasParamButOneLongOptHasNoParam(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.OptionNeedsParam:
-		assert.Equal(t, err.Get("Opt"), "foo-bar")
+		assert.Equal(t, err.Get("Option"), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -385,7 +385,7 @@ func TestParseWith_oneCfgHasParamAndOneShortOptHasNoParam(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.OptionNeedsParam:
-		assert.Equal(t, err.Get("Opt"), "f")
+		assert.Equal(t, err.Get("Option"), "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -421,7 +421,7 @@ func TestParseWith_oneCfgHasNoParamAndOneLongOptHasParam(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.OptionTakesNoParam:
-		assert.Equal(t, err.Get("Opt"), "foo-bar")
+		assert.Equal(t, err.Get("Option"), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -451,7 +451,7 @@ func TestParseWith_oneCfgHasNoParamAndOneLongOptHasParam(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.OptionTakesNoParam:
-		assert.Equal(t, err.Get("Opt"), "foo-bar")
+		assert.Equal(t, err.Get("Option"), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -487,7 +487,7 @@ func TestParseWith_oneCfgHasNoParamAndOneShortOptHasParam(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.OptionTakesNoParam:
-		assert.Equal(t, err.Get("Opt"), "f")
+		assert.Equal(t, err.Get("Option"), "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -518,7 +518,7 @@ func TestParseWith_oneCfgHasNoParamAndOneShortOptHasParam(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.OptionTakesNoParam:
-		assert.Equal(t, err.Get("Opt"), "f")
+		assert.Equal(t, err.Get("Option"), "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -543,7 +543,7 @@ func TestParseWith_oneCfgHasNoParamButIsArray(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.ConfigIsArrayButHasNoParam:
-		assert.Equal(t, err.Get("Opt"), "foo-bar")
+		assert.Equal(t, err.Get("Option"), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -730,7 +730,7 @@ func TestParseWith_oneCfgIsNotArrayButOptsAreMultiple(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.OptionIsNotArray:
-		assert.Equal(t, err.Get("Opt"), "foo-bar")
+		assert.Equal(t, err.Get("Option"), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -774,7 +774,7 @@ func TestParseWith_oneCfgHasNoParamButHasDefault(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.ConfigHasDefaultButHasNoParam:
-		assert.Equal(t, err.Get("Opt"), "foo-bar")
+		assert.Equal(t, err.Get("Option"), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
