@@ -14,7 +14,7 @@ import (
 type /* error reason */ (
 	// OptionHasInvalidChar is an error reason which indicates that an invalid
 	// character is found in the option.
-	OptionHasInvalidChar struct{ Opt string }
+	OptionHasInvalidChar struct{ Option string }
 )
 
 var (
@@ -181,11 +181,11 @@ func parseArgs(
 						break
 					}
 					if !unicode.Is(rangeOfAlNumMarks, r) {
-						return sabi.NewErr(OptionHasInvalidChar{Opt: arg})
+						return sabi.NewErr(OptionHasInvalidChar{Option: arg})
 					}
 				} else {
 					if !unicode.Is(rangeOfAlphabets, r) {
-						return sabi.NewErr(OptionHasInvalidChar{Opt: arg})
+						return sabi.NewErr(OptionHasInvalidChar{Option: arg})
 					}
 				}
 				i++
@@ -230,7 +230,7 @@ func parseArgs(
 				}
 				opt = string(r)
 				if !unicode.Is(rangeOfAlphabets, r) {
-					return sabi.NewErr(OptionHasInvalidChar{Opt: opt})
+					return sabi.NewErr(OptionHasInvalidChar{Option: opt})
 				}
 				i++
 			}
