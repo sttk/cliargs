@@ -12,6 +12,10 @@ func TestLineIter_Next_emptyText(t *testing.T) {
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
 	assert.Equal(t, line, text)
+
+	line, status = iter.Next()
+	assert.Equal(t, status, ITER_NO_MORE)
+	assert.Equal(t, line, "")
 }
 
 func TestLineIter_Next_oneCharText(t *testing.T) {
@@ -21,6 +25,10 @@ func TestLineIter_Next_oneCharText(t *testing.T) {
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
 	assert.Equal(t, line, text)
+
+	line, status = iter.Next()
+	assert.Equal(t, status, ITER_NO_MORE)
+	assert.Equal(t, line, "")
 }
 
 func TestLineIter_Next_lessThanLineWidth(t *testing.T) {
@@ -30,6 +38,10 @@ func TestLineIter_Next_lessThanLineWidth(t *testing.T) {
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
 	assert.Equal(t, line, text)
+
+	line, status = iter.Next()
+	assert.Equal(t, status, ITER_NO_MORE)
+	assert.Equal(t, line, "")
 }
 
 func TestLineIter_Next_equalToLineWidth(t *testing.T) {
@@ -39,6 +51,10 @@ func TestLineIter_Next_equalToLineWidth(t *testing.T) {
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
 	assert.Equal(t, line, text)
+
+	line, status = iter.Next()
+	assert.Equal(t, status, ITER_NO_MORE)
+	assert.Equal(t, line, "")
 }
 
 func TestLineIter_Next_breakAtLineBreakOppotunity(t *testing.T) {
@@ -52,6 +68,10 @@ func TestLineIter_Next_breakAtLineBreakOppotunity(t *testing.T) {
 	line, status = iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
 	assert.Equal(t, line, text[11:21])
+
+	line, status = iter.Next()
+	assert.Equal(t, status, ITER_NO_MORE)
+	assert.Equal(t, line, "")
 }
 
 func TestLineIter_Next_removeHeadingSpaceOfEachLine(t *testing.T) {
@@ -65,6 +85,10 @@ func TestLineIter_Next_removeHeadingSpaceOfEachLine(t *testing.T) {
 	line, status = iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
 	assert.Equal(t, line, text[23:])
+
+	line, status = iter.Next()
+	assert.Equal(t, status, ITER_NO_MORE)
+	assert.Equal(t, line, "")
 }
 
 func TestLineIter_Next_thereIsNoLineBreakOppotunity(t *testing.T) {
@@ -78,6 +102,10 @@ func TestLineIter_Next_thereIsNoLineBreakOppotunity(t *testing.T) {
 	line, status = iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
 	assert.Equal(t, line, text[20:])
+
+	line, status = iter.Next()
+	assert.Equal(t, status, ITER_NO_MORE)
+	assert.Equal(t, line, "")
 }
 
 func TestLineIter_setIndent(t *testing.T) {
@@ -101,6 +129,10 @@ func TestLineIter_setIndent(t *testing.T) {
 	line, status = iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
 	assert.Equal(t, line, "   "+text[24:])
+
+	line, status = iter.Next()
+	assert.Equal(t, status, ITER_NO_MORE)
+	assert.Equal(t, line, "")
 }
 
 func TestLineIter_resetText(t *testing.T) {
@@ -129,6 +161,10 @@ func TestLineIter_resetText(t *testing.T) {
 	line, status = iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
 	assert.Equal(t, line, text[24:])
+
+	line, status = iter.Next()
+	assert.Equal(t, status, ITER_NO_MORE)
+	assert.Equal(t, line, "")
 }
 
 // This text is quoted from https://go.dev/doc/
@@ -274,6 +310,10 @@ func TestLineIter_Next_tryLongText(t *testing.T) {
 	line, status = iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
 	assert.Equal(t, line, "language.")
+
+	line, status = iter.Next()
+	assert.Equal(t, status, ITER_NO_MORE)
+	assert.Equal(t, line, "")
 }
 
 /*
