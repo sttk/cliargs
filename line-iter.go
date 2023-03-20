@@ -31,7 +31,7 @@ const (
 	lbo_space
 )
 
-type scanLineIter struct {
+type lineIter struct {
 	scanner   *scanner.Scanner
 	buffer    runeBuffer
 	lineWidth int
@@ -39,27 +39,27 @@ type scanLineIter struct {
 	indent    string
 }
 
-func newScanLineIter(text string, lineWidth int) scanLineIter {
+func newLineIter(text string, lineWidth int) lineIter {
 	sc := new(scanner.Scanner)
 	sc.Init(strings.NewReader(text))
 
-	iter := scanLineIter{}
+	iter := lineIter{}
 	iter.scanner = sc
 	iter.buffer = newRuneBuffer(lineWidth)
 	iter.lineWidth = lineWidth
 	return iter
 }
 
-func (iter *scanLineIter) setIndent(indent int) {
+func (iter *lineIter) setIndent(indent int) {
 	iter.indent = strings.Repeat(" ", indent)
 }
 
-func (iter *scanLineIter) resetText(text string) {
+func (iter *lineIter) resetText(text string) {
 	iter.scanner.Init(strings.NewReader(text))
 	iter.buffer.length = 0
 }
 
-func (iter *scanLineIter) Next() (string, IterStatus) {
+func (iter *lineIter) Next() (string, IterStatus) {
 	lineWidth := iter.lineWidth - len(iter.indent)
 
 	var line string

@@ -7,7 +7,7 @@ import (
 
 func TestLineIter_Next_emptyText(t *testing.T) {
 	text := ""
-	iter := newScanLineIter(text, 20)
+	iter := newLineIter(text, 20)
 
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
@@ -20,7 +20,7 @@ func TestLineIter_Next_emptyText(t *testing.T) {
 
 func TestLineIter_Next_oneCharText(t *testing.T) {
 	text := "a"
-	iter := newScanLineIter(text, 20)
+	iter := newLineIter(text, 20)
 
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
@@ -33,7 +33,7 @@ func TestLineIter_Next_oneCharText(t *testing.T) {
 
 func TestLineIter_Next_lessThanLineWidth(t *testing.T) {
 	text := "1234567890123456789"
-	iter := newScanLineIter(text, 20)
+	iter := newLineIter(text, 20)
 
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
@@ -46,7 +46,7 @@ func TestLineIter_Next_lessThanLineWidth(t *testing.T) {
 
 func TestLineIter_Next_equalToLineWidth(t *testing.T) {
 	text := "12345678901234567890"
-	iter := newScanLineIter(text, 20)
+	iter := newLineIter(text, 20)
 
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_NO_MORE)
@@ -59,7 +59,7 @@ func TestLineIter_Next_equalToLineWidth(t *testing.T) {
 
 func TestLineIter_Next_breakAtLineBreakOppotunity(t *testing.T) {
 	text := "1234567890 abcdefghij"
-	iter := newScanLineIter(text, 20)
+	iter := newLineIter(text, 20)
 
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_HAS_MORE)
@@ -76,7 +76,7 @@ func TestLineIter_Next_breakAtLineBreakOppotunity(t *testing.T) {
 
 func TestLineIter_Next_removeHeadingSpaceOfEachLine(t *testing.T) {
 	text := "12345678901234567890   abcdefghij"
-	iter := newScanLineIter(text, 20)
+	iter := newLineIter(text, 20)
 
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_HAS_MORE)
@@ -93,7 +93,7 @@ func TestLineIter_Next_removeHeadingSpaceOfEachLine(t *testing.T) {
 
 func TestLineIter_Next_thereIsNoLineBreakOppotunity(t *testing.T) {
 	text := "12345678901234567890abcdefghij"
-	iter := newScanLineIter(text, 20)
+	iter := newLineIter(text, 20)
 
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_HAS_MORE)
@@ -110,7 +110,7 @@ func TestLineIter_Next_thereIsNoLineBreakOppotunity(t *testing.T) {
 
 func TestLineIter_setIndent(t *testing.T) {
 	text := "12345678901234567890abcdefghij"
-	iter := newScanLineIter(text, 10)
+	iter := newLineIter(text, 10)
 
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_HAS_MORE)
@@ -137,7 +137,7 @@ func TestLineIter_setIndent(t *testing.T) {
 
 func TestLineIter_resetText(t *testing.T) {
 	text := "12345678901234567890"
-	iter := newScanLineIter(text, 12)
+	iter := newLineIter(text, 12)
 
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_HAS_MORE)
@@ -173,7 +173,7 @@ const longText string = `The Go programming language is an open source project t
 Go is expressive, concise, clean, and efficient. Its concurrency mechanisms make it easy to write programs that get the most out of multicore and networked machines, while its novel type system enables flexible and modular program construction. Go compiles quickly to machine code yet has the convenience of garbage collection and the power of run-time reflection. It's a fast, statically typed, compiled language that feels like a dynamically typed, interpreted language.`
 
 func TestLineIter_Next_tryLongText(t *testing.T) {
-	iter := newScanLineIter(longText, 20)
+	iter := newLineIter(longText, 20)
 
 	line, status := iter.Next()
 	assert.Equal(t, status, ITER_HAS_MORE)
@@ -318,7 +318,7 @@ func TestLineIter_Next_tryLongText(t *testing.T) {
 
 /*
 func TestLineIter_Next_printLongText(t *testing.T) {
-	iter := newScanLineIter(longText, 20)
+	iter := newLineIter(longText, 20)
 
 	for {
 		line, status := iter.Next()
@@ -330,7 +330,7 @@ func TestLineIter_Next_printLongText(t *testing.T) {
 }
 
 func TestLineIter_setIndentToLongText(t *testing.T) {
-	iter := newScanLineIter(longText, 40)
+	iter := newLineIter(longText, 40)
 
 	line, status := iter.Next()
 	t.Logf("%v\n", line)
