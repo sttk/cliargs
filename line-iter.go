@@ -62,15 +62,19 @@ func (iter *scanLineIter) resetText(text string) {
 func (iter *scanLineIter) Next() (string, IterStatus) {
 	lineWidth := iter.lineWidth - len(iter.indent)
 
+	var line string
+
 	for r := iter.scanner.Next(); r != scanner.EOF; r = iter.scanner.Next() {
 		lboTyp := lineBreakOppotunity(r)
 
-		var line string
 		if lboTyp == lbo_break {
 			line = string(iter.buffer.slice())
 			iter.lboPos = 0
 			iter.buffer.length = 0
-			return iter.indent + line, ITER_HAS_MORE
+			if len(line) > 0 {
+				line = iter.indent + line
+			}
+			return line, ITER_HAS_MORE
 		}
 
 		if iter.buffer.length == 0 && lboTyp == lbo_space {
@@ -103,7 +107,10 @@ func (iter *scanLineIter) Next() (string, IterStatus) {
 				iter.lboPos = 0
 			}
 
-			return iter.indent + line, ITER_HAS_MORE
+			if len(line) > 0 {
+				line = iter.indent + line
+			}
+			return line, ITER_HAS_MORE
 		}
 
 		iter.buffer.add(r)
@@ -115,7 +122,13 @@ func (iter *scanLineIter) Next() (string, IterStatus) {
 		}
 	}
 
-	return iter.indent + string(iter.buffer.slice()), ITER_NO_MORE
+	line = string(iter.buffer.slice())
+	iter.buffer.length = 0
+
+	if len(line) > 0 {
+		line = iter.indent + line
+	}
+	return line, ITER_NO_MORE
 }
 
 func lineBreakOppotunity(r rune) lboType {
