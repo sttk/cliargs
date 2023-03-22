@@ -177,6 +177,8 @@ func makeOptHelp(title string, cfg OptCfg, indent int) string {
 	return title
 }
 
+// PrintHelp is a function which output a help text to stdout.
+// This function calls MakeHelp function to make a help text inside itself.
 func PrintHelp(usage string, optCfgs []OptCfg, wrapOpts WrapOpts) sabi.Err {
 	iter, err := MakeHelp(usage, optCfgs, wrapOpts)
 	if !err.IsOk() {
