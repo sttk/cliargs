@@ -26,8 +26,8 @@ type /* error reason */ (
 // This struct type has the following field for wrap options: MarginLeft,
 // MarginRight, and Indent.
 // MarginLeft and MarginRight is space widths on both sides, and these are
-// output on all lines.
-// Indent is space width on left side, and this is output on second line or
+// applied to all lines.
+// Indent is a space width on left side, and this is applied to second line or
 // later of each option.
 type WrapOpts struct {
 	MarginLeft  int
@@ -35,7 +35,7 @@ type WrapOpts struct {
 	Indent      int
 }
 
-// HelpIter is a struct type to iterate lines of help texts.
+// HelpIter is a struct type to iterate lines of a help text.
 type HelpIter struct {
 	texts    []string
 	index    int
@@ -56,9 +56,9 @@ func newHelpIter(texts []string, lineWidth, indent, margin int) HelpIter {
 	}
 }
 
-// Next is a method which returns a line of help texts and a status which
+// Next is a method which returns a line of a help text and a status which
 // indicates this HelpIter has more texts or not.
-// If there are more lines, the IterStatus value returned is ITER_HAS_MORE,
+// If there are more lines, the returned IterStatus value is ITER_HAS_MORE,
 // otherwise the value is ITER_NO_MORE.
 func (iter *HelpIter) Next() (string, IterStatus) {
 	if len(iter.texts) == 0 {
@@ -85,9 +85,23 @@ func (iter *HelpIter) Next() (string, IterStatus) {
 	return line, status
 }
 
-// MakeHelp is a function to make a line iterator of help text.
+// MakeHelp is a function to make a line iterator of a help text.
+// This function makes a help text from a usage text, option configurations
+// ([]OptCfg), and wrap options (WrapOpts).
+//
 // A help text consists of an usage section and options section, and options
 // section consists of title parts and description parts.
+// A title part enumerates a option name and aliases, and its description
+// follows the title with an indent, specified in WrapOpts,  in a description
+// part.
+//
+// On the both sides of a help text, left margin and right margin of which size
+// are specified in WrapOpts can be put.
+// These margins are applied to all lines of a help text.
+//
+// The sum of left margin, right margin, and indent have to be less than the
+// line width, because if not, there is no width to output texts.
+// The line width is obtained from the terminal width.
 func MakeHelp(
 	usage string, optCfgs []OptCfg, wrapOpts WrapOpts,
 ) (HelpIter, sabi.Err) {

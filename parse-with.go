@@ -67,7 +67,7 @@ const anyOption = "*"
 // argument.
 // If this field is nil, nothing is done after parsing.
 //
-// Desc is the field to put the description of the option.
+// Desc is the field to set the description of the option.
 type OptCfg struct {
 	Name     string
 	Aliases  []string
