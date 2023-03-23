@@ -1397,3 +1397,22 @@ func TestMakeOptCfgsFor_multipleOptsAndMultipleArgs(t *testing.T) {
 	assert.Equal(t, options.Quux, []string{"A", "B", "C"})
 	assert.Equal(t, options.Corge, []int{20, 21})
 }
+
+func TestMakeOptCfgsFor_optionDescriptions(t *testing.T) {
+	type MyOptions struct {
+		FooBar bool     `opt:"foo-bar,f" optdesc:"FooBar description"`
+		Baz    int      `opt:"baz,b=99" optdesc:"Baz description"`
+		Qux    string   `opt:"=XXX" optdesc:"Qux description"`
+		Quux   []string `opt:"quux=/[A/B/C]" optdesc:"Quux description"`
+		Corge  []int
+	}
+	options := MyOptions{}
+
+	optCfgs, err0 := cliargs.MakeOptCfgsFor(&options)
+	assert.True(t, err0.IsOk())
+	assert.Equal(t, optCfgs[0].Desc, "FooBar description")
+	assert.Equal(t, optCfgs[1].Desc, "Baz description")
+	assert.Equal(t, optCfgs[2].Desc, "Qux description")
+	assert.Equal(t, optCfgs[3].Desc, "Quux description")
+	assert.Equal(t, optCfgs[4].Desc, "")
+}
