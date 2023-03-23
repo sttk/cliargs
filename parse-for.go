@@ -98,7 +98,7 @@ type /* error reason */ (
 // Usage example:
 //
 //	type MyOptions struct {
-//	  FooBar bool     `opt:"foo-bar,f"`
+//	  FooBar bool     `opt:"foo-bar,f" optdesc:"foo bar description"`
 //	  Baz    int      `opt:"baz,b=99"`
 //	  Qux    string   `opt:"=XXX"`
 //	  Quux   []string `opt:"quux=[A,B,C]"`
@@ -166,7 +166,6 @@ func MakeOptCfgsFor(options any) ([]OptCfg, sabi.Err) {
 func newOptCfg(fld reflect.StructField) (OptCfg, sabi.Err) {
 	opt := fld.Tag.Get("opt")
 	arr := strings.SplitN(opt, "=", 2)
-
 	names := strings.Split(arr[0], ",")
 
 	var name string
@@ -213,12 +212,15 @@ func newOptCfg(fld reflect.StructField) (OptCfg, sabi.Err) {
 		}
 	}
 
+	desc := fld.Tag.Get("optdesc")
+
 	return OptCfg{
 		Name:     name,
 		Aliases:  aliases,
 		HasParam: hasParam,
 		IsArray:  isArray,
 		Default:  defaults,
+		Desc:     desc,
 	}, sabi.Ok()
 }
 
