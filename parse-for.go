@@ -94,30 +94,6 @@ type /* error reason */ (
 // string but an empty array.
 // If you want to specify an array which contains only an empty string, write
 // nothing after "=" mark, like `opt:"name="`.
-//
-// Usage example:
-//
-//	type MyOptions struct {
-//	  FooBar bool     `opt:"foo-bar,f" optdesc:"foo bar description"`
-//	  Baz    int      `opt:"baz,b=99"`
-//	  Qux    string   `opt:"=XXX"`
-//	  Quux   []string `opt:"quux=[A,B,C]"`
-//	  Corge  []int
-//	}
-//	options := MyOptions{}
-//
-//	osArgs := []string{
-//	  "--foo-bar", "c1", "-b", "12", "--Qux", "ABC", "c2",
-//	  "--Corge", "20", "--Corge=21",
-//	}
-//
-//	cmdParams, err := ParseFor(osArgs, &options)
-//	cmdParams      // [c1 c2]
-//	options.FooBar // true
-//	options.Baz    // 12
-//	options.Qux    // ABC
-//	options.Quux   // [A B C]
-//	options.Corge  // [20 21]
 func ParseFor(args []string, options any) ([]string, sabi.Err) {
 	optCfgs, err := MakeOptCfgsFor(options)
 	if !err.IsOk() {

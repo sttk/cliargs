@@ -97,19 +97,6 @@ func (args Args) CmdParams() []string {
 // In case of combined short options, only the last short option can take an
 // option parameter.
 // (For example, -abc=3 is equal to -a -b -c=3.)
-//
-// Usage example:
-//
-//	// os.Args[1:]  ==>  [--foo-bar=A -a --baz -bc=3 qux -c=4 quux]
-//	args, err := Parse()
-//	args.HasOpt("a")          // true
-//	args.HasOpt("b")          // true
-//	args.HasOpt("c")          // true
-//	args.HasOpt("foo-bar")    // true
-//	args.HasOpt("baz")        // true
-//	args.OptParam("c")        // 3
-//	args.OptParams("c")       // [3 4]
-//	args.CmdParams()          // [qux quux]
 func Parse() (Args, sabi.Err) {
 	var cmdParams = make([]string, 0)
 	var optParams = make(map[string][]string)

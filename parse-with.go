@@ -102,27 +102,6 @@ type OptCfg struct {
 // arguments, this function basically returns UnconfiguredOption error.
 // If you want to allow other options, add an option configuration of which
 // Name is "*" (but HasParam and IsArray of this configuration is ignored).
-//
-// Usage example:
-//
-//	osArgs := []string{"--foo-bar", "quz", "--baz", "1", "-z=2", "-X", "quux"}
-//	optCfgs := []OptCfg{
-//		OptCfg{Name:"foo-bar"},
-//		OptCfg{Name:"baz", Aliases:[]string{"z"}, HasParam:true, IsArray:true},
-//		OptCfg{Name:"corge", HasParam:true, Default:[]string{"99"}},
-//		OptCfg{Name:"*"},
-//	}
-//
-//	args, err := ParseWith(osArgs, optCfgs)
-//	args.HasOpt("foo-bar")  // true
-//	args.HasOpt("baz")      // true
-//	args.HasOpt("X")        // true, due to "*" config
-//	args.HasOpt("corge")    // true, due to .Default.
-//	args.OptParam("baz")    // 1
-//	args.OptParams("baz")   // [1 2]
-//	args.OptParam("corge")  // 99
-//	args.OptParams("corge") // [99]
-//	args.CmdParams()        // [qux quux]
 func ParseWith(args []string, optCfgs []OptCfg) (Args, sabi.Err) {
 	hasAnyOpt := false
 	cfgMap := make(map[string]int)
