@@ -1436,3 +1436,23 @@ func TestParseFor_optCfgHasUnsupportedType(t *testing.T) {
 		assert.Fail(t, err.Error())
 	}
 }
+
+func TestParseFor_argIsNotPointer(t *testing.T) {
+	type MyOptions struct {
+		FooBar bool     `opt:"foo-bar,f" optdesc:"FooBar description"`
+		Baz    int      `opt:"baz,b=99" optdesc:"Baz description"`
+		Qux    string   `opt:"=XXX" optdesc:"Qux description"`
+		Quux   []string `opt:"quux=/[A/B/C]" optdesc:"Quux description"`
+		Corge  []int
+	}
+	options := MyOptions{}
+
+	_, err := cliargs.MakeOptCfgsFor(options)
+
+	assert.False(t, err.IsOk())
+	switch err.Reason().(type) {
+	case cliargs.OptionStoreIsNotChangeable:
+	default:
+		assert.Fail(t, err.Error())
+	}
+}
