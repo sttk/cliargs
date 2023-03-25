@@ -47,8 +47,9 @@ type /* error reason */ (
 	// field of the option store is neither a boolean, a number, a string, nor
 	// an array of numbers or strings.
 	IllegalOptionType struct {
-		Field string
-		Type  reflect.Type
+		Option string
+		Field  string
+		Type   reflect.Type
 	}
 )
 
@@ -129,7 +130,7 @@ func MakeOptCfgsFor(options any) ([]OptCfg, sabi.Err) {
 			return nil, err
 		}
 		var setter func([]string) sabi.Err
-		setter, err = newValueSetter(optCfgs[i].Name, v.Field(i))
+		setter, err = newValueSetter(optCfgs[i].Name, t.Field(i).Name, v.Field(i))
 		if !err.IsOk() {
 			return nil, err
 		}
@@ -201,84 +202,82 @@ func newOptCfg(fld reflect.StructField) (OptCfg, sabi.Err) {
 }
 
 func newValueSetter(
-	name string,
+	optName string,
+	fldName string,
 	fld reflect.Value,
 ) (func([]string) sabi.Err, sabi.Err) {
 	t := fld.Type()
 	switch t.Kind() {
 	case reflect.Bool:
-		return newBoolSetter(name, fld)
+		return newBoolSetter(optName, fld)
 	case reflect.Int:
-		return newIntSetter(name, fld, strconv.IntSize)
+		return newIntSetter(optName, fld, strconv.IntSize)
 	case reflect.Int8:
-		return newIntSetter(name, fld, 8)
+		return newIntSetter(optName, fld, 8)
 	case reflect.Int16:
-		return newIntSetter(name, fld, 16)
+		return newIntSetter(optName, fld, 16)
 	case reflect.Int32:
-		return newIntSetter(name, fld, 32)
+		return newIntSetter(optName, fld, 32)
 	case reflect.Int64:
-		return newIntSetter(name, fld, 64)
+		return newIntSetter(optName, fld, 64)
 	case reflect.Uint:
-		return newUintSetter(name, fld, strconv.IntSize)
+		return newUintSetter(optName, fld, strconv.IntSize)
 	case reflect.Uint8:
-		return newUintSetter(name, fld, 8)
+		return newUintSetter(optName, fld, 8)
 	case reflect.Uint16:
-		return newUintSetter(name, fld, 16)
+		return newUintSetter(optName, fld, 16)
 	case reflect.Uint32:
-		return newUintSetter(name, fld, 32)
+		return newUintSetter(optName, fld, 32)
 	case reflect.Uint64:
-		return newUintSetter(name, fld, 64)
+		return newUintSetter(optName, fld, 64)
 	case reflect.Float32:
-		return newFloatSetter(name, fld, 32)
+		return newFloatSetter(optName, fld, 32)
 	case reflect.Float64:
-		return newFloatSetter(name, fld, 64)
+		return newFloatSetter(optName, fld, 64)
 	case reflect.Array | reflect.Slice:
 		elm := t.Elem()
 		switch elm.Kind() {
 		case reflect.Int:
-			return newIntArraySetter(name, fld, strconv.IntSize)
+			return newIntArraySetter(optName, fld, strconv.IntSize)
 		case reflect.Int8:
-			return newIntArraySetter(name, fld, 8)
+			return newIntArraySetter(optName, fld, 8)
 		case reflect.Int16:
-			return newIntArraySetter(name, fld, 16)
+			return newIntArraySetter(optName, fld, 16)
 		case reflect.Int32:
-			return newIntArraySetter(name, fld, 32)
+			return newIntArraySetter(optName, fld, 32)
 		case reflect.Int64:
-			return newIntArraySetter(name, fld, 64)
+			return newIntArraySetter(optName, fld, 64)
 		case reflect.Uint:
-			return newUintArraySetter(name, fld, strconv.IntSize)
+			return newUintArraySetter(optName, fld, strconv.IntSize)
 		case reflect.Uint8:
-			return newUintArraySetter(name, fld, 8)
+			return newUintArraySetter(optName, fld, 8)
 		case reflect.Uint16:
-			return newUintArraySetter(name, fld, 16)
+			return newUintArraySetter(optName, fld, 16)
 		case reflect.Uint32:
-			return newUintArraySetter(name, fld, 32)
+			return newUintArraySetter(optName, fld, 32)
 		case reflect.Uint64:
-			return newUintArraySetter(name, fld, 64)
+			return newUintArraySetter(optName, fld, 64)
 		case reflect.Float32:
-			return newFloatArraySetter(name, fld, 32)
+			return newFloatArraySetter(optName, fld, 32)
 		case reflect.Float64:
-			return newFloatArraySetter(name, fld, 64)
+			return newFloatArraySetter(optName, fld, 64)
 		case reflect.String:
-			return newStringArraySetter(name, fld)
+			return newStringArraySetter(optName, fld)
 		default:
-			return newIllegalOptionTypeErr(name, t)
+			return newIllegalOptionTypeErr(optName, fldName, t)
 		}
 	case reflect.String:
-		return newStringSetter(name, fld)
+		return newStringSetter(optName, fld)
 	default:
-		return newIllegalOptionTypeErr(name, t)
+		return newIllegalOptionTypeErr(optName, fldName, t)
 	}
 }
 
 func newIllegalOptionTypeErr(
-	name string, t reflect.Type,
+	optName string, fldName string, t reflect.Type,
 ) (func([]string) sabi.Err, sabi.Err) {
-	fn := func([]string) sabi.Err {
-		return sabi.Ok()
-	}
-	r := IllegalOptionType{Field: name, Type: t}
-	return fn, sabi.NewErr(r)
+	r := IllegalOptionType{Option: optName, Field: fldName, Type: t}
+	return nil, sabi.NewErr(r)
 }
 
 func newBoolSetter(

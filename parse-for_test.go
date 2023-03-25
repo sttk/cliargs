@@ -1416,3 +1416,23 @@ func TestMakeOptCfgsFor_optionDescriptions(t *testing.T) {
 	assert.Equal(t, optCfgs[3].Desc, "Quux description")
 	assert.Equal(t, optCfgs[4].Desc, "")
 }
+
+func TestParseFor_optCfgHasUnsupportedType(t *testing.T) {
+	type A struct{ Name string }
+	type MyOptions struct {
+		FooBar A `opt:"foo-bar,f" optdesc:"FooBar description"`
+	}
+
+	options := MyOptions{}
+
+	_, err := cliargs.MakeOptCfgsFor(&options)
+	assert.False(t, err.IsOk())
+	switch err.Reason().(type) {
+	case cliargs.IllegalOptionType:
+		assert.Equal(t, err.Get("Option"), "foo-bar")
+		assert.Equal(t, err.Get("Field"), "FooBar")
+		assert.Equal(t, err.Get("Type").(reflect.Type).Name(), "A")
+	default:
+		assert.Fail(t, err.Error())
+	}
+}
