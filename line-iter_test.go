@@ -1,6 +1,7 @@
 package cliargs
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -316,13 +317,12 @@ func TestLineIter_Next_tryLongText(t *testing.T) {
 	assert.Equal(t, line, "")
 }
 
-/*
 func TestLineIter_Next_printLongText(t *testing.T) {
 	iter := newLineIter(longText, 20)
 
 	for {
 		line, status := iter.Next()
-		t.Logf("%v\n", line)
+		fmt.Println(line)
 		if status == ITER_NO_MORE {
 			break
 		}
@@ -333,7 +333,7 @@ func TestLineIter_setIndentToLongText(t *testing.T) {
 	iter := newLineIter(longText, 40)
 
 	line, status := iter.Next()
-	t.Logf("%v\n", line)
+	fmt.Println(line)
 
 	iter.setIndent(8)
 
@@ -342,7 +342,19 @@ func TestLineIter_setIndentToLongText(t *testing.T) {
 			break
 		}
 		line, status = iter.Next()
-		t.Logf("%v\n", line)
+		fmt.Println(line)
 	}
 }
-*/
+
+func TestLineIter_textContainsNonPrintChar(t *testing.T) {
+	text := "abcdefg\u0002hijklmn"
+	iter := newLineIter(text, 10)
+
+	line, status := iter.Next()
+	assert.Equal(t, line, "abcdefghij")
+	assert.Equal(t, status, ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "klmn")
+	assert.Equal(t, status, ITER_NO_MORE)
+}
