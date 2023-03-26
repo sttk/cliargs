@@ -20,6 +20,7 @@ type /* error reason */ (
 	// FailToParseInt is an error reaason which indicates that an option
 	// parameter in command line arguments should be an integer but is invalid.
 	FailToParseInt struct {
+		Option  string
 		Field   string
 		Input   string
 		BitSize int
@@ -29,6 +30,7 @@ type /* error reason */ (
 	// parameter in command line arguments should be an unsigned integer but is
 	// invalid.
 	FailToParseUint struct {
+		Option  string
 		Field   string
 		Input   string
 		BitSize int
@@ -38,6 +40,7 @@ type /* error reason */ (
 	// parameter in command line arguments should be a floating point number but
 	// is invalid.
 	FailToParseFloat struct {
+		Option  string
 		Field   string
 		Input   string
 		BitSize int
@@ -209,65 +212,65 @@ func newValueSetter(
 	t := fld.Type()
 	switch t.Kind() {
 	case reflect.Bool:
-		return newBoolSetter(optName, fld)
+		return newBoolSetter(optName, fldName, fld)
 	case reflect.Int:
-		return newIntSetter(optName, fld, strconv.IntSize)
+		return newIntSetter(optName, fldName, fld, strconv.IntSize)
 	case reflect.Int8:
-		return newIntSetter(optName, fld, 8)
+		return newIntSetter(optName, fldName, fld, 8)
 	case reflect.Int16:
-		return newIntSetter(optName, fld, 16)
+		return newIntSetter(optName, fldName, fld, 16)
 	case reflect.Int32:
-		return newIntSetter(optName, fld, 32)
+		return newIntSetter(optName, fldName, fld, 32)
 	case reflect.Int64:
-		return newIntSetter(optName, fld, 64)
+		return newIntSetter(optName, fldName, fld, 64)
 	case reflect.Uint:
-		return newUintSetter(optName, fld, strconv.IntSize)
+		return newUintSetter(optName, fldName, fld, strconv.IntSize)
 	case reflect.Uint8:
-		return newUintSetter(optName, fld, 8)
+		return newUintSetter(optName, fldName, fld, 8)
 	case reflect.Uint16:
-		return newUintSetter(optName, fld, 16)
+		return newUintSetter(optName, fldName, fld, 16)
 	case reflect.Uint32:
-		return newUintSetter(optName, fld, 32)
+		return newUintSetter(optName, fldName, fld, 32)
 	case reflect.Uint64:
-		return newUintSetter(optName, fld, 64)
+		return newUintSetter(optName, fldName, fld, 64)
 	case reflect.Float32:
-		return newFloatSetter(optName, fld, 32)
+		return newFloatSetter(optName, fldName, fld, 32)
 	case reflect.Float64:
-		return newFloatSetter(optName, fld, 64)
+		return newFloatSetter(optName, fldName, fld, 64)
 	case reflect.Array | reflect.Slice:
 		elm := t.Elem()
 		switch elm.Kind() {
 		case reflect.Int:
-			return newIntArraySetter(optName, fld, strconv.IntSize)
+			return newIntArraySetter(optName, fldName, fld, strconv.IntSize)
 		case reflect.Int8:
-			return newIntArraySetter(optName, fld, 8)
+			return newIntArraySetter(optName, fldName, fld, 8)
 		case reflect.Int16:
-			return newIntArraySetter(optName, fld, 16)
+			return newIntArraySetter(optName, fldName, fld, 16)
 		case reflect.Int32:
-			return newIntArraySetter(optName, fld, 32)
+			return newIntArraySetter(optName, fldName, fld, 32)
 		case reflect.Int64:
-			return newIntArraySetter(optName, fld, 64)
+			return newIntArraySetter(optName, fldName, fld, 64)
 		case reflect.Uint:
-			return newUintArraySetter(optName, fld, strconv.IntSize)
+			return newUintArraySetter(optName, fldName, fld, strconv.IntSize)
 		case reflect.Uint8:
-			return newUintArraySetter(optName, fld, 8)
+			return newUintArraySetter(optName, fldName, fld, 8)
 		case reflect.Uint16:
-			return newUintArraySetter(optName, fld, 16)
+			return newUintArraySetter(optName, fldName, fld, 16)
 		case reflect.Uint32:
-			return newUintArraySetter(optName, fld, 32)
+			return newUintArraySetter(optName, fldName, fld, 32)
 		case reflect.Uint64:
-			return newUintArraySetter(optName, fld, 64)
+			return newUintArraySetter(optName, fldName, fld, 64)
 		case reflect.Float32:
-			return newFloatArraySetter(optName, fld, 32)
+			return newFloatArraySetter(optName, fldName, fld, 32)
 		case reflect.Float64:
-			return newFloatArraySetter(optName, fld, 64)
+			return newFloatArraySetter(optName, fldName, fld, 64)
 		case reflect.String:
-			return newStringArraySetter(optName, fld)
+			return newStringArraySetter(optName, fldName, fld)
 		default:
 			return newIllegalOptionTypeErr(optName, fldName, t)
 		}
 	case reflect.String:
-		return newStringSetter(optName, fld)
+		return newStringSetter(optName, fldName, fld)
 	default:
 		return newIllegalOptionTypeErr(optName, fldName, t)
 	}
@@ -281,7 +284,7 @@ func newIllegalOptionTypeErr(
 }
 
 func newBoolSetter(
-	name string, fld reflect.Value,
+	optName string, fldName string, fld reflect.Value,
 ) (func([]string) sabi.Err, sabi.Err) {
 	fn := func(s []string) sabi.Err {
 		if s != nil {
@@ -293,7 +296,7 @@ func newBoolSetter(
 }
 
 func newIntSetter(
-	name string, fld reflect.Value, bitSize int,
+	optName string, fldName string, fld reflect.Value, bitSize int,
 ) (func([]string) sabi.Err, sabi.Err) {
 	fn := func(s []string) sabi.Err {
 		if len(s) == 0 {
@@ -301,7 +304,9 @@ func newIntSetter(
 		}
 		n, e := strconv.ParseInt(s[0], 0, bitSize)
 		if e != nil {
-			r := FailToParseInt{Field: name, Input: s[0], BitSize: bitSize}
+			r := FailToParseInt{
+				Option: optName, Field: fldName, Input: s[0], BitSize: bitSize,
+			}
 			return sabi.NewErr(r, e)
 		}
 		fld.SetInt(n)
@@ -311,7 +316,7 @@ func newIntSetter(
 }
 
 func newUintSetter(
-	name string, fld reflect.Value, bitSize int,
+	optName string, fldName string, fld reflect.Value, bitSize int,
 ) (func([]string) sabi.Err, sabi.Err) {
 	fn := func(s []string) sabi.Err {
 		if len(s) == 0 {
@@ -319,7 +324,9 @@ func newUintSetter(
 		}
 		n, e := strconv.ParseUint(s[0], 0, bitSize)
 		if e != nil {
-			r := FailToParseUint{Field: name, Input: s[0], BitSize: bitSize}
+			r := FailToParseUint{
+				Option: optName, Field: fldName, Input: s[0], BitSize: bitSize,
+			}
 			return sabi.NewErr(r, e)
 		}
 		fld.SetUint(n)
@@ -329,7 +336,7 @@ func newUintSetter(
 }
 
 func newFloatSetter(
-	name string, fld reflect.Value, bitSize int,
+	optName string, fldName string, fld reflect.Value, bitSize int,
 ) (func([]string) sabi.Err, sabi.Err) {
 	fn := func(s []string) sabi.Err {
 		if len(s) == 0 {
@@ -337,7 +344,9 @@ func newFloatSetter(
 		}
 		n, e := strconv.ParseFloat(s[0], bitSize)
 		if e != nil {
-			r := FailToParseFloat{Field: name, Input: s[0], BitSize: bitSize}
+			r := FailToParseFloat{
+				Option: optName, Field: fldName, Input: s[0], BitSize: bitSize,
+			}
 			return sabi.NewErr(r, e)
 		}
 		fld.SetFloat(n)
@@ -347,7 +356,7 @@ func newFloatSetter(
 }
 
 func newStringSetter(
-	name string, fld reflect.Value,
+	optName string, fldName string, fld reflect.Value,
 ) (func([]string) sabi.Err, sabi.Err) {
 	fn := func(s []string) sabi.Err {
 		if len(s) == 0 {
@@ -360,7 +369,7 @@ func newStringSetter(
 }
 
 func newIntArraySetter(
-	name string, fld reflect.Value, bitSize int,
+	optName string, fldName string, fld reflect.Value, bitSize int,
 ) (func([]string) sabi.Err, sabi.Err) {
 	fn := func(s []string) sabi.Err {
 		if s == nil {
@@ -377,7 +386,9 @@ func newIntArraySetter(
 		for i := 0; i < n; i++ {
 			v, e := strconv.ParseInt(s[i], 0, bitSize)
 			if e != nil {
-				r := FailToParseInt{Field: name, Input: s[i], BitSize: bitSize}
+				r := FailToParseInt{
+					Option: optName, Field: fldName, Input: s[i], BitSize: bitSize,
+				}
 				return sabi.NewErr(r, e)
 			}
 			a[i] = reflect.ValueOf(v).Convert(t)
@@ -389,7 +400,7 @@ func newIntArraySetter(
 }
 
 func newUintArraySetter(
-	name string, fld reflect.Value, bitSize int,
+	optName string, fldName string, fld reflect.Value, bitSize int,
 ) (func([]string) sabi.Err, sabi.Err) {
 	fn := func(s []string) sabi.Err {
 		if s == nil {
@@ -406,7 +417,9 @@ func newUintArraySetter(
 		for i := 0; i < n; i++ {
 			v, e := strconv.ParseUint(s[i], 0, bitSize)
 			if e != nil {
-				r := FailToParseUint{Field: name, Input: s[i], BitSize: bitSize}
+				r := FailToParseUint{
+					Option: optName, Field: fldName, Input: s[i], BitSize: bitSize,
+				}
 				return sabi.NewErr(r, e)
 			}
 			a[i] = reflect.ValueOf(v).Convert(t)
@@ -418,7 +431,7 @@ func newUintArraySetter(
 }
 
 func newFloatArraySetter(
-	name string, fld reflect.Value, bitSize int,
+	optName string, fldName string, fld reflect.Value, bitSize int,
 ) (func([]string) sabi.Err, sabi.Err) {
 	fn := func(s []string) sabi.Err {
 		if s == nil {
@@ -435,7 +448,9 @@ func newFloatArraySetter(
 		for i := 0; i < n; i++ {
 			v, e := strconv.ParseFloat(s[i], bitSize)
 			if e != nil {
-				r := FailToParseFloat{Field: name, Input: s[i], BitSize: bitSize}
+				r := FailToParseFloat{
+					Option: optName, Field: fldName, Input: s[i], BitSize: bitSize,
+				}
 				return sabi.NewErr(r, e)
 			}
 			a[i] = reflect.ValueOf(v).Convert(t)
@@ -447,7 +462,7 @@ func newFloatArraySetter(
 }
 
 func newStringArraySetter(
-	name string, fld reflect.Value,
+	optName string, fldName string, fld reflect.Value,
 ) (func([]string) sabi.Err, sabi.Err) {
 	fn := func(s []string) sabi.Err {
 		if s == nil {

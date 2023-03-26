@@ -1113,7 +1113,7 @@ func TestParseFor_ignoreEmptyDefaultValueIfOptionIsBool(t *testing.T) {
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsInt(t *testing.T) {
 	type MyOptions struct {
-		IntVar int `opt:"="`
+		IntVar int `opt:"int-var="`
 	}
 	options := MyOptions{}
 
@@ -1124,6 +1124,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsInt(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.FailToParseInt:
+		assert.Equal(t, err.Get("Option"), "int-var")
 		assert.Equal(t, err.Get("Field"), "IntVar")
 		assert.Equal(t, err.Get("Input"), "")
 		assert.Equal(t, err.Get("BitSize"), 64)
@@ -1134,7 +1135,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsInt(t *testing.T) {
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsUint(t *testing.T) {
 	type MyOptions struct {
-		UintVar uint `opt:"="`
+		UintVar uint `opt:"uint-var="`
 	}
 	options := MyOptions{}
 
@@ -1145,6 +1146,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUint(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.FailToParseUint:
+		assert.Equal(t, err.Get("Option"), "uint-var")
 		assert.Equal(t, err.Get("Field"), "UintVar")
 		assert.Equal(t, err.Get("Input"), "")
 		assert.Equal(t, err.Get("BitSize"), 64)
@@ -1155,7 +1157,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUint(t *testing.T) {
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsFloat(t *testing.T) {
 	type MyOptions struct {
-		Float64Var float64 `opt:"="`
+		Float64Var float64 `opt:"float-var="`
 	}
 	options := MyOptions{}
 
@@ -1166,6 +1168,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloat(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.FailToParseFloat:
+		assert.Equal(t, err.Get("Option"), "float-var")
 		assert.Equal(t, err.Get("Field"), "Float64Var")
 		assert.Equal(t, err.Get("Input"), "")
 		assert.Equal(t, err.Get("BitSize"), 64)
@@ -1176,7 +1179,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloat(t *testing.T) {
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsString(t *testing.T) {
 	type MyOptions struct {
-		StringVar string `opt:"="`
+		StringVar string `opt:"str-var="`
 	}
 	options := MyOptions{}
 
@@ -1190,7 +1193,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsString(t *testing.T) {
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsIntArray(t *testing.T) {
 	type MyOptions struct {
-		IntArr []int `opt:"="`
+		IntArr []int `opt:"int-arr="`
 	}
 	options := MyOptions{}
 
@@ -1201,6 +1204,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsIntArray(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.FailToParseInt:
+		assert.Equal(t, err.Get("Option"), "int-arr")
 		assert.Equal(t, err.Get("Field"), "IntArr")
 		assert.Equal(t, err.Get("Input"), "")
 		assert.Equal(t, err.Get("BitSize"), 64)
@@ -1211,7 +1215,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsIntArray(t *testing.T) {
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsUintArray(t *testing.T) {
 	type MyOptions struct {
-		UintArr []uint `opt:"="`
+		UintArr []uint `opt:"uint-arr="`
 	}
 	options := MyOptions{}
 
@@ -1222,6 +1226,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUintArray(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.FailToParseUint:
+		assert.Equal(t, err.Get("Option"), "uint-arr")
 		assert.Equal(t, err.Get("Field"), "UintArr")
 		assert.Equal(t, err.Get("Input"), "")
 		assert.Equal(t, err.Get("BitSize"), 64)
@@ -1232,7 +1237,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUintArray(t *testing.T) {
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsFloatArray(t *testing.T) {
 	type MyOptions struct {
-		Float64Arr []float64 `opt:"="`
+		Float64Arr []float64 `opt:"float-arr="`
 	}
 	options := MyOptions{}
 
@@ -1243,6 +1248,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloatArray(t *testing.T) {
 	assert.False(t, err.IsOk())
 	switch err.Reason().(type) {
 	case cliargs.FailToParseFloat:
+		assert.Equal(t, err.Get("Option"), "float-arr")
 		assert.Equal(t, err.Get("Field"), "Float64Arr")
 		assert.Equal(t, err.Get("Input"), "")
 		assert.Equal(t, err.Get("BitSize"), 64)
