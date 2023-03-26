@@ -1404,6 +1404,25 @@ func TestMakeOptCfgsFor_multipleOptsAndMultipleArgs(t *testing.T) {
 	assert.Equal(t, options.Corge, []int{20, 21})
 }
 
+func TestParseFor_emptyArrayOfDefaultValueWithNotCommaSeparator(t *testing.T) {
+	type MyOptions struct {
+		Foo []int     `opt:"foo=/[]"`
+		Bar []uint    `opt:"bar=|[]"`
+		Baz []float64 `opt:"baz=@[]"`
+		Qux []string  `opt:"baz=![]"`
+	}
+	options := MyOptions{}
+
+	args := []string{}
+	cmdParams, err := cliargs.ParseFor(args, &options)
+	assert.True(t, err.IsOk())
+	assert.Equal(t, cmdParams, []string{})
+	assert.Equal(t, options.Foo, []int{})
+	assert.Equal(t, options.Bar, []uint{})
+	assert.Equal(t, options.Baz, []float64{})
+	assert.Equal(t, options.Qux, []string{})
+}
+
 func TestMakeOptCfgsFor_optionDescriptions(t *testing.T) {
 	type MyOptions struct {
 		FooBar bool     `opt:"foo-bar,f" optdesc:"FooBar description"`

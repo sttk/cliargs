@@ -128,10 +128,8 @@ func MakeOptCfgsFor(options any) ([]OptCfg, sabi.Err) {
 	var err sabi.Err
 
 	for i := 0; i < n; i++ {
-		optCfgs[i], err = newOptCfg(t.Field(i))
-		if !err.IsOk() {
-			return nil, err
-		}
+		optCfgs[i] = newOptCfg(t.Field(i))
+
 		var setter func([]string) sabi.Err
 		setter, err = newValueSetter(optCfgs[i].Name, t.Field(i).Name, v.Field(i))
 		if !err.IsOk() {
@@ -143,7 +141,7 @@ func MakeOptCfgsFor(options any) ([]OptCfg, sabi.Err) {
 	return optCfgs, sabi.Ok()
 }
 
-func newOptCfg(fld reflect.StructField) (OptCfg, sabi.Err) {
+func newOptCfg(fld reflect.StructField) OptCfg {
 	opt := fld.Tag.Get("opt")
 	arr := strings.SplitN(opt, "=", 2)
 	names := strings.Split(arr[0], ",")
@@ -201,7 +199,7 @@ func newOptCfg(fld reflect.StructField) (OptCfg, sabi.Err) {
 		IsArray:  isArray,
 		Default:  defaults,
 		Desc:     desc,
-	}, sabi.Ok()
+	}
 }
 
 func newValueSetter(
