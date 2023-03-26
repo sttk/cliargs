@@ -32,11 +32,12 @@ const (
 )
 
 type lineIter struct {
-	scanner   *scanner.Scanner
-	buffer    runeBuffer
-	lineWidth int
-	lboPos    int
-	indent    string
+	scanner *scanner.Scanner
+	buffer  runeBuffer
+	width   [2]int /* 0: width before lbo, 1: width after lbo */
+	lboPos  int
+	limit   int
+	indent  string
 }
 
 func newLineIter(text string, lineWidth int) lineIter {
@@ -46,7 +47,7 @@ func newLineIter(text string, lineWidth int) lineIter {
 	iter := lineIter{}
 	iter.scanner = sc
 	iter.buffer = newRuneBuffer(lineWidth)
-	iter.lineWidth = lineWidth
+	iter.limit = lineWidth
 	return iter
 }
 
@@ -57,10 +58,13 @@ func (iter *lineIter) setIndent(indent int) {
 func (iter *lineIter) resetText(text string) {
 	iter.scanner.Init(strings.NewReader(text))
 	iter.buffer.length = 0
+	iter.width[0] = 0
+	iter.width[1] = 0
+	iter.lboPos = 0
 }
 
 func (iter *lineIter) Next() (string, IterStatus) {
-	lineWidth := iter.lineWidth - len(iter.indent)
+	limit := iter.limit - len(iter.indent)
 
 	var line string
 
@@ -69,8 +73,10 @@ func (iter *lineIter) Next() (string, IterStatus) {
 
 		if lboTyp == lbo_break {
 			line = string(iter.buffer.slice())
-			iter.lboPos = 0
 			iter.buffer.length = 0
+			iter.width[0] = 0
+			iter.width[1] = 0
+			iter.lboPos = 0
 			if len(line) > 0 {
 				line = iter.indent + line
 			}
@@ -81,16 +87,18 @@ func (iter *lineIter) Next() (string, IterStatus) {
 			continue
 		}
 
-		length := iter.buffer.length + runeWidth(r)
+		runeW := runeWidth(r)
 		lboPos := iter.lboPos
 
-		if length > lineWidth {
+		if (iter.width[0] + iter.width[1] + runeW) > limit {
 			switch lboTyp {
 			case lbo_before, lbo_both, lbo_space:
 				lboPos = iter.buffer.length
 			}
 			if lboPos == 0 {
-				lboPos = lineWidth
+				//iter.width[0] += iter.width[1]
+				iter.width[1] = 0
+				lboPos = iter.buffer.length
 			}
 
 			line := string(iter.buffer.runes[0:lboPos])
@@ -98,12 +106,23 @@ func (iter *lineIter) Next() (string, IterStatus) {
 
 			switch lboTyp {
 			case lbo_space:
+				iter.width[0] = 0
+				iter.width[1] = 0
 				iter.lboPos = 0
+			//case lbo_before:
+			//	iter.buffer.add(r)
+			//	iter.width[0] = runeW
+			//	iter.width[1] = 0
+			//	iter.lboPos = 0
 			case lbo_after, lbo_both:
 				iter.buffer.add(r)
+				iter.width[0] = iter.width[1] + runeW
+				iter.width[1] = 0
 				iter.lboPos = iter.buffer.length
 			default:
 				iter.buffer.add(r)
+				iter.width[0] = iter.width[1] + runeW
+				iter.width[1] = 0
 				iter.lboPos = 0
 			}
 
@@ -113,12 +132,20 @@ func (iter *lineIter) Next() (string, IterStatus) {
 			return line, ITER_HAS_MORE
 		}
 
-		iter.buffer.add(r)
+		if runeW > 0 {
+			iter.buffer.add(r)
+		}
 		switch lboTyp {
-		case lbo_before:
-			iter.lboPos = iter.buffer.length - 1
+		//case lbo_before:
+		//	iter.lboPos = iter.buffer.length - 1
+		//	iter.width[0] += iter.width[1]
+		//	iter.width[1] = runeW
 		case lbo_after, lbo_both, lbo_space:
 			iter.lboPos = iter.buffer.length
+			iter.width[0] += iter.width[1] + runeW
+			iter.width[1] = 0
+		default:
+			iter.width[1] += runeW
 		}
 	}
 
