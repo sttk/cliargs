@@ -4,7 +4,6 @@ go 1.20
 
 require (
 	github.com/stretchr/testify v1.8.2
-	github.com/sttk-go/sabi v0.2.0
 	golang.org/x/term v0.6.0
 )
 

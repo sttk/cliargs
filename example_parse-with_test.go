@@ -28,7 +28,7 @@ func ExampleParseWith() {
 	}
 
 	args, err := cliargs.ParseWith(osArgs, optCfgs)
-	fmt.Printf("err.IsOk() = %v\n", err.IsOk())
+	fmt.Printf("err = %v\n", err)
 	fmt.Printf("args.HasOpt(\"foo-bar\") = %v\n", args.HasOpt("foo-bar"))
 	fmt.Printf("args.HasOpt(\"baz\") = %v\n", args.HasOpt("baz"))
 	fmt.Printf("args.HasOpt(\"X\") = %v\n", args.HasOpt("X"))
@@ -40,7 +40,7 @@ func ExampleParseWith() {
 	fmt.Printf("args.CmdParams() = %v\n", args.CmdParams())
 
 	// Output:
-	// err.IsOk() = true
+	// err = <nil>
 	// args.HasOpt("foo-bar") = true
 	// args.HasOpt("baz") = true
 	// args.HasOpt("X") = true

@@ -21,7 +21,7 @@ func TestParse_zeroArg(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, args.CmdParams(), []string{})
 	assert.False(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "")
@@ -46,7 +46,7 @@ func TestParse_oneNonOptArg(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, args.CmdParams(), []string{"abcd"})
 	assert.False(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "")
@@ -71,7 +71,7 @@ func TestParse_oneLongOpt(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, args.CmdParams(), []string{})
 	assert.False(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "")
@@ -96,7 +96,7 @@ func TestParse_oneLongOptWithParam(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, args.CmdParams(), []string{})
 	assert.False(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "")
@@ -121,7 +121,7 @@ func TestParse_oneShortOpt(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, args.CmdParams(), []string{})
 	assert.False(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "")
@@ -146,7 +146,7 @@ func TestParse_oneShortOptWithParam(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, args.CmdParams(), []string{})
 	assert.True(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "123")
@@ -171,7 +171,7 @@ func TestParse_oneArgByMultipleShortOpts(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, len(args.CmdParams()), 0)
 	assert.True(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "")
@@ -182,7 +182,7 @@ func TestParse_oneArgByMultipleShortOpts(t *testing.T) {
 	assert.Equal(t, args.OptParams("s"), []string{})
 	assert.False(t, args.HasOpt("silent"))
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, args.CmdParams(), []string{})
 	assert.True(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "")
@@ -207,7 +207,7 @@ func TestParse_oneArgByMultipleShortOptsWithParam(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, args.CmdParams(), []string{})
 	assert.True(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "123")
@@ -232,7 +232,7 @@ func TestParse_longOptNameIncludesHyphenMark(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, len(args.CmdParams()), 0)
 	assert.True(t, args.HasOpt("aaa-bbb-ccc"))
 	assert.Equal(t, args.OptParam("aaa-bbb-ccc"), "123")
@@ -248,7 +248,7 @@ func TestParse_optParamsIncludesEqualMark(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, args.CmdParams(), []string{})
 	assert.True(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "b=c")
@@ -273,7 +273,7 @@ func TestParse_optParamsIncludesMarks(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, args.CmdParams(), []string{})
 	assert.True(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "1,2-3")
@@ -300,10 +300,11 @@ func TestParse_illegalLongOptIfIncludingInvalidChar(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "OptionHasInvalidChar")
+	switch err.(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, err.Get("Option"), "abc%def")
+		assert.Equal(t, err.(cliargs.OptionHasInvalidChar).Option, "abc%def")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -331,10 +332,11 @@ func TestParse_illegalLongOptIfFirstCharIsNumber(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "OptionHasInvalidChar")
+	switch err.(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, err.Get("Option"), "1abc")
+		assert.Equal(t, err.(cliargs.OptionHasInvalidChar).Option, "1abc")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -362,9 +364,11 @@ func TestParse_illegalLongOptIfFirstCharIsHyphen(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "OptionHasInvalidChar")
+	switch err.(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, err.Get("Option"), "-aaa=123")
+		assert.Equal(t, err.(cliargs.OptionHasInvalidChar).Option, "-aaa=123")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -394,10 +398,11 @@ func TestParse_IllegalCharInShortOpt(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "OptionHasInvalidChar")
+	switch err.(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, err.Get("Option"), "@")
+		assert.Equal(t, err.(cliargs.OptionHasInvalidChar).Option, "@")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -430,7 +435,7 @@ func TestParse_useEndOptMark(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, args.CmdParams(), []string{"-s", "--", "-s@", "xxx"})
 	assert.False(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "")
@@ -455,7 +460,7 @@ func TestParse_singleHyphen(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, args.CmdParams(), []string{"-"})
 	assert.False(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "")
@@ -486,7 +491,7 @@ func TestParse_multipleArgs(t *testing.T) {
 
 	args, err := cliargs.Parse()
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.True(t, args.HasOpt("a"))
 	assert.Equal(t, args.OptParam("a"), "")
 	assert.Equal(t, args.OptParams("a"), []string{})

@@ -5,17 +5,18 @@
 package cliargs
 
 import (
-	"github.com/sttk-go/sabi"
 	"os"
 	"strings"
 	"unicode"
 )
 
-type /* error reason */ (
-	// OptionHasInvalidChar is an error reason which indicates that an invalid
-	// character is found in the option.
-	OptionHasInvalidChar struct{ Option string }
-)
+// OptionHasInvalidChar is an error which indicates that an invalid character
+// is found in the option.
+type OptionHasInvalidChar struct{ Option string }
+
+func (e OptionHasInvalidChar) Error() string {
+	return "OptionHasInvalidChar"
+}
 
 var (
 	empty            = make([]string, 0)
@@ -97,25 +98,25 @@ func (args Args) CmdParams() []string {
 // In case of combined short options, only the last short option can take an
 // option parameter.
 // (For example, -abc=3 is equal to -a -b -c=3.)
-func Parse() (Args, sabi.Err) {
+func Parse() (Args, error) {
 	var cmdParams = make([]string, 0)
 	var optParams = make(map[string][]string)
 
-	var collCmdParams = func(params ...string) sabi.Err {
+	var collCmdParams = func(params ...string) error {
 		cmdParams = append(cmdParams, params...)
-		return sabi.Ok()
+		return nil
 	}
-	var collOptParams = func(opt string, params ...string) sabi.Err {
+	var collOptParams = func(opt string, params ...string) error {
 		arr, exists := optParams[opt]
 		if !exists {
 			arr = empty
 		}
 		optParams[opt] = append(arr, params...)
-		return sabi.Ok()
+		return nil
 	}
 
 	err := parseArgs(os.Args[1:], collCmdParams, collOptParams, _false)
-	if !err.IsOk() {
+	if err != nil {
 		return Args{cmdParams: empty}, err
 	}
 
@@ -128,10 +129,10 @@ func _false(_ string) bool {
 
 func parseArgs(
 	args []string,
-	collectCmdParams func(...string) sabi.Err,
-	collectOptParams func(string, ...string) sabi.Err,
+	collectCmdParams func(...string) error,
+	collectOptParams func(string, ...string) error,
 	takeParams func(string) bool,
-) sabi.Err {
+) error {
 
 	isNonOpt := false
 	prevOptTakingParams := ""
@@ -139,13 +140,13 @@ func parseArgs(
 	for iArg, arg := range args {
 		if isNonOpt {
 			err := collectCmdParams(arg)
-			if !err.IsOk() {
+			if err != nil {
 				return err
 			}
 
 		} else if len(prevOptTakingParams) > 0 {
 			err := collectOptParams(prevOptTakingParams, arg)
-			if !err.IsOk() {
+			if err != nil {
 				return err
 			}
 			prevOptTakingParams = ""
@@ -162,17 +163,17 @@ func parseArgs(
 				if i > 0 {
 					if r == '=' {
 						err := collectOptParams(arg[0:i], arg[i+1:])
-						if !err.IsOk() {
+						if err != nil {
 							return err
 						}
 						break
 					}
 					if !unicode.Is(rangeOfAlNumMarks, r) {
-						return sabi.NewErr(OptionHasInvalidChar{Option: arg})
+						return OptionHasInvalidChar{Option: arg}
 					}
 				} else {
 					if !unicode.Is(rangeOfAlphabets, r) {
-						return sabi.NewErr(OptionHasInvalidChar{Option: arg})
+						return OptionHasInvalidChar{Option: arg}
 					}
 				}
 				i++
@@ -184,7 +185,7 @@ func parseArgs(
 					continue
 				}
 				err := collectOptParams(arg)
-				if !err.IsOk() {
+				if err != nil {
 					return err
 				}
 			}
@@ -192,7 +193,7 @@ func parseArgs(
 		} else if strings.HasPrefix(arg, "-") {
 			if len(arg) == 1 {
 				err := collectCmdParams(arg)
-				if !err.IsOk() {
+				if err != nil {
 					return err
 				}
 				continue
@@ -205,19 +206,19 @@ func parseArgs(
 				if i > 0 {
 					if r == '=' {
 						err := collectOptParams(opt, arg[i+1:])
-						if !err.IsOk() {
+						if err != nil {
 							return err
 						}
 						break
 					}
 					err := collectOptParams(opt)
-					if !err.IsOk() {
+					if err != nil {
 						return err
 					}
 				}
 				opt = string(r)
 				if !unicode.Is(rangeOfAlphabets, r) {
-					return sabi.NewErr(OptionHasInvalidChar{Option: opt})
+					return OptionHasInvalidChar{Option: opt}
 				}
 				i++
 			}
@@ -227,7 +228,7 @@ func parseArgs(
 					prevOptTakingParams = opt
 				} else {
 					err := collectOptParams(opt)
-					if !err.IsOk() {
+					if err != nil {
 						return err
 					}
 				}
@@ -235,11 +236,11 @@ func parseArgs(
 
 		} else {
 			err := collectCmdParams(arg)
-			if !err.IsOk() {
+			if err != nil {
 				return err
 			}
 		}
 	}
 
-	return sabi.Ok()
+	return nil
 }

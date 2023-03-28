@@ -6,21 +6,21 @@ package cliargs
 
 import (
 	"fmt"
-	"github.com/sttk-go/sabi"
 	"golang.org/x/term"
 	"os"
 	"strings"
 )
 
-type /* error reason */ (
-	// MarginsAndIndentExceedLineWidth is an error reason which indicates that
-	// the sum of left margin, right margin, and indent is greater than line
-	// width.
-	// It means that there are no width to print texts.
-	MarginsAndIndentExceedLineWidth struct {
-		LineWidth, MarginLeft, MarginRight, Indent int
-	}
-)
+// MarginsAndIndentExceedLineWidth is an error which indicates that the sum of
+// left margin, right margin, and indent is greater than line width.
+// It means that there are no width to print texts.
+type MarginsAndIndentExceedLineWidth struct {
+	LineWidth, MarginLeft, MarginRight, Indent int
+}
+
+func (e MarginsAndIndentExceedLineWidth) Error() string {
+	return "MarginsAndIndentExceedLineWidth"
+}
 
 // WrapOpts is a struct type which holds options for wrapping texts.
 // This struct type has the following field for wrap options: MarginLeft,
@@ -104,9 +104,9 @@ func (iter *HelpIter) Next() (string, IterStatus) {
 // The line width is obtained from the terminal width.
 func MakeHelp(
 	usage string, optCfgs []OptCfg, wrapOpts WrapOpts,
-) (HelpIter, sabi.Err) {
-	lineWidth, _, _ := term.GetSize(int(os.Stdout.Fd()))
-	if lineWidth <= 0 {
+) (HelpIter, error) {
+	lineWidth, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
 		lineWidth = 80
 	}
 
@@ -127,12 +127,12 @@ func MakeHelp(
 	}
 
 	if (wrapOpts.MarginLeft + wrapOpts.MarginRight + indent) >= lineWidth {
-		return HelpIter{}, sabi.NewErr(MarginsAndIndentExceedLineWidth{
+		return HelpIter{}, MarginsAndIndentExceedLineWidth{
 			LineWidth:   lineWidth,
 			MarginLeft:  wrapOpts.MarginLeft,
 			MarginRight: wrapOpts.MarginRight,
 			Indent:      indent,
-		})
+		}
 	}
 	lineWidth -= wrapOpts.MarginLeft + wrapOpts.MarginRight
 
@@ -142,7 +142,7 @@ func MakeHelp(
 		texts[i+1] = makeOptHelp(texts[i+1], cfg, indent)
 	}
 
-	return newHelpIter(texts, lineWidth, indent, wrapOpts.MarginLeft), sabi.Ok()
+	return newHelpIter(texts, lineWidth, indent, wrapOpts.MarginLeft), nil
 }
 
 func makeOptTitle(cfg OptCfg) string {
@@ -179,9 +179,9 @@ func makeOptHelp(title string, cfg OptCfg, indent int) string {
 
 // PrintHelp is a function which output a help text to stdout.
 // This function calls MakeHelp function to make a help text inside itself.
-func PrintHelp(usage string, optCfgs []OptCfg, wrapOpts WrapOpts) sabi.Err {
+func PrintHelp(usage string, optCfgs []OptCfg, wrapOpts WrapOpts) error {
 	iter, err := MakeHelp(usage, optCfgs, wrapOpts)
-	if !err.IsOk() {
+	if err != nil {
 		return err
 	}
 
@@ -192,5 +192,5 @@ func PrintHelp(usage string, optCfgs []OptCfg, wrapOpts WrapOpts) sabi.Err {
 			break
 		}
 	}
-	return sabi.Ok()
+	return nil
 }

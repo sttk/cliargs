@@ -11,7 +11,7 @@ func TestMakeHelp_emptyUsage_noOptCfg_emptyWrapOpts(t *testing.T) {
 	wrapOpts := WrapOpts{}
 
 	iter, err := MakeHelp("", optCfgs, wrapOpts)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 
 	line, status := iter.Next()
 	assert.Equal(t, line, "")
@@ -28,7 +28,7 @@ func TestMakeHelp_shortUsage_noOptCfg_emptyWrapOpts(t *testing.T) {
 	wrapOpts := WrapOpts{}
 
 	iter, err := MakeHelp(usage, optCfgs, wrapOpts)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 
 	line, status := iter.Next()
 	assert.Equal(t, line, usage)
@@ -48,7 +48,7 @@ func TestMakeHelp_longUsage_noOptCfg_emptyWrapOpts(t *testing.T) {
 	wrapOpts := WrapOpts{}
 
 	iter, err := MakeHelp(usage, optCfgs, wrapOpts)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 
 	line, status := iter.Next()
 	assert.Equal(t, line, usage[0:79])
@@ -74,7 +74,7 @@ func TestMakeHelp_longUsage_oneShortOptCfg_emptyWrapOpts(t *testing.T) {
 	wrapOpts := WrapOpts{}
 
 	iter, err := MakeHelp(usage, optCfgs, wrapOpts)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 
 	line, status := iter.Next()
 	assert.Equal(t, line, usage[0:79])
@@ -123,7 +123,7 @@ func TestMakeHelp_longUsage_twoShortAndLongOptCfg_emptyWrapOpts(t *testing.T) {
 	wrapOpts := WrapOpts{}
 
 	iter, err := MakeHelp(usage, optCfgs, wrapOpts)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 
 	line, status := iter.Next()
 	assert.Equal(t, line, usage[0:79])
@@ -184,7 +184,7 @@ func TestMakeHelp_longUsage_twoShortAndLongOptCfg_largeIndent(t *testing.T) {
 	wrapOpts := WrapOpts{Indent: 20}
 
 	iter, err := MakeHelp(usage, optCfgs, wrapOpts)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 
 	line, status := iter.Next()
 	assert.Equal(t, line, usage[0:79])
@@ -245,7 +245,7 @@ func TestMakeHelp_longUsage_twoShortAndLongOptCfg_shortIndent(t *testing.T) {
 	wrapOpts := WrapOpts{Indent: 10}
 
 	iter, err := MakeHelp(usage, optCfgs, wrapOpts)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 
 	line, status := iter.Next()
 	assert.Equal(t, line, usage[0:79])
@@ -310,7 +310,7 @@ func TestMakeHelp_longUsage_twoShortAndLongOptCfg_margins(t *testing.T) {
 	wrapOpts := WrapOpts{MarginLeft: 5, MarginRight: 5}
 
 	iter, err := MakeHelp(usage, optCfgs, wrapOpts)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 
 	line, status := iter.Next()
 	assert.Equal(t, line, "     "+usage[0:62])
@@ -371,7 +371,7 @@ func TestMakeHelp_optNameIsShortAndOptAliasIsLong(t *testing.T) {
 	wrapOpts := WrapOpts{MarginLeft: 5, MarginRight: 5}
 
 	iter, err := MakeHelp(usage, optCfgs, wrapOpts)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 
 	line, status := iter.Next()
 	assert.Equal(t, line, "     "+usage[0:62])
@@ -432,13 +432,14 @@ func TestMakeHelp_marginsAndIndentExceedLineWidth(t *testing.T) {
 	wrapOpts := WrapOpts{MarginLeft: 50, MarginRight: 50, Indent: 10}
 
 	_, err := MakeHelp(usage, optCfgs, wrapOpts)
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "MarginsAndIndentExceedLineWidth")
+	switch err.(type) {
 	case MarginsAndIndentExceedLineWidth:
-		assert.Equal(t, err.Get("LineWidth"), 80)
-		assert.Equal(t, err.Get("MarginLeft"), 50)
-		assert.Equal(t, err.Get("MarginRight"), 50)
-		assert.Equal(t, err.Get("Indent"), 10)
+		assert.Equal(t, err.(MarginsAndIndentExceedLineWidth).LineWidth, 80)
+		assert.Equal(t, err.(MarginsAndIndentExceedLineWidth).MarginLeft, 50)
+		assert.Equal(t, err.(MarginsAndIndentExceedLineWidth).MarginRight, 50)
+		assert.Equal(t, err.(MarginsAndIndentExceedLineWidth).Indent, 10)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -468,7 +469,7 @@ func TestPrintHelp(t *testing.T) {
 	wrapOpts := WrapOpts{MarginLeft: 5, MarginRight: 5, Indent: 10}
 
 	err := PrintHelp(usage, optCfgs, wrapOpts)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 }
 
 func TestPrintHelp_error(t *testing.T) {
@@ -488,13 +489,14 @@ func TestPrintHelp_error(t *testing.T) {
 	wrapOpts := WrapOpts{MarginLeft: 50, MarginRight: 50, Indent: 10}
 
 	err := PrintHelp(usage, optCfgs, wrapOpts)
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "MarginsAndIndentExceedLineWidth")
+	switch err.(type) {
 	case MarginsAndIndentExceedLineWidth:
-		assert.Equal(t, err.Get("LineWidth"), 80)
-		assert.Equal(t, err.Get("MarginLeft"), 50)
-		assert.Equal(t, err.Get("MarginRight"), 50)
-		assert.Equal(t, err.Get("Indent"), 10)
+		assert.Equal(t, err.(MarginsAndIndentExceedLineWidth).LineWidth, 80)
+		assert.Equal(t, err.(MarginsAndIndentExceedLineWidth).MarginLeft, 50)
+		assert.Equal(t, err.(MarginsAndIndentExceedLineWidth).MarginRight, 50)
+		assert.Equal(t, err.(MarginsAndIndentExceedLineWidth).Indent, 10)
 	default:
 		assert.Fail(t, err.Error())
 	}
