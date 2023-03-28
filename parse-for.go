@@ -5,56 +5,86 @@
 package cliargs
 
 import (
-	"github.com/sttk-go/sabi"
 	"reflect"
 	"strconv"
 	"strings"
 )
 
-type /* error reason */ (
-	// OptionStoreIsNotChangeable is an error reason which indicates that
-	// the second parameter of ParseFor function, which is set options produced
-	// by parsing command line arguments, is not a pointer.
-	OptionStoreIsNotChangeable struct{}
+// OptionStoreIsNotChangeable is an error which indicates that the second
+// parameter of ParseFor function, which is set options produced by parsing
+// command line arguments, is not a pointer.
+type OptionStoreIsNotChangeable struct{}
 
-	// FailToParseInt is an error reaason which indicates that an option
-	// parameter in command line arguments should be an integer but is invalid.
-	FailToParseInt struct {
-		Option  string
-		Field   string
-		Input   string
-		BitSize int
-	}
+func (e OptionStoreIsNotChangeable) Error() string {
+	return "OptionStoreIsNotChangeable"
+}
 
-	// FailToParseUint is an error reason which indicates that an option
-	// parameter in command line arguments should be an unsigned integer but is
-	// invalid.
-	FailToParseUint struct {
-		Option  string
-		Field   string
-		Input   string
-		BitSize int
-	}
+// FailToParseInt is an error reaason which indicates that an option
+// parameter in command line arguments should be an integer but is invalid.
+type FailToParseInt struct {
+	Option  string
+	Field   string
+	Input   string
+	BitSize int
+	cause   error
+}
 
-	// FailToParseFloat is an error reason which indicates that an option
-	// parameter in command line arguments should be a floating point number but
-	// is invalid.
-	FailToParseFloat struct {
-		Option  string
-		Field   string
-		Input   string
-		BitSize int
-	}
+func (e FailToParseInt) Error() string {
+	return "FailToParseInt"
+}
 
-	// IllegalOptionType is an error reason which indicates that a type of a
-	// field of the option store is neither a boolean, a number, a string, nor
-	// an array of numbers or strings.
-	IllegalOptionType struct {
-		Option string
-		Field  string
-		Type   reflect.Type
-	}
-)
+func (e FailToParseInt) Unwrap() error {
+	return e.cause
+}
+
+// FailToParseUint is an error which indicates that an option parameter in
+// command line arguments should be an unsigned integer but is invalid.
+type FailToParseUint struct {
+	Option  string
+	Field   string
+	Input   string
+	BitSize int
+	cause   error
+}
+
+func (e FailToParseUint) Error() string {
+	return "FailToParseUint"
+}
+
+func (e FailToParseUint) Unwrap() error {
+	return e.cause
+}
+
+// FailToParseFloat is an error which indicates that an option parameter in
+// command line arguments should be a floating point number but is invalid.
+type FailToParseFloat struct {
+	Option  string
+	Field   string
+	Input   string
+	BitSize int
+	cause   error
+}
+
+func (e FailToParseFloat) Error() string {
+	return "FailToParseFloat"
+}
+
+func (e FailToParseFloat) Unwrap() error {
+	return e.cause
+}
+
+// IllegalOptionType is an error which indicates that a type of a field of the
+// option store is neither a boolean, a number, a string, nor an array of
+// numbers or strings.
+type IllegalOptionType struct {
+	Option string
+	Field  string
+	Type   reflect.Type
+}
+
+func (e IllegalOptionType) Error() string {
+	return "IllegalOptionType"
+}
 
 // ParseFor is a function to parse command line arguments and set their values
 // to the option store which is the second parameter of this function.
@@ -98,26 +128,26 @@ type /* error reason */ (
 // string but an empty array.
 // If you want to specify an array which contains only an empty string, write
 // nothing after "=" mark, like `opt:"name="`.
-func ParseFor(args []string, options any) ([]string, sabi.Err) {
+func ParseFor(args []string, options any) ([]string, error) {
 	optCfgs, err := MakeOptCfgsFor(options)
-	if !err.IsOk() {
+	if err != nil {
 		return empty, err
 	}
 
 	a, err := ParseWith(args, optCfgs)
-	if !err.IsOk() {
+	if err != nil {
 		return empty, err
 	}
 
-	return a.cmdParams, sabi.Ok()
+	return a.cmdParams, nil
 }
 
 // MakeOptCfgsFor is a function to make a OptCfg array from fields of the
 // option store which is the argument of this function.
-func MakeOptCfgsFor(options any) ([]OptCfg, sabi.Err) {
+func MakeOptCfgsFor(options any) ([]OptCfg, error) {
 	v := reflect.ValueOf(options)
 	if v.Kind() != reflect.Ptr {
-		return nil, sabi.NewErr(OptionStoreIsNotChangeable{})
+		return nil, OptionStoreIsNotChangeable{}
 	}
 	v = v.Elem()
 
@@ -125,20 +155,20 @@ func MakeOptCfgsFor(options any) ([]OptCfg, sabi.Err) {
 	n := t.NumField()
 
 	optCfgs := make([]OptCfg, n)
-	var err sabi.Err
+	var err error
 
 	for i := 0; i < n; i++ {
 		optCfgs[i] = newOptCfg(t.Field(i))
 
-		var setter func([]string) sabi.Err
+		var setter func([]string) error
 		setter, err = newValueSetter(optCfgs[i].Name, t.Field(i).Name, v.Field(i))
-		if !err.IsOk() {
+		if err != nil {
 			return nil, err
 		}
 		optCfgs[i].OnParsed = &setter
 	}
 
-	return optCfgs, sabi.Ok()
+	return optCfgs, nil
 }
 
 func newOptCfg(fld reflect.StructField) OptCfg {
@@ -206,7 +236,7 @@ func newValueSetter(
 	optName string,
 	fldName string,
 	fld reflect.Value,
-) (func([]string) sabi.Err, sabi.Err) {
+) (func([]string) error, error) {
 	t := fld.Type()
 	switch t.Kind() {
 	case reflect.Bool:
@@ -276,208 +306,195 @@ func newValueSetter(
 
 func newIllegalOptionTypeErr(
 	optName string, fldName string, t reflect.Type,
-) (func([]string) sabi.Err, sabi.Err) {
-	r := IllegalOptionType{Option: optName, Field: fldName, Type: t}
-	return nil, sabi.NewErr(r)
+) (func([]string) error, error) {
+	return nil, IllegalOptionType{Option: optName, Field: fldName, Type: t}
 }
 
 func newBoolSetter(
 	optName string, fldName string, fld reflect.Value,
-) (func([]string) sabi.Err, sabi.Err) {
-	fn := func(s []string) sabi.Err {
+) (func([]string) error, error) {
+	fn := func(s []string) error {
 		if s != nil {
 			fld.SetBool(true)
 		}
-		return sabi.Ok()
+		return nil
 	}
-	return fn, sabi.Ok()
+	return fn, nil
 }
 
 func newIntSetter(
 	optName string, fldName string, fld reflect.Value, bitSize int,
-) (func([]string) sabi.Err, sabi.Err) {
-	fn := func(s []string) sabi.Err {
+) (func([]string) error, error) {
+	fn := func(s []string) error {
 		if len(s) == 0 {
-			return sabi.Ok()
+			return nil
 		}
 		n, e := strconv.ParseInt(s[0], 0, bitSize)
 		if e != nil {
-			r := FailToParseInt{
-				Option: optName, Field: fldName, Input: s[0], BitSize: bitSize,
-			}
-			return sabi.NewErr(r, e)
+			return FailToParseInt{Option: optName, Field: fldName, Input: s[0],
+				BitSize: bitSize, cause: e}
 		}
 		fld.SetInt(n)
-		return sabi.Ok()
+		return nil
 	}
-	return fn, sabi.Ok()
+	return fn, nil
 }
 
 func newUintSetter(
 	optName string, fldName string, fld reflect.Value, bitSize int,
-) (func([]string) sabi.Err, sabi.Err) {
-	fn := func(s []string) sabi.Err {
+) (func([]string) error, error) {
+	fn := func(s []string) error {
 		if len(s) == 0 {
-			return sabi.Ok()
+			return nil
 		}
 		n, e := strconv.ParseUint(s[0], 0, bitSize)
 		if e != nil {
-			r := FailToParseUint{
-				Option: optName, Field: fldName, Input: s[0], BitSize: bitSize,
-			}
-			return sabi.NewErr(r, e)
+			return FailToParseUint{Option: optName, Field: fldName, Input: s[0],
+				BitSize: bitSize, cause: e}
 		}
 		fld.SetUint(n)
-		return sabi.Ok()
+		return nil
 	}
-	return fn, sabi.Ok()
+	return fn, nil
 }
 
 func newFloatSetter(
 	optName string, fldName string, fld reflect.Value, bitSize int,
-) (func([]string) sabi.Err, sabi.Err) {
-	fn := func(s []string) sabi.Err {
+) (func([]string) error, error) {
+	fn := func(s []string) error {
 		if len(s) == 0 {
-			return sabi.Ok()
+			return nil
 		}
 		n, e := strconv.ParseFloat(s[0], bitSize)
 		if e != nil {
-			r := FailToParseFloat{
-				Option: optName, Field: fldName, Input: s[0], BitSize: bitSize,
-			}
-			return sabi.NewErr(r, e)
+			return FailToParseFloat{Option: optName, Field: fldName, Input: s[0],
+				BitSize: bitSize, cause: e}
 		}
 		fld.SetFloat(n)
-		return sabi.Ok()
+		return nil
 	}
-	return fn, sabi.Ok()
+	return fn, nil
 }
 
 func newStringSetter(
 	optName string, fldName string, fld reflect.Value,
-) (func([]string) sabi.Err, sabi.Err) {
-	fn := func(s []string) sabi.Err {
+) (func([]string) error, error) {
+	fn := func(s []string) error {
 		if len(s) == 0 {
-			return sabi.Ok()
+			return nil
 		}
 		fld.SetString(s[0])
-		return sabi.Ok()
+		return nil
 	}
-	return fn, sabi.Ok()
+	return fn, nil
 }
 
 func newIntArraySetter(
 	optName string, fldName string, fld reflect.Value, bitSize int,
-) (func([]string) sabi.Err, sabi.Err) {
-	fn := func(s []string) sabi.Err {
+) (func([]string) error, error) {
+	fn := func(s []string) error {
 		if s == nil {
-			return sabi.Ok()
+			return nil
 		}
 		emp := reflect.MakeSlice(fld.Type(), 0, 0)
 		n := len(s)
 		if n == 0 {
 			fld.Set(emp)
-			return sabi.Ok()
+			return nil
 		}
 		t := fld.Type().Elem()
 		a := make([]reflect.Value, n)
 		for i := 0; i < n; i++ {
 			v, e := strconv.ParseInt(s[i], 0, bitSize)
 			if e != nil {
-				r := FailToParseInt{
-					Option: optName, Field: fldName, Input: s[i], BitSize: bitSize,
-				}
-				return sabi.NewErr(r, e)
+				return FailToParseInt{Option: optName, Field: fldName, Input: s[i],
+					BitSize: bitSize, cause: e}
 			}
 			a[i] = reflect.ValueOf(v).Convert(t)
 		}
 		fld.Set(reflect.Append(emp, a...))
-		return sabi.Ok()
+		return nil
 	}
-	return fn, sabi.Ok()
+	return fn, nil
 }
 
 func newUintArraySetter(
 	optName string, fldName string, fld reflect.Value, bitSize int,
-) (func([]string) sabi.Err, sabi.Err) {
-	fn := func(s []string) sabi.Err {
+) (func([]string) error, error) {
+	fn := func(s []string) error {
 		if s == nil {
-			return sabi.Ok()
+			return nil
 		}
 		emp := reflect.MakeSlice(fld.Type(), 0, 0)
 		n := len(s)
 		if n == 0 { // If "=[]" then n==0, else if "=" then n==1 and s[0]=""
 			fld.Set(emp)
-			return sabi.Ok()
+			return nil
 		}
 		t := fld.Type().Elem()
 		a := make([]reflect.Value, n)
 		for i := 0; i < n; i++ {
 			v, e := strconv.ParseUint(s[i], 0, bitSize)
 			if e != nil {
-				r := FailToParseUint{
-					Option: optName, Field: fldName, Input: s[i], BitSize: bitSize,
-				}
-				return sabi.NewErr(r, e)
+				return FailToParseUint{Option: optName, Field: fldName, Input: s[i],
+					BitSize: bitSize, cause: e}
 			}
 			a[i] = reflect.ValueOf(v).Convert(t)
 		}
 		fld.Set(reflect.Append(emp, a...))
-		return sabi.Ok()
+		return nil
 	}
-	return fn, sabi.Ok()
+	return fn, nil
 }
 
 func newFloatArraySetter(
 	optName string, fldName string, fld reflect.Value, bitSize int,
-) (func([]string) sabi.Err, sabi.Err) {
-	fn := func(s []string) sabi.Err {
+) (func([]string) error, error) {
+	fn := func(s []string) error {
 		if s == nil {
-			return sabi.Ok()
+			return nil
 		}
 		emp := reflect.MakeSlice(fld.Type(), 0, 0)
 		n := len(s)
 		if n == 0 { // If "=[]" then n==0, else if "=" then n==1 and s[0]=""
 			fld.Set(emp)
-			return sabi.Ok()
+			return nil
 		}
 		t := fld.Type().Elem()
 		a := make([]reflect.Value, n)
 		for i := 0; i < n; i++ {
 			v, e := strconv.ParseFloat(s[i], bitSize)
 			if e != nil {
-				r := FailToParseFloat{
-					Option: optName, Field: fldName, Input: s[i], BitSize: bitSize,
-				}
-				return sabi.NewErr(r, e)
+				return FailToParseFloat{Option: optName, Field: fldName, Input: s[i],
+					BitSize: bitSize, cause: e}
 			}
 			a[i] = reflect.ValueOf(v).Convert(t)
 		}
 		fld.Set(reflect.Append(emp, a...))
-		return sabi.Ok()
+		return nil
 	}
-	return fn, sabi.Ok()
+	return fn, nil
 }
 
 func newStringArraySetter(
 	optName string, fldName string, fld reflect.Value,
-) (func([]string) sabi.Err, sabi.Err) {
-	fn := func(s []string) sabi.Err {
+) (func([]string) error, error) {
+	fn := func(s []string) error {
 		if s == nil {
-			return sabi.Ok()
+			return nil
 		}
 		emp := reflect.MakeSlice(fld.Type(), 0, 0)
 		n := len(s)
 		if n == 0 { // If "=[]" then n==0, else if "=" then n==1 and s[0]=""
 			fld.Set(emp)
-			return sabi.Ok()
+			return nil
 		}
 		a := make([]reflect.Value, n)
 		for i := 0; i < n; i++ {
 			a[i] = reflect.ValueOf(s[i])
 		}
 		fld.Set(reflect.Append(emp, a...))
-		return sabi.Ok()
+		return nil
 	}
-	return fn, sabi.Ok()
+	return fn, nil
 }

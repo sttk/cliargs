@@ -18,7 +18,7 @@ func ExamplePrintHelp() {
 
 	usage := "This is the usage section."
 	err := cliargs.PrintHelp(usage, optCfgs, wrapOpts)
-	fmt.Printf("\nerr.IsOk() = %v\n", err.IsOk())
+	fmt.Printf("\nerr = %v\n", err)
 
 	// Output:
 	//      This is the usage section.
@@ -34,7 +34,7 @@ func ExamplePrintHelp() {
 	//
 	//      --quux    Quux is a string array.
 	//
-	// err.IsOk() = true
+	// err = <nil>
 }
 
 func ExampleMakeHelp() {
@@ -50,7 +50,7 @@ func ExampleMakeHelp() {
 
 	usage := "This is the usage section."
 	iter, err := cliargs.MakeHelp(usage, optCfgs, wrapOpts)
-	fmt.Printf("\nerr.IsOk() = %v\n", err.IsOk())
+	fmt.Printf("\nerr = %v\n", err)
 
 	for {
 		line, status := iter.Next()
@@ -61,7 +61,7 @@ func ExampleMakeHelp() {
 	}
 
 	// Output:
-	// err.IsOk() = true
+	// err = <nil>
 	//      This is the usage section.
 	//
 	//      --foo-bar, -f  FooBar is a flag.

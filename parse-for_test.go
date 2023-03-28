@@ -1,6 +1,7 @@
 package cliargs_test
 
 import (
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/sttk-go/cliargs"
 	"reflect"
@@ -12,7 +13,7 @@ func TestParseFor_emptyOptionStoreAndNoArgs(t *testing.T) {
 	args := []string{}
 	options := MyOptions{}
 	cmdParams, err := cliargs.ParseFor(args, &options)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, cmdParams, []string{})
 }
 
@@ -50,7 +51,7 @@ func TestParseFor_nonEmptyOptionStoreAndNoArgs(t *testing.T) {
 
 	args := []string{}
 	cmdParams, err := cliargs.ParseFor(args, &options)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, cmdParams, []string{})
 	assert.False(t, options.BoolVal)
 	assert.Equal(t, options.IntVal, 0)
@@ -143,7 +144,7 @@ func TestParseFor_dontOverwriteOptionsIfNoArgs(t *testing.T) {
 
 	args := []string{}
 	cmdParams, err := cliargs.ParseFor(args, &options)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, cmdParams, []string{})
 	assert.True(t, options.BoolVal)
 	assert.Equal(t, options.IntVal, 111)
@@ -183,7 +184,7 @@ func TestParseFor_optionIsBoolAndArgIsName(t *testing.T) {
 	args := []string{"--flag", "abc"}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{"abc"})
 	assert.True(t, options.Flag)
 }
@@ -197,7 +198,7 @@ func TestParseFor_optionIsBoolAndArgIsAlias(t *testing.T) {
 	args := []string{"-f", "abc"}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{"abc"})
 	assert.True(t, options.Flag)
 }
@@ -222,7 +223,7 @@ func TestParseFor_optionsAreIntAndArgsAreNames(t *testing.T) {
 	}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{"abc"})
 	assert.Equal(t, options.IntVal, 1)
 	assert.Equal(t, options.Int8Val, int8(2))
@@ -251,7 +252,7 @@ func TestParseFor_optionsAreIntAndArgsAreAliases(t *testing.T) {
 	}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{"abc"})
 	assert.Equal(t, options.IntVal, 1)
 	assert.Equal(t, options.Int8Val, int8(2))
@@ -280,7 +281,7 @@ func TestParseFor_optionsAreUintAndArgsAreNames(t *testing.T) {
 	}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{"abc"})
 	assert.Equal(t, options.UintVal, uint(1))
 	assert.Equal(t, options.Uint8Val, uint8(2))
@@ -309,7 +310,7 @@ func TestParseFor_optionsAreUintAndArgsAreAliases(t *testing.T) {
 	}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{"abc"})
 	assert.Equal(t, options.UintVal, uint(1))
 	assert.Equal(t, options.Uint8Val, uint8(2))
@@ -332,7 +333,7 @@ func TestParseFor_optionsAreFloatAndArgsAreNames(t *testing.T) {
 	}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{"abc"})
 	assert.Equal(t, options.Float32Val, float32(0.1234))
 	assert.Equal(t, options.Float64Val, 0.5678)
@@ -352,7 +353,7 @@ func TestParseFor_optionsAreFloatAndArgsAreAliases(t *testing.T) {
 	}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{"abc"})
 	assert.Equal(t, options.Float32Val, float32(0.1234))
 	assert.Equal(t, options.Float64Val, 0.5678)
@@ -370,7 +371,7 @@ func TestParseFor_optionsAreStringAndArgsAreNames(t *testing.T) {
 	}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{"abc"})
 	assert.Equal(t, options.StringVal, "def")
 }
@@ -387,7 +388,7 @@ func TestParseFor_optionsAreStringAndArgsAreAliases(t *testing.T) {
 	}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{"abc"})
 	assert.Equal(t, options.StringVal, "def")
 }
@@ -405,7 +406,7 @@ func TestParseFor_defaultValueIsInt(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.IntVal, 11)
 	assert.Equal(t, options.Int8Val, int8(22))
@@ -427,7 +428,7 @@ func TestParseFor_defaultValueIsNegativeInt(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.IntVal, -11)
 	assert.Equal(t, options.Int8Val, int8(-22))
@@ -449,7 +450,7 @@ func TestParseFor_defaultValueIsUint(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.UintVal, uint(11))
 	assert.Equal(t, options.Uint8Val, uint8(22))
@@ -468,7 +469,7 @@ func TestParseFor_defaultValueIsFloat(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.Float32Val, float32(0.123))
 	assert.Equal(t, options.Float64Val, float64(0.456789))
@@ -484,7 +485,7 @@ func TestParseFor_defaultValueIsNegativeFloat(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.Float32Val, float32(-0.123))
 	assert.Equal(t, options.Float64Val, float64(-0.456789))
@@ -503,7 +504,7 @@ func TestParseFor_defaultValueIsIntArrayAndSize0(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.IntArr, []int{})
 	assert.Equal(t, options.Int8Arr, []int8{})
@@ -531,7 +532,7 @@ func TestParseFor_overwriteIntArrayWithDefaultValueIfSize0(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.IntArr, []int{})
 	assert.Equal(t, options.Int8Arr, []int8{})
@@ -553,7 +554,7 @@ func TestParseFor_defaultValueIsIntArrayAndSize1(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.IntArr, []int{1})
 	assert.Equal(t, options.Int8Arr, []int8{2})
@@ -581,7 +582,7 @@ func TestParseFor_overwriteIntArrayWithDefaultValueIfSize1(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.IntArr, []int{1})
 	assert.Equal(t, options.Int8Arr, []int8{2})
@@ -603,7 +604,7 @@ func TestParseFor_defaultValueIsIntArrayAndSize2(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.IntArr, []int{1, 2})
 	assert.Equal(t, options.Int8Arr, []int8{2, 3})
@@ -631,7 +632,7 @@ func TestParseFor_overwriteIntArrayWithDefaultValueIfSize2(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.IntArr, []int{1, 2})
 	assert.Equal(t, options.Int8Arr, []int8{2, 3})
@@ -653,7 +654,7 @@ func TestParseFor_defaultValueIsNegativeIntArray(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.IntArr, []int{-1, -2})
 	assert.Equal(t, options.Int8Arr, []int8{-2, -3})
@@ -675,7 +676,7 @@ func TestParseFor_defaultValueIsIntArraySeparatedByColons(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.IntArr, []int{-1, -2})
 	assert.Equal(t, options.Int8Arr, []int8{-2, -3})
@@ -697,7 +698,7 @@ func TestParseFor_defaultValueIsUintArrayAndSize0(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.UintArr, []uint{})
 	assert.Equal(t, options.Uint8Arr, []uint8{})
@@ -725,7 +726,7 @@ func TestParseFor_overwriteUintArrayWithDefaultValueIfSize0(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.UintArr, []uint{})
 	assert.Equal(t, options.Uint8Arr, []uint8{})
@@ -747,7 +748,7 @@ func TestParseFor_defaultValueIsUintArrayAndSize1(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.UintArr, []uint{1})
 	assert.Equal(t, options.Uint8Arr, []uint8{2})
@@ -775,7 +776,7 @@ func TestParseFor_overwriteUintArrayWithDefaultValueIfSize1(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.UintArr, []uint{1})
 	assert.Equal(t, options.Uint8Arr, []uint8{2})
@@ -797,7 +798,7 @@ func TestParseFor_defaultValueIsUintArrayAndSize2(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.UintArr, []uint{1, 2})
 	assert.Equal(t, options.Uint8Arr, []uint8{2, 3})
@@ -825,7 +826,7 @@ func TestParseFor_overwriteUintArrayWithDefaultValueIfSize2(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.UintArr, []uint{1, 2})
 	assert.Equal(t, options.Uint8Arr, []uint8{2, 3})
@@ -847,7 +848,7 @@ func TestParseFor_defaultValueIsUintArraySeparatedByColons(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.UintArr, []uint{1, 2})
 	assert.Equal(t, options.Uint8Arr, []uint8{2, 3})
@@ -866,7 +867,7 @@ func TestParseFor_defaultValueIsFloatArrayAndSize0(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.Float32Arr, []float32{})
 	assert.Equal(t, options.Float64Arr, []float64{})
@@ -885,7 +886,7 @@ func TestParseFor_overwriteFloatArrayWithDefaultValueIfSize0(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.Float32Arr, []float32{})
 	assert.Equal(t, options.Float64Arr, []float64{})
@@ -901,7 +902,7 @@ func TestParseFor_defaultValueIsFloatArrayAndSize1(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.Float32Arr, []float32{0.1})
 	assert.Equal(t, options.Float64Arr, []float64{0.2})
@@ -920,7 +921,7 @@ func TestParseFor_overwriteFloatArrayWithDefaultValueIfSize1(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.Float32Arr, []float32{0.1})
 	assert.Equal(t, options.Float64Arr, []float64{0.2})
@@ -936,7 +937,7 @@ func TestParseFor_defaultValueIsFloatArrayAndSize2(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.Float32Arr, []float32{0.1, 0.2})
 	assert.Equal(t, options.Float64Arr, []float64{0.3, 0.4})
@@ -955,7 +956,7 @@ func TestParseFor_overwriteFloatArrayWithDefaultValueIfSize2(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.Float32Arr, []float32{0.1, 0.2})
 	assert.Equal(t, options.Float64Arr, []float64{0.3, 0.4})
@@ -971,7 +972,7 @@ func TestParseFor_defaultValueIsNegativeFloatArray(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.Float32Arr, []float32{-0.1, -0.2})
 	assert.Equal(t, options.Float64Arr, []float64{-0.3, -0.4})
@@ -987,7 +988,7 @@ func TestParseFor_defaultValueIsFloatArraySeparatedByColons(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.Float32Arr, []float32{-0.1, -0.2})
 	assert.Equal(t, options.Float64Arr, []float64{-0.3, -0.4})
@@ -1002,7 +1003,7 @@ func TestParseFor_defaultValueIsStringAndSize0(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.StringArr, []string{})
 }
@@ -1018,7 +1019,7 @@ func TestParseFor_overwriteStringArrayWithDefaultValueIfSize0(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.StringArr, []string{})
 }
@@ -1032,7 +1033,7 @@ func TestParseFor_defaultValueIsStringArrayAndSize1(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.StringArr, []string{"ABC"})
 }
@@ -1048,7 +1049,7 @@ func TestParseFor_overwriteStringArrayWithDefaultValueIfSize1(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.StringArr, []string{"ABC"})
 }
@@ -1062,7 +1063,7 @@ func TestParseFor_defaultValueIsStringArrayAndSize2(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.StringArr, []string{"ABC", "DEF"})
 }
@@ -1078,7 +1079,7 @@ func TestParseFor_overwriteStringArrayWithDefaultValueIfSize2(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.StringArr, []string{"ABC", "DEF"})
 }
@@ -1092,7 +1093,7 @@ func TestParseFor_defaultValueIsStringArraySeparatedByColons(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.StringArr, []string{"ABC", "DEF"})
 }
@@ -1106,7 +1107,7 @@ func TestParseFor_ignoreEmptyDefaultValueIfOptionIsBool(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.False(t, options.BoolVar)
 }
@@ -1121,13 +1122,15 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsInt(t *testing.T) {
 	params, err := cliargs.ParseFor(args, &options)
 
 	assert.Equal(t, params, []string{})
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "FailToParseInt")
+	assert.NotNil(t, errors.Unwrap(err))
+	switch err.(type) {
 	case cliargs.FailToParseInt:
-		assert.Equal(t, err.Get("Option"), "int-var")
-		assert.Equal(t, err.Get("Field"), "IntVar")
-		assert.Equal(t, err.Get("Input"), "")
-		assert.Equal(t, err.Get("BitSize"), 64)
+		assert.Equal(t, err.(cliargs.FailToParseInt).Option, "int-var")
+		assert.Equal(t, err.(cliargs.FailToParseInt).Field, "IntVar")
+		assert.Equal(t, err.(cliargs.FailToParseInt).Input, "")
+		assert.Equal(t, err.(cliargs.FailToParseInt).BitSize, 64)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1143,13 +1146,15 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUint(t *testing.T) {
 	params, err := cliargs.ParseFor(args, &options)
 
 	assert.Equal(t, params, []string{})
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "FailToParseUint")
+	assert.NotNil(t, errors.Unwrap(err))
+	switch err.(type) {
 	case cliargs.FailToParseUint:
-		assert.Equal(t, err.Get("Option"), "uint-var")
-		assert.Equal(t, err.Get("Field"), "UintVar")
-		assert.Equal(t, err.Get("Input"), "")
-		assert.Equal(t, err.Get("BitSize"), 64)
+		assert.Equal(t, err.(cliargs.FailToParseUint).Option, "uint-var")
+		assert.Equal(t, err.(cliargs.FailToParseUint).Field, "UintVar")
+		assert.Equal(t, err.(cliargs.FailToParseUint).Input, "")
+		assert.Equal(t, err.(cliargs.FailToParseUint).BitSize, 64)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1165,13 +1170,15 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloat(t *testing.T) {
 	params, err := cliargs.ParseFor(args, &options)
 
 	assert.Equal(t, params, []string{})
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "FailToParseFloat")
+	assert.NotNil(t, errors.Unwrap(err))
+	switch err.(type) {
 	case cliargs.FailToParseFloat:
-		assert.Equal(t, err.Get("Option"), "float-var")
-		assert.Equal(t, err.Get("Field"), "Float64Var")
-		assert.Equal(t, err.Get("Input"), "")
-		assert.Equal(t, err.Get("BitSize"), 64)
+		assert.Equal(t, err.(cliargs.FailToParseFloat).Option, "float-var")
+		assert.Equal(t, err.(cliargs.FailToParseFloat).Field, "Float64Var")
+		assert.Equal(t, err.(cliargs.FailToParseFloat).Input, "")
+		assert.Equal(t, err.(cliargs.FailToParseFloat).BitSize, 64)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1186,7 +1193,7 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsString(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.StringVar, "")
 }
@@ -1201,13 +1208,15 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsIntArray(t *testing.T) {
 	params, err := cliargs.ParseFor(args, &options)
 
 	assert.Equal(t, params, []string{})
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "FailToParseInt")
+	assert.NotNil(t, errors.Unwrap(err))
+	switch err.(type) {
 	case cliargs.FailToParseInt:
-		assert.Equal(t, err.Get("Option"), "int-arr")
-		assert.Equal(t, err.Get("Field"), "IntArr")
-		assert.Equal(t, err.Get("Input"), "")
-		assert.Equal(t, err.Get("BitSize"), 64)
+		assert.Equal(t, err.(cliargs.FailToParseInt).Option, "int-arr")
+		assert.Equal(t, err.(cliargs.FailToParseInt).Field, "IntArr")
+		assert.Equal(t, err.(cliargs.FailToParseInt).Input, "")
+		assert.Equal(t, err.(cliargs.FailToParseInt).BitSize, 64)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1223,13 +1232,15 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUintArray(t *testing.T) {
 	params, err := cliargs.ParseFor(args, &options)
 
 	assert.Equal(t, params, []string{})
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "FailToParseUint")
+	assert.NotNil(t, errors.Unwrap(err))
+	switch err.(type) {
 	case cliargs.FailToParseUint:
-		assert.Equal(t, err.Get("Option"), "uint-arr")
-		assert.Equal(t, err.Get("Field"), "UintArr")
-		assert.Equal(t, err.Get("Input"), "")
-		assert.Equal(t, err.Get("BitSize"), 64)
+		assert.Equal(t, err.(cliargs.FailToParseUint).Option, "uint-arr")
+		assert.Equal(t, err.(cliargs.FailToParseUint).Field, "UintArr")
+		assert.Equal(t, err.(cliargs.FailToParseUint).Input, "")
+		assert.Equal(t, err.(cliargs.FailToParseUint).BitSize, 64)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1245,13 +1256,15 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloatArray(t *testing.T) {
 	params, err := cliargs.ParseFor(args, &options)
 
 	assert.Equal(t, params, []string{})
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "FailToParseFloat")
+	assert.NotNil(t, errors.Unwrap(err))
+	switch err.(type) {
 	case cliargs.FailToParseFloat:
-		assert.Equal(t, err.Get("Option"), "float-arr")
-		assert.Equal(t, err.Get("Field"), "Float64Arr")
-		assert.Equal(t, err.Get("Input"), "")
-		assert.Equal(t, err.Get("BitSize"), 64)
+		assert.Equal(t, err.(cliargs.FailToParseFloat).Option, "float-arr")
+		assert.Equal(t, err.(cliargs.FailToParseFloat).Field, "Float64Arr")
+		assert.Equal(t, err.(cliargs.FailToParseFloat).Input, "")
+		assert.Equal(t, err.(cliargs.FailToParseFloat).BitSize, 64)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1266,7 +1279,7 @@ func TestParseFor_optionIsStringArrayAndSetOneEmptyStringByDefaultArray(t *testi
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, options.StringArr, []string{""})
 }
@@ -1280,7 +1293,7 @@ func TestParseFor_defaultValueIsIgnoreWhenTypeIsBool(t *testing.T) {
 	args := []string{}
 	params, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, params, []string{})
 	assert.False(t, options.BoolVar)
 }
@@ -1295,11 +1308,12 @@ func TestParseFor_errorIfDefaultValueIsInvalidType(t *testing.T) {
 	params, err := cliargs.ParseFor(args, &options)
 
 	assert.Equal(t, params, []string{})
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "IllegalOptionType")
+	switch err.(type) {
 	case cliargs.IllegalOptionType:
-		assert.Equal(t, err.Get("Field"), "BoolArr")
-		assert.Equal(t, err.Get("Type"), reflect.TypeOf(options.BoolArr))
+		assert.Equal(t, err.(cliargs.IllegalOptionType).Field, "BoolArr")
+		assert.Equal(t, err.(cliargs.IllegalOptionType).Type, reflect.TypeOf(options.BoolArr))
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1322,7 +1336,7 @@ func TestParseFor_multipleOptsAndMultipleArgs(t *testing.T) {
 
 	cmdParams, err := cliargs.ParseFor(args, &options)
 
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, cmdParams, []string{"c1", "c2"})
 	assert.True(t, options.FooBar)
 	assert.Equal(t, options.Baz, 12)
@@ -1347,7 +1361,7 @@ func TestMakeOptCfgsFor_multipleOptsAndMultipleArgs(t *testing.T) {
 	}
 
 	optCfgs, err0 := cliargs.MakeOptCfgsFor(&options)
-	assert.True(t, err0.IsOk())
+	assert.Nil(t, err0)
 	assert.Equal(t, optCfgs[0].Name, "foo-bar")
 	assert.Equal(t, optCfgs[0].Aliases, []string{"f"})
 	assert.False(t, optCfgs[0].HasParam)
@@ -1380,7 +1394,7 @@ func TestMakeOptCfgsFor_multipleOptsAndMultipleArgs(t *testing.T) {
 	assert.NotNil(t, optCfgs[4].OnParsed)
 
 	a, err1 := cliargs.ParseWith(args, optCfgs)
-	assert.True(t, err1.IsOk())
+	assert.Nil(t, err1)
 	assert.Equal(t, a.CmdParams(), []string{"c1", "c2"})
 	assert.True(t, a.HasOpt("foo-bar"))
 	assert.True(t, a.HasOpt("baz"))
@@ -1415,7 +1429,7 @@ func TestParseFor_emptyArrayOfDefaultValueWithNotCommaSeparator(t *testing.T) {
 
 	args := []string{}
 	cmdParams, err := cliargs.ParseFor(args, &options)
-	assert.True(t, err.IsOk())
+	assert.Nil(t, err)
 	assert.Equal(t, cmdParams, []string{})
 	assert.Equal(t, options.Foo, []int{})
 	assert.Equal(t, options.Bar, []uint{})
@@ -1434,7 +1448,7 @@ func TestMakeOptCfgsFor_optionDescriptions(t *testing.T) {
 	options := MyOptions{}
 
 	optCfgs, err0 := cliargs.MakeOptCfgsFor(&options)
-	assert.True(t, err0.IsOk())
+	assert.Nil(t, err0)
 	assert.Equal(t, optCfgs[0].Desc, "FooBar description")
 	assert.Equal(t, optCfgs[1].Desc, "Baz description")
 	assert.Equal(t, optCfgs[2].Desc, "Qux description")
@@ -1451,12 +1465,13 @@ func TestParseFor_optCfgHasUnsupportedType(t *testing.T) {
 	options := MyOptions{}
 
 	_, err := cliargs.MakeOptCfgsFor(&options)
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "IllegalOptionType")
+	switch err.(type) {
 	case cliargs.IllegalOptionType:
-		assert.Equal(t, err.Get("Option"), "foo-bar")
-		assert.Equal(t, err.Get("Field"), "FooBar")
-		assert.Equal(t, err.Get("Type").(reflect.Type).Name(), "A")
+		assert.Equal(t, err.(cliargs.IllegalOptionType).Option, "foo-bar")
+		assert.Equal(t, err.(cliargs.IllegalOptionType).Field, "FooBar")
+		assert.Equal(t, err.(cliargs.IllegalOptionType).Type.(reflect.Type).Name(), "A")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1474,8 +1489,9 @@ func TestParseFor_argIsNotPointer(t *testing.T) {
 
 	_, err := cliargs.MakeOptCfgsFor(options)
 
-	assert.False(t, err.IsOk())
-	switch err.Reason().(type) {
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "OptionStoreIsNotChangeable")
+	switch err.(type) {
 	case cliargs.OptionStoreIsNotChangeable:
 	default:
 		assert.Fail(t, err.Error())

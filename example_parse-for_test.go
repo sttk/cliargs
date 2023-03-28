@@ -21,7 +21,7 @@ func ExampleParseFor() {
 	}
 
 	cmdParams, err := cliargs.ParseFor(osArgs, &options)
-	fmt.Printf("err.IsOk() = %v\n", err.IsOk())
+	fmt.Printf("err = %v\n", err)
 	fmt.Printf("cmdParams = %v\n", cmdParams)
 	fmt.Printf("options.FooBar = %v\n", options.FooBar)
 	fmt.Printf("options.Baz = %v\n", options.Baz)
@@ -30,7 +30,7 @@ func ExampleParseFor() {
 	fmt.Printf("options.Corge = %v\n", options.Corge)
 
 	// Output:
-	// err.IsOk() = true
+	// err = <nil>
 	// cmdParams = [c1 c2]
 	// options.FooBar = true
 	// options.Baz = 12
@@ -50,7 +50,7 @@ func ExampleMakeOptCfgsFor() {
 	options := MyOptions{}
 
 	optCfgs, err := cliargs.MakeOptCfgsFor(&options)
-	fmt.Printf("err.IsOk() = %v\n", err.IsOk())
+	fmt.Printf("err = %v\n", err)
 	fmt.Printf("len(optCfgs) = %v\n", len(optCfgs))
 	fmt.Println()
 	fmt.Printf("optCfgs[0].Name = %v\n", optCfgs[0].Name)
@@ -89,7 +89,7 @@ func ExampleMakeOptCfgsFor() {
 	fmt.Printf("optCfgs[4].Desc = %v\n", optCfgs[4].Desc)
 
 	// Output:
-	// err.IsOk() = true
+	// err = <nil>
 	// len(optCfgs) = 5
 	//
 	// optCfgs[0].Name = foo-bar

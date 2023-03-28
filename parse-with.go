@@ -4,40 +4,58 @@
 
 package cliargs
 
-import (
-	"github.com/sttk-go/sabi"
-)
+// ConfigIsArrayButHasNoParam is an error which indicates that an option
+// configuration contradicts that the option must be an array
+// (.IsArray = true) but must have no option parameter (.HasParam = false).
+type ConfigIsArrayButHasNoParam struct{ Option string }
 
-type /* error reason */ (
-	// ConfigIsArrayButHasNoParam is an error reason which indicates that
-	// an option configuration contradicts that the option must be an array
-	// (.IsArray = true) but must have no option parameter (.HasParam = false).
-	ConfigIsArrayButHasNoParam struct{ Option string }
+func (e ConfigIsArrayButHasNoParam) Error() string {
+	return "ConfigIsArrayButHasNoParam"
+}
 
-	// ConfigHasDefaultButHasNoParam is an error reason which indicates that
-	// an option configuration contradicts that the option has default value
-	// (.Default != nil) but must have no option parameter (.HasParam = false).
-	ConfigHasDefaultButHasNoParam struct{ Option string }
+// ConfigHasDefaultButHasNoParam is an error which indicates that an option
+// configuration contradicts that the option has default value
+// (.Default != nil) but must have no option parameter (.HasParam = false).
+type ConfigHasDefaultButHasNoParam struct{ Option string }
 
-	// UnconfiguredOption is an error reason which indicates that there is no
-	// configuration about the input option.
-	UnconfiguredOption struct{ Option string }
+func (e ConfigHasDefaultButHasNoParam) Error() string {
+	return "ConfigHasDefaultButHasNoParam"
+}
 
-	// OptionNeedsParam is an error reason which indicates that an option is
-	// input with no option parameter though its option configuration requires
-	// option parameters (.HasParam = true).
-	OptionNeedsParam struct{ Option string }
+// UnconfiguredOption is an error which indicates that there is no
+// configuration about the input option.
+type UnconfiguredOption struct{ Option string }
 
-	// OptionTakesNoParam is an error reason which indicates that an option is
-	// input with an option parameter though its option configuration does not
-	// accept option parameters (.HasParam = false).
-	OptionTakesNoParam struct{ Option string }
+func (e UnconfiguredOption) Error() string {
+	return "UnconfiguredOption"
+}
 
-	// OptionIsNotArray is an error reason which indicates that an option is
-	// input with an option parameter multiple times though its option
-	// configuration specifies the option is not an array (.IsArray = false).
-	OptionIsNotArray struct{ Option string }
-)
+// OptionNeedsParam is an error which indicates that an option is input with
+// no option parameter though its option configuration requires option
+// parameters (.HasParam = true).
+type OptionNeedsParam struct{ Option string }
+
+func (e OptionNeedsParam) Error() string {
+	return "OptionNeedsParam"
+}
+
+// OptionTakesNoParam is an error which indicates that an option isinput with
+// an option parameter though its option configuration does not accept option
+// parameters (.HasParam = false).
+type OptionTakesNoParam struct{ Option string }
+
+func (e OptionTakesNoParam) Error() string {
+	return "OptionTakesNoParam"
+}
+
+// OptionIsNotArray is an error which indicates that an option is input with
+// an option parameter multiple times though its option configuration specifies
+// the option is not an array (.IsArray = false).
+type OptionIsNotArray struct{ Option string }
+
+func (e OptionIsNotArray) Error() string {
+	return "OptionIsNotArray"
+}
 
 const anyOption = "*"
 
@@ -74,7 +92,7 @@ type OptCfg struct {
 	HasParam bool
 	IsArray  bool
 	Default  []string
-	OnParsed *func([]string) sabi.Err
+	OnParsed *func([]string) error
 	Desc     string
 }
 
@@ -102,17 +120,17 @@ type OptCfg struct {
 // arguments, this function basically returns UnconfiguredOption error.
 // If you want to allow other options, add an option configuration of which
 // Name is "*" (but HasParam and IsArray of this configuration is ignored).
-func ParseWith(args []string, optCfgs []OptCfg) (Args, sabi.Err) {
+func ParseWith(args []string, optCfgs []OptCfg) (Args, error) {
 	hasAnyOpt := false
 	cfgMap := make(map[string]int)
 	for i, cfg := range optCfgs {
 		if !cfg.HasParam {
 			if cfg.IsArray {
-				err := sabi.NewErr(ConfigIsArrayButHasNoParam{Option: cfg.Name})
+				err := ConfigIsArrayButHasNoParam{Option: cfg.Name}
 				return Args{cmdParams: empty}, err
 			}
 			if cfg.Default != nil {
-				err := sabi.NewErr(ConfigHasDefaultButHasNoParam{Option: cfg.Name})
+				err := ConfigHasDefaultButHasNoParam{Option: cfg.Name}
 				return Args{cmdParams: empty}, err
 			}
 		}
@@ -137,15 +155,15 @@ func ParseWith(args []string, optCfgs []OptCfg) (Args, sabi.Err) {
 	var cmdParams = make([]string, 0)
 	var optParams = make(map[string][]string)
 
-	var collCmdParams = func(params ...string) sabi.Err {
+	var collCmdParams = func(params ...string) error {
 		cmdParams = append(cmdParams, params...)
-		return sabi.Ok()
+		return nil
 	}
-	var collOptParams = func(opt string, params ...string) sabi.Err {
+	var collOptParams = func(opt string, params ...string) error {
 		i, exists := cfgMap[opt]
 		if !exists {
 			if !hasAnyOpt {
-				return sabi.NewErr(UnconfiguredOption{Option: opt})
+				return UnconfiguredOption{Option: opt}
 			}
 
 			arr := optParams[opt]
@@ -153,17 +171,17 @@ func ParseWith(args []string, optCfgs []OptCfg) (Args, sabi.Err) {
 				arr = empty
 			}
 			optParams[opt] = append(arr, params...)
-			return sabi.Ok()
+			return nil
 		}
 
 		cfg := optCfgs[i]
 		if !cfg.HasParam {
 			if len(params) > 0 {
-				return sabi.NewErr(OptionTakesNoParam{Option: cfg.Name})
+				return OptionTakesNoParam{Option: cfg.Name}
 			}
 		} else {
 			if len(params) == 0 {
-				return sabi.NewErr(OptionNeedsParam{Option: cfg.Name})
+				return OptionNeedsParam{Option: cfg.Name}
 			}
 		}
 
@@ -175,16 +193,16 @@ func ParseWith(args []string, optCfgs []OptCfg) (Args, sabi.Err) {
 
 		if !cfg.IsArray {
 			if len(arr) > 1 {
-				return sabi.NewErr(OptionIsNotArray{Option: cfg.Name})
+				return OptionIsNotArray{Option: cfg.Name}
 			}
 		}
 
 		optParams[cfg.Name] = arr
-		return sabi.Ok()
+		return nil
 	}
 
 	err := parseArgs(args, collCmdParams, collOptParams, takeParam)
-	if !err.IsOk() {
+	if err != nil {
 		return Args{cmdParams: empty}, err
 	}
 
@@ -196,7 +214,7 @@ func ParseWith(args []string, optCfgs []OptCfg) (Args, sabi.Err) {
 		}
 		if cfg.OnParsed != nil {
 			err = (*cfg.OnParsed)(arr)
-			if !err.IsOk() {
+			if err != nil {
 				return Args{cmdParams: empty}, err
 			}
 		}
