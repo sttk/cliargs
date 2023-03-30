@@ -22,16 +22,12 @@ func ExamplePrintHelp() {
 
 	// Output:
 	//      This is the usage section.
-	//
 	//      --foo-bar, -f
 	//                FooBar is a flag.
 	//                This flag is foo bar.
-	//
 	//      --baz, -b
 	//                Baz is a integer.
-	//
 	//      --Qux     Qux is a string.
-	//
 	//      --quux    Quux is a string array.
 	//
 	// err = <nil>
@@ -63,13 +59,9 @@ func ExampleMakeHelp() {
 	// Output:
 	// err = <nil>
 	//      This is the usage section.
-	//
 	//      --foo-bar, -f  FooBar is a flag.
 	//                     This flag is foo bar.
-	//
 	//      --baz, -b      Baz is a integer.
-	//
 	//      --Qux          Qux is a string.
-	//
 	//      --quux         Quux is a string array.
 }

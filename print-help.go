@@ -138,7 +138,6 @@ func MakeHelp(
 
 	texts[0] = usage
 	for i, cfg := range optCfgs {
-		texts[i] += "\n"
 		texts[i+1] = makeOptHelp(texts[i+1], cfg, indent)
 	}
 
