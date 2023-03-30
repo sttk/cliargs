@@ -85,10 +85,6 @@ func TestMakeHelp_longUsage_oneShortOptCfg_emptyWrapOpts(t *testing.T) {
 	assert.Equal(t, status, ITER_HAS_MORE)
 
 	line, status = iter.Next()
-	assert.Equal(t, line, "")
-	assert.Equal(t, status, ITER_HAS_MORE)
-
-	line, status = iter.Next()
 	assert.Equal(t, line, "--foo  This is the description of --foo option.")
 	assert.Equal(t, status, ITER_NO_MORE)
 
@@ -134,15 +130,7 @@ func TestMakeHelp_longUsage_twoShortAndLongOptCfg_emptyWrapOpts(t *testing.T) {
 	assert.Equal(t, status, ITER_HAS_MORE)
 
 	line, status = iter.Next()
-	assert.Equal(t, line, "")
-	assert.Equal(t, status, ITER_HAS_MORE)
-
-	line, status = iter.Next()
 	assert.Equal(t, line, "--foo          This is the description of --foo option.")
-	assert.Equal(t, status, ITER_HAS_MORE)
-
-	line, status = iter.Next()
-	assert.Equal(t, line, "")
 	assert.Equal(t, status, ITER_HAS_MORE)
 
 	line, status = iter.Next()
@@ -195,15 +183,7 @@ func TestMakeHelp_longUsage_twoShortAndLongOptCfg_largeIndent(t *testing.T) {
 	assert.Equal(t, status, ITER_HAS_MORE)
 
 	line, status = iter.Next()
-	assert.Equal(t, line, "")
-	assert.Equal(t, status, ITER_HAS_MORE)
-
-	line, status = iter.Next()
 	assert.Equal(t, line, "--foo               This is the description of --foo option.")
-	assert.Equal(t, status, ITER_HAS_MORE)
-
-	line, status = iter.Next()
-	assert.Equal(t, line, "")
 	assert.Equal(t, status, ITER_HAS_MORE)
 
 	line, status = iter.Next()
@@ -256,15 +236,7 @@ func TestMakeHelp_longUsage_twoShortAndLongOptCfg_shortIndent(t *testing.T) {
 	assert.Equal(t, status, ITER_HAS_MORE)
 
 	line, status = iter.Next()
-	assert.Equal(t, line, "")
-	assert.Equal(t, status, ITER_HAS_MORE)
-
-	line, status = iter.Next()
 	assert.Equal(t, line, "--foo     This is the description of --foo option.")
-	assert.Equal(t, status, ITER_HAS_MORE)
-
-	line, status = iter.Next()
-	assert.Equal(t, line, "")
 	assert.Equal(t, status, ITER_HAS_MORE)
 
 	line, status = iter.Next()
@@ -321,15 +293,7 @@ func TestMakeHelp_longUsage_twoShortAndLongOptCfg_margins(t *testing.T) {
 	assert.Equal(t, status, ITER_HAS_MORE)
 
 	line, status = iter.Next()
-	assert.Equal(t, line, "")
-	assert.Equal(t, status, ITER_HAS_MORE)
-
-	line, status = iter.Next()
 	assert.Equal(t, line, "     --foo          This is the description of --foo option.")
-	assert.Equal(t, status, ITER_HAS_MORE)
-
-	line, status = iter.Next()
-	assert.Equal(t, line, "")
 	assert.Equal(t, status, ITER_HAS_MORE)
 
 	line, status = iter.Next()
@@ -382,15 +346,7 @@ func TestMakeHelp_optNameIsShortAndOptAliasIsLong(t *testing.T) {
 	assert.Equal(t, status, ITER_HAS_MORE)
 
 	line, status = iter.Next()
-	assert.Equal(t, line, "")
-	assert.Equal(t, status, ITER_HAS_MORE)
-
-	line, status = iter.Next()
 	assert.Equal(t, line, "     --foo          This is the description of --foo option.")
-	assert.Equal(t, status, ITER_HAS_MORE)
-
-	line, status = iter.Next()
-	assert.Equal(t, line, "")
 	assert.Equal(t, status, ITER_HAS_MORE)
 
 	line, status = iter.Next()
