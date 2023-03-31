@@ -172,12 +172,21 @@ func makeOptTitle(cfg OptCfg) string {
 }
 
 func makeOptHelp(title string, cfg OptCfg, indent int) string {
-	if len(title)+2 > indent {
+	w := titleWidth(title)
+	if w+2 > indent {
 		title += "\n" + strings.Repeat(" ", indent) + cfg.Desc
 	} else {
-		title += strings.Repeat(" ", indent-len(title)) + cfg.Desc
+		title += strings.Repeat(" ", indent-w) + cfg.Desc
 	}
 	return title
+}
+
+func titleWidth(title string) int {
+	w := 0
+	for _, r := range title[:] {
+		w += runeWidth(r)
+	}
+	return w
 }
 
 // PrintHelp is a function which output a help text to stdout.
