@@ -61,7 +61,7 @@ const anyOption = "*"
 
 // OptCfg is a structure that represents an option configuration.
 // An option configuration consists of fields: Name, Aliases, HasParam,
-// IsArray, Default, OnParsed, Desc.
+// IsArray, Default, OnParsed, Desc, and AtParam.
 
 // Name is the option name and Aliases are the another names.
 // Options given by those names in command line arguments are all registered to
@@ -86,6 +86,9 @@ const anyOption = "*"
 // If this field is nil, nothing is done after parsing.
 //
 // Desc is the field to set the description of the option.
+//
+// AtParam is a display at a parameter position of this option in a help text.
+// This string is for a display like: -o, --option <value>.
 type OptCfg struct {
 	Name     string
 	Aliases  []string
@@ -94,6 +97,7 @@ type OptCfg struct {
 	Default  []string
 	OnParsed *func([]string) error
 	Desc     string
+	AtParam  string
 }
 
 // ParseWith is a function which parses command line arguments with option
