@@ -164,6 +164,10 @@ func makeOptTitle(cfg OptCfg) string {
 		}
 	}
 
+	if cfg.HasParam && len(cfg.AtParam) > 0 {
+		title += " " + cfg.AtParam
+	}
+
 	return title
 }
 

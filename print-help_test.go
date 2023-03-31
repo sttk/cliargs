@@ -401,6 +401,75 @@ func TestMakeHelp_marginsAndIndentExceedLineWidth(t *testing.T) {
 	}
 }
 
+func TestMakeHelp_useAtParam(t *testing.T) {
+	usage := longUsage
+	optCfgs := []OptCfg{
+		OptCfg{
+			Name:     "d",
+			Aliases:  []string{"data"},
+			HasParam: true,
+			Desc:     "This is the description of --data option.",
+			AtParam:  "<data>",
+		},
+		OptCfg{
+			Name:     "f",
+			Aliases:  []string{"fail"},
+			HasParam: false,
+			Desc:     "This is the description of --fail option.",
+		},
+		OptCfg{
+			Name:     "o",
+			Aliases:  []string{"output"},
+			HasParam: true,
+			Desc:     "This is the description of --output option.",
+			AtParam:  "<file>",
+		},
+		OptCfg{
+			Name:     "s",
+			Aliases:  []string{"silent"},
+			HasParam: false,
+			Desc:     "This is the description of --silent option.",
+		},
+	}
+	wrapOpts := WrapOpts{}
+
+	iter, err := MakeHelp(usage, optCfgs, wrapOpts)
+	assert.Nil(t, err)
+
+	line, status := iter.Next()
+	assert.Equal(t, line, usage[0:79])
+	assert.Equal(t, status, ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, usage[79:90])
+	assert.Equal(t, status, ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "-d, --data <data>    This is the description of --data option.")
+	assert.Equal(t, status, ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "-f, --fail           This is the description of --fail option.")
+	assert.Equal(t, status, ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "-o, --output <file>  This is the description of --output option.")
+	assert.Equal(t, status, ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "-s, --silent         This is the description of --silent option.")
+	assert.Equal(t, status, ITER_NO_MORE)
+
+	iter, _ = MakeHelp(usage, optCfgs, wrapOpts)
+	for {
+		line, status = iter.Next()
+		fmt.Println(line)
+		if status == ITER_NO_MORE {
+			break
+		}
+	}
+}
+
 func TestHelpIter_textsIsEmpty(t *testing.T) {
 	iter := newHelpIter([]string{}, 0, 0, 0)
 	line, status := iter.Next()
