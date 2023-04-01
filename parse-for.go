@@ -90,7 +90,7 @@ func (e IllegalOptionType) Error() string {
 // to the option store which is the second parameter of this function.
 // This function divides command line arguments to command parameters and
 // options, then stores the options to the option store, and returns the
-// command parameters.
+// command parameters with the generated option configuratins.
 //
 // The configurations of options are determined by types and struct tags of
 // fields of the option store.
@@ -128,18 +128,18 @@ func (e IllegalOptionType) Error() string {
 // string but an empty array.
 // If you want to specify an array which contains only an empty string, write
 // nothing after "=" mark, like `opt:"name="`.
-func ParseFor(args []string, options any) ([]string, error) {
+func ParseFor(args []string, options any) ([]string, []OptCfg, error) {
 	optCfgs, err := MakeOptCfgsFor(options)
 	if err != nil {
-		return empty, err
+		return empty, optCfgs, err
 	}
 
 	a, err := ParseWith(args, optCfgs)
 	if err != nil {
-		return empty, err
+		return empty, optCfgs, err
 	}
 
-	return a.cmdParams, nil
+	return a.cmdParams, optCfgs, nil
 }
 
 // MakeOptCfgsFor is a function to make a OptCfg array from fields of the
