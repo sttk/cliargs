@@ -18,7 +18,7 @@ import "github.com/sttk-go/cliargs"
 <a name="usage"></a>
 ## Usage examplee
 
-This library provides 3 functions to parse command line arguments, and privides a function to print help a text.
+This library provides 3 functions to parse command line arguments, and provides a function to print help a text.
 
 ### 1. Parse CLI arguments without configurations
 
