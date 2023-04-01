@@ -8,8 +8,8 @@ import (
 func ExampleParseFor() {
 	type MyOptions struct {
 		FooBar bool     `opt:"foo-bar,f" optdesc:"FooBar description."`
-		Baz    int      `opt:"baz,b=99" optdesc:"Baz description."`
-		Qux    []string `opt:"qux,q=[A,B,C]" optdesc:"Qux description."`
+		Baz    int      `opt:"baz,b=99" optdesc:"Baz description." optparam:"<num>"`
+		Qux    []string `opt:"qux,q=[A,B,C]" optdesc:"Qux description." optparam:"<text>"`
 	}
 	options := MyOptions{}
 
@@ -34,6 +34,7 @@ func ExampleParseFor() {
 	fmt.Printf("optCfgs[1].IsArray = %v\n", optCfgs[1].IsArray)
 	fmt.Printf("optCfgs[1].Default = %v\n", optCfgs[1].Default)
 	fmt.Printf("optCfgs[1].Desc = %v\n", optCfgs[1].Desc)
+	fmt.Printf("optCfgs[1].AtParam = %v\n", optCfgs[1].AtParam)
 
 	fmt.Printf("optCfgs[2].Name = %v\n", optCfgs[2].Name)
 	fmt.Printf("optCfgs[2].Aliases = %v\n", optCfgs[2].Aliases)
@@ -41,6 +42,7 @@ func ExampleParseFor() {
 	fmt.Printf("optCfgs[2].IsArray = %v\n", optCfgs[2].IsArray)
 	fmt.Printf("optCfgs[2].Default = %v\n", optCfgs[2].Default)
 	fmt.Printf("optCfgs[2].Desc = %v\n", optCfgs[2].Desc)
+	fmt.Printf("optCfgs[2].AtParam = %v\n", optCfgs[2].AtParam)
 
 	fmt.Printf("options.FooBar = %v\n", options.FooBar)
 	fmt.Printf("options.Baz = %v\n", options.Baz)
@@ -61,12 +63,14 @@ func ExampleParseFor() {
 	// optCfgs[1].IsArray = false
 	// optCfgs[1].Default = [99]
 	// optCfgs[1].Desc = Baz description.
+	// optCfgs[1].AtParam = <num>
 	// optCfgs[2].Name = qux
 	// optCfgs[2].Aliases = [q]
 	// optCfgs[2].HasParam = true
 	// optCfgs[2].IsArray = true
 	// optCfgs[2].Default = [A B C]
 	// optCfgs[2].Desc = Qux description.
+	// optCfgs[2].AtParam = <text>
 	// options.FooBar = true
 	// options.Baz = 12
 	// options.Qux = [D E]
@@ -75,9 +79,9 @@ func ExampleParseFor() {
 func ExampleMakeOptCfgsFor() {
 	type MyOptions struct {
 		FooBar bool     `opt:"foo-bar,f" optdesc:"FooBar description"`
-		Baz    int      `opt:"baz,b=99" optdesc:"Baz description"`
-		Qux    string   `opt:"=XXX" optdesc:"Qux description"`
-		Quux   []string `opt:"quux=[A,B,C]" optdesc:"Quux description"`
+		Baz    int      `opt:"baz,b=99" optdesc:"Baz description" optparam:"<number>"`
+		Qux    string   `opt:"=XXX" optdesc:"Qux description" optparam:"<string>"`
+		Quux   []string `opt:"quux=[A,B,C]" optdesc:"Quux description" optparam:"<array elem>"`
 		Corge  []int
 	}
 	options := MyOptions{}
@@ -99,6 +103,7 @@ func ExampleMakeOptCfgsFor() {
 	fmt.Printf("optCfgs[1].IsArray = %v\n", optCfgs[1].IsArray)
 	fmt.Printf("optCfgs[1].Default = %v\n", optCfgs[1].Default)
 	fmt.Printf("optCfgs[1].Desc = %v\n", optCfgs[1].Desc)
+	fmt.Printf("optCfgs[1].AtParam = %v\n", optCfgs[1].AtParam)
 	fmt.Println()
 	fmt.Printf("optCfgs[2].Name = %v\n", optCfgs[2].Name)
 	fmt.Printf("optCfgs[2].Aliases = %v\n", optCfgs[2].Aliases)
@@ -106,6 +111,7 @@ func ExampleMakeOptCfgsFor() {
 	fmt.Printf("optCfgs[2].IsArray = %v\n", optCfgs[2].IsArray)
 	fmt.Printf("optCfgs[2].Default = %v\n", optCfgs[2].Default)
 	fmt.Printf("optCfgs[2].Desc = %v\n", optCfgs[2].Desc)
+	fmt.Printf("optCfgs[2].AtParam = %v\n", optCfgs[2].AtParam)
 	fmt.Println()
 	fmt.Printf("optCfgs[3].Name = %v\n", optCfgs[3].Name)
 	fmt.Printf("optCfgs[3].Aliases = %v\n", optCfgs[3].Aliases)
@@ -113,6 +119,7 @@ func ExampleMakeOptCfgsFor() {
 	fmt.Printf("optCfgs[3].IsArray = %v\n", optCfgs[3].IsArray)
 	fmt.Printf("optCfgs[3].Default = %v\n", optCfgs[3].Default)
 	fmt.Printf("optCfgs[3].Desc = %v\n", optCfgs[3].Desc)
+	fmt.Printf("optCfgs[3].AtParam = %v\n", optCfgs[3].AtParam)
 	fmt.Println()
 	fmt.Printf("optCfgs[4].Name = %v\n", optCfgs[4].Name)
 	fmt.Printf("optCfgs[4].Aliases = %v\n", optCfgs[4].Aliases)
@@ -138,6 +145,7 @@ func ExampleMakeOptCfgsFor() {
 	// optCfgs[1].IsArray = false
 	// optCfgs[1].Default = [99]
 	// optCfgs[1].Desc = Baz description
+	// optCfgs[1].AtParam = <number>
 	//
 	// optCfgs[2].Name = Qux
 	// optCfgs[2].Aliases = []
@@ -145,6 +153,7 @@ func ExampleMakeOptCfgsFor() {
 	// optCfgs[2].IsArray = false
 	// optCfgs[2].Default = [XXX]
 	// optCfgs[2].Desc = Qux description
+	// optCfgs[2].AtParam = <string>
 	//
 	// optCfgs[3].Name = quux
 	// optCfgs[3].Aliases = []
@@ -152,6 +161,7 @@ func ExampleMakeOptCfgsFor() {
 	// optCfgs[3].IsArray = true
 	// optCfgs[3].Default = [A B C]
 	// optCfgs[3].Desc = Quux description
+	// optCfgs[3].AtParam = <array elem>
 	//
 	// optCfgs[4].Name = Corge
 	// optCfgs[4].Aliases = []

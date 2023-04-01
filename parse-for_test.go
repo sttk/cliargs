@@ -1517,6 +1517,25 @@ func TestMakeOptCfgsFor_optionDescriptions(t *testing.T) {
 	assert.Equal(t, optCfgs[4].Desc, "")
 }
 
+func TestMakeOptCfgsFor_optionParam(t *testing.T) {
+	type MyOptions struct {
+		FooBar bool     `opt:"foo-bar,f" optparam:"aaa"`
+		Baz    int      `opt:"baz,b=99" optparam:"bbb"`
+		Qux    string   `opt:"=XXX" optparam:"ccc"`
+		Quux   []string `opt:"quux=/[A/B/C]" optparam:"ddd (multiple)"`
+		Corge  []int
+	}
+	options := MyOptions{}
+
+	optCfgs, err0 := cliargs.MakeOptCfgsFor(&options)
+	assert.Nil(t, err0)
+	assert.Equal(t, optCfgs[0].AtParam, "")
+	assert.Equal(t, optCfgs[1].AtParam, "bbb")
+	assert.Equal(t, optCfgs[2].AtParam, "ccc")
+	assert.Equal(t, optCfgs[3].AtParam, "ddd (multiple)")
+	assert.Equal(t, optCfgs[4].AtParam, "")
+}
+
 func TestParseFor_optCfgHasUnsupportedType(t *testing.T) {
 	type A struct{ Name string }
 	type MyOptions struct {
