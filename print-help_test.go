@@ -526,3 +526,46 @@ func TestPrintHelp_error(t *testing.T) {
 		assert.Fail(t, err.Error())
 	}
 }
+
+func TestMakeHelp_optCfgsIncludesAnyOption(t *testing.T) {
+	usage := "abcdefg"
+	optCfgs := []OptCfg{
+		OptCfg{Name:"foo", Desc:"description of foo."},
+		OptCfg{Name:"bar-baz", Desc:"description of bar-baz."},
+		OptCfg{Name:"*", Desc:"description of *."},
+		OptCfg{Name:"qux", Desc:"description of qux."},
+  }
+	wrapOpts := WrapOpts{}
+
+  iter, err := MakeHelp(usage, optCfgs, wrapOpts)
+  assert.Nil(t, err)
+  text, status := iter.Next()
+  assert.Equal(t, status, ITER_HAS_MORE)
+  assert.Equal(t, text, usage)
+  text, status = iter.Next()
+  assert.Equal(t, status, ITER_HAS_MORE)
+  assert.Equal(t, text, "--foo      description of foo.")
+  text, status = iter.Next()
+  assert.Equal(t, status, ITER_HAS_MORE)
+  assert.Equal(t, text, "--bar-baz  description of bar-baz.")
+  text, status = iter.Next()
+  assert.Equal(t, status, ITER_NO_MORE)
+  assert.Equal(t, text, "--qux      description of qux.")
+  text, status = iter.Next()
+  assert.Equal(t, status, ITER_NO_MORE)
+  assert.Equal(t, text, "")
+}
+
+func TestPrintHelp_optCfgsIncludesAnyOption(t *testing.T) {
+	usage := "abcdefg"
+	optCfgs := []OptCfg{
+		OptCfg{Name:"foo", Desc:"description of foo."},
+		OptCfg{Name:"bar-baz", Desc:"description of bar-baz."},
+		OptCfg{Name:"*", Desc:"description of *."},
+		OptCfg{Name:"qux", Desc:"description of qux."},
+  }
+	wrapOpts := WrapOpts{MarginLeft:5}
+
+  err := PrintHelp(usage, optCfgs, wrapOpts)
+  assert.Nil(t, err)
+}

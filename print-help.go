@@ -111,18 +111,25 @@ func MakeHelp(
 		lineWidth = 80
 	}
 
-	texts := make([]string, len(optCfgs)+1)
+	tw := make([]textAndWidth, len(optCfgs))
 	indent := 0
 
-	for i, cfg := range optCfgs {
-		t := makeOptTitle(cfg)
-		if indent < len(t) {
-			indent = len(t)
+	i := 0
+	for _, cfg := range optCfgs {
+		if cfg.Name == anyOption {
+			continue
 		}
-		texts[i+1] = t
+		tw[i] = makeOptTitle(cfg)
+		if indent < tw[i].width {
+			indent = tw[i].width
+		}
+		i++
 	}
-	indent += 2
+	if i != len(tw) {
+		tw = tw[0:i]
+	}
 
+	indent += 2
 	if wrapOpts.Indent > 0 {
 		indent = wrapOpts.Indent
 	}
@@ -137,15 +144,26 @@ func MakeHelp(
 	}
 	lineWidth -= wrapOpts.MarginLeft + wrapOpts.MarginRight
 
+	texts := make([]string, 1+len(tw))
 	texts[0] = usage
-	for i, cfg := range optCfgs {
-		texts[i+1] = makeOptHelp(texts[i+1], cfg, indent)
+	i = 0
+	for _, cfg := range optCfgs {
+		if cfg.Name == anyOption {
+			continue
+		}
+		texts[i+1] = makeOptHelp(tw[i], cfg, indent)
+		i++
 	}
 
 	return newHelpIter(texts, lineWidth, indent, wrapOpts.MarginLeft), nil
 }
 
-func makeOptTitle(cfg OptCfg) string {
+type textAndWidth struct {
+	text  string
+	width int
+}
+
+func makeOptTitle(cfg OptCfg) textAndWidth {
 	title := cfg.Name
 	switch len(title) {
 	case 0:
@@ -169,25 +187,25 @@ func makeOptTitle(cfg OptCfg) string {
 		title += " " + cfg.AtParam
 	}
 
-	return title
+	w := textWidth(title)
+	return textAndWidth{text: title, width: w}
 }
 
-func makeOptHelp(title string, cfg OptCfg, indent int) string {
-	w := titleWidth(title)
-	if w+2 > indent {
-		title += "\n" + strings.Repeat(" ", indent) + cfg.Desc
-	} else {
-		title += strings.Repeat(" ", indent-w) + cfg.Desc
-	}
-	return title
-}
-
-func titleWidth(title string) int {
+func textWidth(text string) int {
 	w := 0
-	for _, r := range title[:] {
+	for _, r := range text {
 		w += runeWidth(r)
 	}
 	return w
+}
+
+func makeOptHelp(tw textAndWidth, cfg OptCfg, indent int) string {
+	w := tw.width
+	if w+2 > indent {
+		return tw.text + "\n" + strings.Repeat(" ", indent) + cfg.Desc
+	} else {
+		return tw.text + strings.Repeat(" ", indent-w) + cfg.Desc
+	}
 }
 
 // PrintHelp is a function which output a help text to stdout.
