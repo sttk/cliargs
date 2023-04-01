@@ -132,15 +132,15 @@ This library supports Go 1.18 or later.
 % gvm-fav
 Now using version go1.18.10
 go version go1.18.10 darwin/amd64
-ok  	github.com/sttk-go/cliargs	0.136s	coverage: 98.2% of statements
+ok  	github.com/sttk-go/cliargs	0.130s	coverage: 99.1% of statements
 
 Now using version go1.19.5
 go version go1.19.5 darwin/amd64
-ok  	github.com/sttk-go/cliargs	0.137s	coverage: 98.2% of statements
+ok  	github.com/sttk-go/cliargs	0.127s	coverage: 99.1% of statements
 
 Now using version go1.20
 go version go1.20 darwin/amd64
-ok  	github.com/sttk-go/cliargs	0.142s	coverage: 98.2% of statements
+ok  	github.com/sttk-go/cliargs	0.133s	coverage: 99.1% of statements
 
 Back to go1.20
 Now using version go1.20
