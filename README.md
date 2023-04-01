@@ -3,6 +3,7 @@
 A library to parse command line arguments for Golang application.
 
 - [Import this package](#import)
+- [Usage examples](#usage)
 - [Supporting Go versions](#support-go-version)
 - [License](#license)
 
@@ -12,6 +13,113 @@ A library to parse command line arguments for Golang application.
 ```
 import "github.com/sttk-go/cliargs"
 ```
+
+
+<a name="usage"></a>
+## Usage examplee
+
+This library provides 3 functions to parse command line arguments, and privides a function to print help a text.
+
+### 1. Parse CLI arguments without configurations
+
+```
+// os.Args[1:] = [--foo-bar=A -a --baz -bc=3 qux -c=4 quux]
+
+args, err := cliargs.Parse()
+args.HasOpt("a")          // true
+args.HasOpt("b")          // true
+args.HasOpt("c")          // true
+args.HasOpt("foo-bar")    // true
+args.HasOpt("baz")        // true
+args.OptParam("c")        // 3
+args.OptParams("c")       // [3 4]
+args.OptParam("foo-bar")  // A
+args.OptParams("foo-bar") // [A]
+args.CmdParams()          // [qux quux]
+```
+
+### 2. Parse CLI arguments with configurations
+
+```
+osArgs := []string{"--foo-bar", "qux", "--baz", "1", "-z=2", "-X", "quux"}
+optCfgs := []cliargs.OptCfg{
+  cliargs.OptCfg{Name:"foo-bar", Desc:"This is description of foo-bar."},
+  cliargs.OptCfg{
+    Name:"baz", Aliases:[]string{"z"}, HasParam:true, IsArray: true,
+    Desc:"This is description of baz.", AtParam:"<text>",
+  },
+  cliargs.OptCfg{Name:"*"},
+}
+
+args, err := cliargs.Parseith(osArgs, optCfgs)
+args.HasOpt("foo-bar")   // true
+args.HasOpt("baz")       // true
+args.HasOpt("X")         // true, due to "*" config
+args.OptParam("baz")     // 1
+args.OptParams("baz")    // [1 2]
+args.CmdParams()         // [qux quux]
+```
+
+#### Print a help text of the above `optCfgs`
+
+```
+wrapOpts := WrapOpts{}
+usage := "This is the usage description."
+cliargs.PrintHelp(optCfgs, wrapOpts)
+```
+(stdout)
+```
+This is the usage description.
+--foo-bar, -f     This is description of foo-bar.
+--baz, -b <text>  This is description of baz.
+```
+
+
+### 3. Parse CLI arguments for an option store with struct tags
+
+```
+type Options struct {
+  FooBar bool     `opt:foo-bar,f" optdesc:"This is FooBar.`
+  Baz    int      `opt:baz,b=99" optdesc:"This is Baz." optparam:"<num>"`
+  Qux    string   `opt:"=XXX" optdesc:"This is Qux." optparam:"<text>"`
+  Quux   []string `opt:"quux=[A,B,C]" optdesc:"This is Quux."`
+  Corge  []int
+}
+options := Options{}
+
+os.Args := []string{
+  "--foo-bar", "c1", "-b", "12", "--Qux", "ABC", "c2",
+  "--Corge", "20", "--Corge=21",
+}
+
+cmdParams, optCfgs, err := cliargs.ParseFor(osArgs, &options)
+cmdParams       // [c1 c2]
+options.FooBar  // true
+options.Baz     // 12
+options.Qux     // ABC
+options.Quux    // [A B C]
+options.Corge   // [20 21]
+```
+
+#### Print a help text of the above `optCfgs`
+
+```
+wrapOpts := WrapOpts{}
+usage := "This is the usage description.\n\nOPTIONS:"
+cliargs.PrintHelp(optCfgs, wrapOpts)
+```
+(stdout)
+```
+This is the usage description.
+
+OPTIONS:
+--foo-bar, -f    This is FooBar.
+--baz, -b <num>  This is Baz.
+--Qux <text>     This is Qux.
+--quux           This is Quux.
+--Corge
+```
+
 
 <a name="support-go-versions"></a>
 ## Supporting Go versions
