@@ -91,9 +91,10 @@ func (iter *HelpIter) Next() (string, IterStatus) {
 //
 // A help text consists of an usage section and options section, and options
 // section consists of title parts and description parts.
-// A title part enumerates a option name and aliases, and its description
-// follows the title with an indent, specified in WrapOpts,  in a description
-// part.
+// On a title part, a option name, aliases, and a .AtParam field of OptCfg are
+// enumerated.
+// On a description part, a .Desc field of OptCfg is put and it follows a title
+// part with an indent, specified in WrapOpts,
 //
 // On the both sides of a help text, left margin and right margin of which size
 // are specified in WrapOpts can be put.

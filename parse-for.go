@@ -220,6 +220,11 @@ func newOptCfg(fld reflect.StructField) OptCfg {
 		}
 	}
 
+	var atparam string
+	if hasParam {
+		atparam = fld.Tag.Get("optparam")
+	}
+
 	desc := fld.Tag.Get("optdesc")
 
 	return OptCfg{
@@ -229,6 +234,7 @@ func newOptCfg(fld reflect.StructField) OptCfg {
 		IsArray:  isArray,
 		Default:  defaults,
 		Desc:     desc,
+		AtParam:  atparam,
 	}
 }
 
