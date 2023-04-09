@@ -1173,7 +1173,10 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsInt(t *testing.T) {
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "FailToParseInt")
+	assert.Equal(t, err.Error(), "FailToParseInt{"+
+		"Option:int-var,Field:IntVar,Input:,BitSize:64,"+
+		"cause:strconv.ParseInt: parsing \"\": invalid syntax}",
+	)
 	assert.NotNil(t, errors.Unwrap(err))
 	switch err.(type) {
 	case cliargs.FailToParseInt:
@@ -1198,7 +1201,10 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUint(t *testing.T) {
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "FailToParseUint")
+	assert.Equal(t, err.Error(), "FailToParseUint{"+
+		"Option:uint-var,Field:UintVar,Input:,BitSize:64,"+
+		"cause:strconv.ParseUint: parsing \"\": invalid syntax}",
+	)
 	assert.NotNil(t, errors.Unwrap(err))
 	switch err.(type) {
 	case cliargs.FailToParseUint:
@@ -1223,7 +1229,10 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloat(t *testing.T) {
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "FailToParseFloat")
+	assert.Equal(t, err.Error(), "FailToParseFloat{"+
+		"Option:float-var,Field:Float64Var,Input:,BitSize:64,"+
+		"cause:strconv.ParseFloat: parsing \"\": invalid syntax}",
+	)
 	assert.NotNil(t, errors.Unwrap(err))
 	switch err.(type) {
 	case cliargs.FailToParseFloat:
@@ -1263,7 +1272,10 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsIntArray(t *testing.T) {
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "FailToParseInt")
+	assert.Equal(t, err.Error(), "FailToParseInt{"+
+		"Option:int-arr,Field:IntArr,Input:,BitSize:64,"+
+		"cause:strconv.ParseInt: parsing \"\": invalid syntax}",
+	)
 	assert.NotNil(t, errors.Unwrap(err))
 	switch err.(type) {
 	case cliargs.FailToParseInt:
@@ -1288,7 +1300,10 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUintArray(t *testing.T) {
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "FailToParseUint")
+	assert.Equal(t, err.Error(), "FailToParseUint{"+
+		"Option:uint-arr,Field:UintArr,Input:,BitSize:64,"+
+		"cause:strconv.ParseUint: parsing \"\": invalid syntax}",
+	)
 	assert.NotNil(t, errors.Unwrap(err))
 	switch err.(type) {
 	case cliargs.FailToParseUint:
@@ -1313,7 +1328,10 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloatArray(t *testing.T) {
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "FailToParseFloat")
+	assert.Equal(t, err.Error(), "FailToParseFloat{"+
+		"Option:float-arr,Field:Float64Arr,Input:,BitSize:64,"+
+		"cause:strconv.ParseFloat: parsing \"\": invalid syntax}",
+	)
 	assert.NotNil(t, errors.Unwrap(err))
 	switch err.(type) {
 	case cliargs.FailToParseFloat:
@@ -1368,9 +1386,12 @@ func TestParseFor_errorIfDefaultValueIsInvalidType(t *testing.T) {
 	assert.Equal(t, params, []string{})
 	assert.Equal(t, len(optCfgs), 0) // because of the error
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "IllegalOptionType")
+	assert.Equal(t, err.Error(), "IllegalOptionType{"+
+		"Option:BoolArr,Field:BoolArr,Type:[]bool}",
+	)
 	switch err.(type) {
 	case cliargs.IllegalOptionType:
+		assert.Equal(t, err.(cliargs.IllegalOptionType).Option, "BoolArr")
 		assert.Equal(t, err.(cliargs.IllegalOptionType).Field, "BoolArr")
 		assert.Equal(t, err.(cliargs.IllegalOptionType).Type, reflect.TypeOf(options.BoolArr))
 	default:
@@ -1546,7 +1567,9 @@ func TestParseFor_optCfgHasUnsupportedType(t *testing.T) {
 
 	_, err := cliargs.MakeOptCfgsFor(&options)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "IllegalOptionType")
+	assert.Equal(t, err.Error(), "IllegalOptionType{"+
+		"Option:foo-bar,Field:FooBar,Type:cliargs_test.A}",
+	)
 	switch err.(type) {
 	case cliargs.IllegalOptionType:
 		assert.Equal(t, err.(cliargs.IllegalOptionType).Option, "foo-bar")
@@ -1570,7 +1593,7 @@ func TestParseFor_argIsNotPointer(t *testing.T) {
 	_, err := cliargs.MakeOptCfgsFor(options)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionStoreIsNotChangeable")
+	assert.Equal(t, err.Error(), "OptionStoreIsNotChangeable{}")
 	switch err.(type) {
 	case cliargs.OptionStoreIsNotChangeable:
 	default:
