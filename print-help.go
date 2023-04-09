@@ -19,7 +19,9 @@ type MarginsAndIndentExceedLineWidth struct {
 }
 
 func (e MarginsAndIndentExceedLineWidth) Error() string {
-	return "MarginsAndIndentExceedLineWidth"
+	return fmt.Sprintf("MarginsAndIndentExceedLineWidth{"+
+		"LineWidth:%d,MarginLeft:%d,MarginRight:%d,Indent:%d}",
+		e.LineWidth, e.MarginLeft, e.MarginRight, e.Indent)
 }
 
 // WrapOpts is a struct type which holds options for wrapping texts.

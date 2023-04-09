@@ -5,6 +5,7 @@
 package cliargs
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -16,7 +17,7 @@ import (
 type OptionStoreIsNotChangeable struct{}
 
 func (e OptionStoreIsNotChangeable) Error() string {
-	return "OptionStoreIsNotChangeable"
+	return "OptionStoreIsNotChangeable{}"
 }
 
 // FailToParseInt is an error reaason which indicates that an option
@@ -30,7 +31,9 @@ type FailToParseInt struct {
 }
 
 func (e FailToParseInt) Error() string {
-	return "FailToParseInt"
+	return fmt.Sprintf("FailToParseInt{"+
+		"Option:%s,Field:%s,Input:%s,BitSize:%d,cause:%s}",
+		e.Option, e.Field, e.Input, e.BitSize, e.cause.Error())
 }
 
 func (e FailToParseInt) Unwrap() error {
@@ -48,7 +51,9 @@ type FailToParseUint struct {
 }
 
 func (e FailToParseUint) Error() string {
-	return "FailToParseUint"
+	return fmt.Sprintf("FailToParseUint{"+
+		"Option:%s,Field:%s,Input:%s,BitSize:%d,cause:%s}",
+		e.Option, e.Field, e.Input, e.BitSize, e.cause.Error())
 }
 
 func (e FailToParseUint) Unwrap() error {
@@ -66,7 +71,9 @@ type FailToParseFloat struct {
 }
 
 func (e FailToParseFloat) Error() string {
-	return "FailToParseFloat"
+	return fmt.Sprintf("FailToParseFloat{"+
+		"Option:%s,Field:%s,Input:%s,BitSize:%d,cause:%s}",
+		e.Option, e.Field, e.Input, e.BitSize, e.cause.Error())
 }
 
 func (e FailToParseFloat) Unwrap() error {
@@ -83,7 +90,9 @@ type IllegalOptionType struct {
 }
 
 func (e IllegalOptionType) Error() string {
-	return "IllegalOptionType"
+	return fmt.Sprintf("IllegalOptionType{"+
+		"Option:%s,Field:%s,Type:%s}",
+		e.Option, e.Field, e.Type.String())
 }
 
 // ParseFor is a function to parse command line arguments and set their values

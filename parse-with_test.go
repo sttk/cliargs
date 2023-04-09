@@ -62,7 +62,7 @@ func TestParseWith_zeroCfgAndOneShortOpt(t *testing.T) {
 
 	args, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "UnconfiguredOption")
+	assert.Equal(t, err.Error(), "UnconfiguredOption{Option:f}")
 	switch err.(type) {
 	case cliargs.UnconfiguredOption:
 		assert.Equal(t, err.(cliargs.UnconfiguredOption).Option, "f")
@@ -159,7 +159,7 @@ func TestParseWith_oneCfgAndOneDifferentLongOpt(t *testing.T) {
 
 	args, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "UnconfiguredOption")
+	assert.Equal(t, err.Error(), "UnconfiguredOption{Option:boo-far}")
 	switch err.(type) {
 	case cliargs.UnconfiguredOption:
 		assert.Equal(t, err.(cliargs.UnconfiguredOption).Option, "boo-far")
@@ -184,7 +184,7 @@ func TestParseWith_oneCfgAndOneDifferentShortOpt(t *testing.T) {
 
 	args, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "UnconfiguredOption")
+	assert.Equal(t, err.Error(), "UnconfiguredOption{Option:b}")
 	switch err.(type) {
 	case cliargs.UnconfiguredOption:
 		assert.Equal(t, err.(cliargs.UnconfiguredOption).Option, "b")
@@ -363,7 +363,7 @@ func TestParseWith_oneCfgHasParamButOneLongOptHasNoParam(t *testing.T) {
 
 	args, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionNeedsParam")
+	assert.Equal(t, err.Error(), "OptionNeedsParam{Option:foo-bar}")
 	switch err.(type) {
 	case cliargs.OptionNeedsParam:
 		assert.Equal(t, err.(cliargs.OptionNeedsParam).Option, "foo-bar")
@@ -388,7 +388,7 @@ func TestParseWith_oneCfgHasParamAndOneShortOptHasNoParam(t *testing.T) {
 
 	args, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionNeedsParam")
+	assert.Equal(t, err.Error(), "OptionNeedsParam{Option:f}")
 	switch err.(type) {
 	case cliargs.OptionNeedsParam:
 		assert.Equal(t, err.(cliargs.OptionNeedsParam).Option, "f")
@@ -425,7 +425,7 @@ func TestParseWith_oneCfgHasNoParamAndOneLongOptHasParam(t *testing.T) {
 
 	args, err = cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionTakesNoParam")
+	assert.Equal(t, err.Error(), "OptionTakesNoParam{Option:foo-bar}")
 	switch err.(type) {
 	case cliargs.OptionTakesNoParam:
 		assert.Equal(t, err.(cliargs.OptionTakesNoParam).Option, "foo-bar")
@@ -456,7 +456,7 @@ func TestParseWith_oneCfgHasNoParamAndOneLongOptHasParam(t *testing.T) {
 
 	args, err = cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionTakesNoParam")
+	assert.Equal(t, err.Error(), "OptionTakesNoParam{Option:foo-bar}")
 	switch err.(type) {
 	case cliargs.OptionTakesNoParam:
 		assert.Equal(t, err.(cliargs.OptionTakesNoParam).Option, "foo-bar")
@@ -493,7 +493,7 @@ func TestParseWith_oneCfgHasNoParamAndOneShortOptHasParam(t *testing.T) {
 
 	args, err = cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionTakesNoParam")
+	assert.Equal(t, err.Error(), "OptionTakesNoParam{Option:f}")
 	switch err.(type) {
 	case cliargs.OptionTakesNoParam:
 		assert.Equal(t, err.(cliargs.OptionTakesNoParam).Option, "f")
@@ -525,7 +525,7 @@ func TestParseWith_oneCfgHasNoParamAndOneShortOptHasParam(t *testing.T) {
 
 	args, err = cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionTakesNoParam")
+	assert.Equal(t, err.Error(), "OptionTakesNoParam{Option:f}")
 	switch err.(type) {
 	case cliargs.OptionTakesNoParam:
 		assert.Equal(t, err.(cliargs.OptionTakesNoParam).Option, "f")
@@ -551,7 +551,7 @@ func TestParseWith_oneCfgHasNoParamButIsArray(t *testing.T) {
 
 	args, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "ConfigIsArrayButHasNoParam")
+	assert.Equal(t, err.Error(), "ConfigIsArrayButHasNoParam{Option:foo-bar}")
 	switch err.(type) {
 	case cliargs.ConfigIsArrayButHasNoParam:
 		assert.Equal(t, err.(cliargs.ConfigIsArrayButHasNoParam).Option, "foo-bar")
@@ -739,7 +739,7 @@ func TestParseWith_oneCfgIsNotArrayButOptsAreMultiple(t *testing.T) {
 
 	args, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionIsNotArray")
+	assert.Equal(t, err.Error(), "OptionIsNotArray{Option:foo-bar}")
 	switch err.(type) {
 	case cliargs.OptionIsNotArray:
 		assert.Equal(t, err.(cliargs.OptionIsNotArray).Option, "foo-bar")
@@ -784,7 +784,7 @@ func TestParseWith_oneCfgHasNoParamButHasDefault(t *testing.T) {
 
 	args, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "ConfigHasDefaultButHasNoParam")
+	assert.Equal(t, err.Error(), "ConfigHasDefaultButHasNoParam{Option:foo-bar}")
 	switch err.(type) {
 	case cliargs.ConfigHasDefaultButHasNoParam:
 		assert.Equal(t, err.(cliargs.ConfigHasDefaultButHasNoParam).Option, "foo-bar")

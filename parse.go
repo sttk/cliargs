@@ -5,6 +5,7 @@
 package cliargs
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"unicode"
@@ -15,7 +16,7 @@ import (
 type OptionHasInvalidChar struct{ Option string }
 
 func (e OptionHasInvalidChar) Error() string {
-	return "OptionHasInvalidChar"
+	return fmt.Sprintf("OptionHasInvalidChar{Option:%s}", e.Option)
 }
 
 var (

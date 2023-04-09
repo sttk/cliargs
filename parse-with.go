@@ -4,13 +4,17 @@
 
 package cliargs
 
+import (
+	"fmt"
+)
+
 // ConfigIsArrayButHasNoParam is an error which indicates that an option
 // configuration contradicts that the option must be an array
 // (.IsArray = true) but must have no option parameter (.HasParam = false).
 type ConfigIsArrayButHasNoParam struct{ Option string }
 
 func (e ConfigIsArrayButHasNoParam) Error() string {
-	return "ConfigIsArrayButHasNoParam"
+	return fmt.Sprintf("ConfigIsArrayButHasNoParam{Option:%s}", e.Option)
 }
 
 // ConfigHasDefaultButHasNoParam is an error which indicates that an option
@@ -19,7 +23,7 @@ func (e ConfigIsArrayButHasNoParam) Error() string {
 type ConfigHasDefaultButHasNoParam struct{ Option string }
 
 func (e ConfigHasDefaultButHasNoParam) Error() string {
-	return "ConfigHasDefaultButHasNoParam"
+	return fmt.Sprintf("ConfigHasDefaultButHasNoParam{Option:%s}", e.Option)
 }
 
 // UnconfiguredOption is an error which indicates that there is no
@@ -27,7 +31,7 @@ func (e ConfigHasDefaultButHasNoParam) Error() string {
 type UnconfiguredOption struct{ Option string }
 
 func (e UnconfiguredOption) Error() string {
-	return "UnconfiguredOption"
+	return fmt.Sprintf("UnconfiguredOption{Option:%s}", e.Option)
 }
 
 // OptionNeedsParam is an error which indicates that an option is input with
@@ -36,7 +40,7 @@ func (e UnconfiguredOption) Error() string {
 type OptionNeedsParam struct{ Option string }
 
 func (e OptionNeedsParam) Error() string {
-	return "OptionNeedsParam"
+	return fmt.Sprintf("OptionNeedsParam{Option:%s}", e.Option)
 }
 
 // OptionTakesNoParam is an error which indicates that an option isinput with
@@ -45,7 +49,7 @@ func (e OptionNeedsParam) Error() string {
 type OptionTakesNoParam struct{ Option string }
 
 func (e OptionTakesNoParam) Error() string {
-	return "OptionTakesNoParam"
+	return fmt.Sprintf("OptionTakesNoParam{Option:%s}", e.Option)
 }
 
 // OptionIsNotArray is an error which indicates that an option is input with
@@ -54,7 +58,7 @@ func (e OptionTakesNoParam) Error() string {
 type OptionIsNotArray struct{ Option string }
 
 func (e OptionIsNotArray) Error() string {
-	return "OptionIsNotArray"
+	return fmt.Sprintf("OptionIsNotArray{Option:%s}", e.Option)
 }
 
 const anyOption = "*"
