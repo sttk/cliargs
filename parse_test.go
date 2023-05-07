@@ -17,288 +17,300 @@ func TestParse_zeroArg(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 1)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "/path/to/app"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, args.CmdParams(), []string{})
-	assert.False(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string(nil))
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.False(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string(nil))
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{})
+	assert.False(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string(nil))
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.False(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string(nil))
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
 func TestParse_oneNonOptArg(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "path/to/app"
 	os.Args[1] = "abcd"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, args.CmdParams(), []string{"abcd"})
-	assert.False(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string(nil))
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.False(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string(nil))
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"abcd"})
+	assert.False(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string(nil))
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.False(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string(nil))
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
 func TestParse_oneLongOpt(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "app"
 	os.Args[1] = "--silent"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, args.CmdParams(), []string{})
-	assert.False(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string(nil))
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.False(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string(nil))
-	assert.True(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string{})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{})
+	assert.False(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string(nil))
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.False(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string(nil))
+	assert.True(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string{})
 }
 
-func TestParse_oneLongOptWithParam(t *testing.T) {
+func TestParse_oneLongOptWithArg(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "path/to/app"
 	os.Args[1] = "--alphabet=ABC"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, args.CmdParams(), []string{})
-	assert.False(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string(nil))
-	assert.True(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "ABC")
-	assert.Equal(t, args.OptParams("alphabet"), []string{"ABC"})
-	assert.False(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string(nil))
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{})
+	assert.False(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string(nil))
+	assert.True(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "ABC")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string{"ABC"})
+	assert.False(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string(nil))
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
 func TestParse_oneShortOpt(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "path/to/app"
 	os.Args[1] = "-s"
 
 	args, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, args.CmdParams(), []string{})
+	assert.Equal(t, args.Name, "app")
+	assert.Equal(t, args.Args(), []string{})
 	assert.False(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string(nil))
+	assert.Equal(t, args.OptArg("a"), "")
+	assert.Equal(t, args.OptArgs("a"), []string(nil))
 	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
+	assert.Equal(t, args.OptArg("alphabet"), "")
+	assert.Equal(t, args.OptArgs("alphabet"), []string(nil))
 	assert.True(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string{})
+	assert.Equal(t, args.OptArg("s"), "")
+	assert.Equal(t, args.OptArgs("s"), []string{})
 	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, args.OptArg("silent"), "")
+	assert.Equal(t, args.OptArgs("silent"), []string(nil))
 }
 
-func TestParse_oneShortOptWithParam(t *testing.T) {
+func TestParse_oneShortOptWithArg(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "path/to/app"
 	os.Args[1] = "-a=123"
 
 	args, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, args.CmdParams(), []string{})
+	assert.Equal(t, args.Name, "app")
+	assert.Equal(t, args.Args(), []string{})
 	assert.True(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "123")
-	assert.Equal(t, args.OptParams("a"), []string{"123"})
+	assert.Equal(t, args.OptArg("a"), "123")
+	assert.Equal(t, args.OptArgs("a"), []string{"123"})
 	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
+	assert.Equal(t, args.OptArg("alphabet"), "")
+	assert.Equal(t, args.OptArgs("alphabet"), []string(nil))
 	assert.False(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string(nil))
+	assert.Equal(t, args.OptArg("s"), "")
+	assert.Equal(t, args.OptArgs("s"), []string(nil))
 	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, args.OptArg("silent"), "")
+	assert.Equal(t, args.OptArgs("silent"), []string(nil))
 }
 
 func TestParse_oneArgByMultipleShortOpts(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "app"
 	os.Args[1] = "-sa"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, len(args.CmdParams()), 0)
-	assert.True(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string{})
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.True(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string{})
-	assert.False(t, args.HasOpt("silent"))
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, len(cmd.Args()), 0)
+	assert.True(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string{})
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.True(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string{})
+	assert.False(t, cmd.HasOpt("silent"))
 
 	assert.Nil(t, err)
-	assert.Equal(t, args.CmdParams(), []string{})
-	assert.True(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string{})
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.True(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string{})
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{})
+	assert.True(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string{})
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.True(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string{})
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
-func TestParse_oneArgByMultipleShortOptsWithParam(t *testing.T) {
+func TestParse_oneArgByMultipleShortOptsWithArg(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "/path/to/app"
 	os.Args[1] = "-sa=123"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, args.CmdParams(), []string{})
-	assert.True(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "123")
-	assert.Equal(t, args.OptParams("a"), []string{"123"})
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.True(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string{})
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{})
+	assert.True(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "123")
+	assert.Equal(t, cmd.OptArgs("a"), []string{"123"})
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.True(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string{})
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
 func TestParse_longOptNameIncludesHyphenMark(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "app"
 	os.Args[1] = "--aaa-bbb-ccc=123"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, len(args.CmdParams()), 0)
-	assert.True(t, args.HasOpt("aaa-bbb-ccc"))
-	assert.Equal(t, args.OptParam("aaa-bbb-ccc"), "123")
-	assert.Equal(t, args.OptParams("aaa-bbb-ccc"), []string{"123"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, len(cmd.Args()), 0)
+	assert.True(t, cmd.HasOpt("aaa-bbb-ccc"))
+	assert.Equal(t, cmd.OptArg("aaa-bbb-ccc"), "123")
+	assert.Equal(t, cmd.OptArgs("aaa-bbb-ccc"), []string{"123"})
 }
 
-func TestParse_optParamsIncludesEqualMark(t *testing.T) {
+func TestParse_optsIncludesEqualMark(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "app"
 	os.Args[1] = "-sa=b=c"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, args.CmdParams(), []string{})
-	assert.True(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "b=c")
-	assert.Equal(t, args.OptParams("a"), []string{"b=c"})
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.True(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string{})
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{})
+	assert.True(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "b=c")
+	assert.Equal(t, cmd.OptArgs("a"), []string{"b=c"})
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.True(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string{})
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
-func TestParse_optParamsIncludesMarks(t *testing.T) {
+func TestParse_optsIncludesMarks(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "path/to/app"
 	os.Args[1] = "-sa=1,2-3"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, args.CmdParams(), []string{})
-	assert.True(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "1,2-3")
-	assert.Equal(t, args.OptParams("a"), []string{"1,2-3"})
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.True(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string{})
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{})
+	assert.True(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "1,2-3")
+	assert.Equal(t, cmd.OptArgs("a"), []string{"1,2-3"})
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.True(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string{})
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
 func TestParse_illegalLongOptIfIncludingInvalidChar(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 4)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "app"
 	os.Args[1] = "-s"
 	os.Args[2] = "--abc%def"
 	os.Args[3] = "-a"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionHasInvalidChar{Option:abc%def}")
@@ -308,29 +320,30 @@ func TestParse_illegalLongOptIfIncludingInvalidChar(t *testing.T) {
 	default:
 		assert.Fail(t, err.Error())
 	}
-	assert.Equal(t, args.CmdParams(), []string{})
-	assert.False(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string(nil))
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.False(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string(nil))
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
+	assert.False(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string(nil))
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.False(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string(nil))
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
 func TestParse_illegalLongOptIfFirstCharIsNumber(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "app"
 	os.Args[1] = "--1abc"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionHasInvalidChar{Option:1abc}")
@@ -340,29 +353,30 @@ func TestParse_illegalLongOptIfFirstCharIsNumber(t *testing.T) {
 	default:
 		assert.Fail(t, err.Error())
 	}
-	assert.Equal(t, args.CmdParams(), []string{})
-	assert.False(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string(nil))
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.False(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string(nil))
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
+	assert.False(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string(nil))
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.False(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string(nil))
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
 func TestParse_illegalLongOptIfFirstCharIsHyphen(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "app"
 	os.Args[1] = "---aaa=123"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionHasInvalidChar{Option:-aaa=123}")
@@ -372,31 +386,32 @@ func TestParse_illegalLongOptIfFirstCharIsHyphen(t *testing.T) {
 	default:
 		assert.Fail(t, err.Error())
 	}
-	assert.Equal(t, args.CmdParams(), []string{})
-	assert.False(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string(nil))
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.False(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string(nil))
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
+	assert.False(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string(nil))
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.False(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string(nil))
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
 func TestParse_IllegalCharInShortOpt(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 4)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "path/to/app"
 	os.Args[1] = "-s"
 	os.Args[2] = "--alphabet"
 	os.Args[3] = "-s@"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionHasInvalidChar{Option:@}")
@@ -406,26 +421,27 @@ func TestParse_IllegalCharInShortOpt(t *testing.T) {
 	default:
 		assert.Fail(t, err.Error())
 	}
-	assert.Equal(t, args.CmdParams(), []string{})
-	assert.False(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string(nil))
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.False(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string(nil))
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
+	assert.False(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string(nil))
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.False(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string(nil))
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
 func TestParse_useEndOptMark(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 7)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "app"
 	os.Args[1] = "-s"
 	os.Args[2] = "--"
 	os.Args[3] = "-s"
@@ -433,54 +449,56 @@ func TestParse_useEndOptMark(t *testing.T) {
 	os.Args[5] = "-s@"
 	os.Args[6] = "xxx"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, args.CmdParams(), []string{"-s", "--", "-s@", "xxx"})
-	assert.False(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string(nil))
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.True(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string{})
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"-s", "--", "-s@", "xxx"})
+	assert.False(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string(nil))
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.True(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string{})
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
 func TestParse_singleHyphen(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 2)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "path/to/app"
 	os.Args[1] = "-"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.Equal(t, args.CmdParams(), []string{"-"})
-	assert.False(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string(nil))
-	assert.False(t, args.HasOpt("alphabet"))
-	assert.Equal(t, args.OptParam("alphabet"), "")
-	assert.Equal(t, args.OptParams("alphabet"), []string(nil))
-	assert.False(t, args.HasOpt("s"))
-	assert.Equal(t, args.OptParam("s"), "")
-	assert.Equal(t, args.OptParams("s"), []string(nil))
-	assert.False(t, args.HasOpt("silent"))
-	assert.Equal(t, args.OptParam("silent"), "")
-	assert.Equal(t, args.OptParams("silent"), []string(nil))
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"-"})
+	assert.False(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string(nil))
+	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.Equal(t, cmd.OptArg("alphabet"), "")
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
+	assert.False(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArg("s"), "")
+	assert.Equal(t, cmd.OptArgs("s"), []string(nil))
+	assert.False(t, cmd.HasOpt("silent"))
+	assert.Equal(t, cmd.OptArg("silent"), "")
+	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
 }
 
 func TestParse_multipleArgs(t *testing.T) {
 	defer resetOsArgs()
 
 	os.Args = make([]string, 8)
-	os.Args[0] = osArgs[0]
+	os.Args[0] = "app"
 	os.Args[1] = "--foo-bar"
 	os.Args[2] = "-a"
 	os.Args[3] = "--baz"
@@ -489,23 +507,24 @@ func TestParse_multipleArgs(t *testing.T) {
 	os.Args[6] = "-c=4"
 	os.Args[7] = "quux"
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 
 	assert.Nil(t, err)
-	assert.True(t, args.HasOpt("a"))
-	assert.Equal(t, args.OptParam("a"), "")
-	assert.Equal(t, args.OptParams("a"), []string{})
-	assert.True(t, args.HasOpt("b"))
-	assert.Equal(t, args.OptParam("b"), "")
-	assert.Equal(t, args.OptParams("b"), []string{})
-	assert.True(t, args.HasOpt("c"))
-	assert.Equal(t, args.OptParam("c"), "3")
-	assert.Equal(t, args.OptParams("c"), []string{"3", "4"})
-	assert.True(t, args.HasOpt("foo-bar"))
-	assert.Equal(t, args.OptParam("foo-bar"), "")
-	assert.Equal(t, args.OptParams("foo-bar"), []string{})
-	assert.True(t, args.HasOpt("baz"))
-	assert.Equal(t, args.OptParam("baz"), "")
-	assert.Equal(t, args.OptParams("baz"), []string{})
-	assert.Equal(t, args.CmdParams(), []string{"qux", "quux"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.True(t, cmd.HasOpt("a"))
+	assert.Equal(t, cmd.OptArg("a"), "")
+	assert.Equal(t, cmd.OptArgs("a"), []string{})
+	assert.True(t, cmd.HasOpt("b"))
+	assert.Equal(t, cmd.OptArg("b"), "")
+	assert.Equal(t, cmd.OptArgs("b"), []string{})
+	assert.True(t, cmd.HasOpt("c"))
+	assert.Equal(t, cmd.OptArg("c"), "3")
+	assert.Equal(t, cmd.OptArgs("c"), []string{"3", "4"})
+	assert.True(t, cmd.HasOpt("foo-bar"))
+	assert.Equal(t, cmd.OptArg("foo-bar"), "")
+	assert.Equal(t, cmd.OptArgs("foo-bar"), []string{})
+	assert.True(t, cmd.HasOpt("baz"))
+	assert.Equal(t, cmd.OptArg("baz"), "")
+	assert.Equal(t, cmd.OptArgs("baz"), []string{})
+	assert.Equal(t, cmd.Args(), []string{"qux", "quux"})
 }

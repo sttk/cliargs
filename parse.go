@@ -7,6 +7,7 @@ package cliargs
 import (
 	"fmt"
 	"os"
+	"path"
 	"strings"
 	"unicode"
 )
@@ -37,25 +38,27 @@ var (
 	}
 )
 
-// Args is a structure which contains command parameters and option parameters
-// that are parsed from command line arguments without configurations.
+// Cmd is a structure which contains a command name, command arguments, and
+// option arguments that are parsed from command line arguments without
+// configurations.
 // And this provides methods to check if they are specified or to obtain them.
-type Args struct {
-	optParams map[string][]string
-	cmdParams []string
+type Cmd struct {
+	Name string
+	args []string
+	opts map[string][]string
 }
 
 // HasOpt is a method which checks if the option is specified in command line
 // arguments.
-func (args Args) HasOpt(opt string) bool {
-	_, exists := args.optParams[opt]
+func (cmd Cmd) HasOpt(name string) bool {
+	_, exists := cmd.opts[name]
 	return exists
 }
 
-// OptParam is a method to get a option parameter which is firstly specified
+// OptArg is a method to get a option argument which is firstly specified
 // with opt in command line arguments.
-func (args Args) OptParam(opt string) string {
-	arr := args.optParams[opt]
+func (cmd Cmd) OptArg(name string) string {
+	arr := cmd.opts[name]
 	// If no entry, map returns a nil slice.
 	// If a value of a found entry is an empty slice.
 	// Both returned values are zero length in common.
@@ -66,62 +69,72 @@ func (args Args) OptParam(opt string) string {
 	}
 }
 
-// OptParams is a method to get option parameters which are all specified with
-// opt in command line arguments.
-func (args Args) OptParams(opt string) []string {
-	return args.optParams[opt]
+// OptArgs is a method to get option arguments which are all specified with
+// name in command line arguments.
+func (cmd Cmd) OptArgs(name string) []string {
+	return cmd.opts[name]
 }
 
-// CmdParams is a method to get command parameters which are specified in
-// command line parameters and are not associated with any options.
-func (args Args) CmdParams() []string {
-	return args.cmdParams
+// Args is a method to get command arguments which are specified in command
+// line arguments and are not associated with any options.
+func (cmd Cmd) Args() []string {
+	return cmd.args
 }
 
 // Parse is a function to parse command line arguments without configurations.
-// This function divides command line arguments to command parameters, which
+// This function divides command line arguments to command arguments, which
 // are not associated with any options, and options, of which each has a name
-// and option parameters.
+// and option arguments.
 // If an option appears multiple times in command line arguments, the option
-// has multiple option parameters.
+// has multiple option arguments.
 // Options are divided to long format options and short format options.
 //
 // A long format option starts with "--" and follows multiple characters which
 // consists of alphabets, numbers, and '-'.
 // (A character immediately after the heading "--" allows only an alphabet.)
-// A long format option can be followed by "=" and its option parameter.
+// A long format option can be followed by "=" and its option argument.
 //
 // A short format option starts with "-" and follows single character which is
 // an alphabet.
 // Multiple short options can be combined into one argument.
 // (For example -a -b -c can be combined into -abc.)
-// Moreover, a short option can be followed by "=" and its option parameter.
+// Moreover, a short option can be followed by "=" and its option argument.
 // In case of combined short options, only the last short option can take an
-// option parameter.
+// option argument.
 // (For example, -abc=3 is equal to -a -b -c=3.)
-func Parse() (Args, error) {
-	var cmdParams = make([]string, 0)
-	var optParams = make(map[string][]string)
+func Parse() (Cmd, error) {
+	var args = make([]string, 0)
+	var opts = make(map[string][]string)
 
-	var collCmdParams = func(params ...string) error {
-		cmdParams = append(cmdParams, params...)
+	var collectArgs = func(a ...string) error {
+		args = append(args, a...)
 		return nil
 	}
-	var collOptParams = func(opt string, params ...string) error {
-		arr, exists := optParams[opt]
+	var collectOpts = func(name string, a ...string) error {
+		arr, exists := opts[name]
 		if !exists {
 			arr = empty
 		}
-		optParams[opt] = append(arr, params...)
+		opts[name] = append(arr, a...)
 		return nil
 	}
 
-	err := parseArgs(os.Args[1:], collCmdParams, collOptParams, _false)
-	if err != nil {
-		return Args{cmdParams: empty}, err
+	var cmdName string
+	if len(os.Args) > 0 {
+		cmdName = path.Base(os.Args[0])
 	}
 
-	return Args{cmdParams: cmdParams, optParams: optParams}, err
+	var osArgs1 []string
+	if len(os.Args) > 1 {
+		osArgs1 = os.Args[1:]
+	}
+
+	err := parseArgs(osArgs1, collectArgs, collectOpts, _false)
+	if err != nil {
+		return Cmd{args: empty}, err
+	}
+
+	return Cmd{Name: cmdName, args: args, opts: opts}, err
 }
 
 func _false(_ string) bool {
@@ -129,28 +142,28 @@ func _false(_ string) bool {
 }
 
 func parseArgs(
-	args []string,
-	collectCmdParams func(...string) error,
-	collectOptParams func(string, ...string) error,
-	takeParams func(string) bool,
+	osArgs []string,
+	collectArgs func(...string) error,
+	collectOpts func(string, ...string) error,
+	takeArgs func(string) bool,
 ) error {
 
 	isNonOpt := false
-	prevOptTakingParams := ""
+	prevOptTakingArgs := ""
 
-	for iArg, arg := range args {
+	for iArg, arg := range osArgs {
 		if isNonOpt {
-			err := collectCmdParams(arg)
+			err := collectArgs(arg)
 			if err != nil {
 				return err
 			}
 
-		} else if len(prevOptTakingParams) > 0 {
-			err := collectOptParams(prevOptTakingParams, arg)
+		} else if len(prevOptTakingArgs) > 0 {
+			err := collectOpts(prevOptTakingArgs, arg)
 			if err != nil {
 				return err
 			}
-			prevOptTakingParams = ""
+			prevOptTakingArgs = ""
 
 		} else if strings.HasPrefix(arg, "--") {
 			if len(arg) == 2 {
@@ -163,7 +176,7 @@ func parseArgs(
 			for _, r := range arg {
 				if i > 0 {
 					if r == '=' {
-						err := collectOptParams(arg[0:i], arg[i+1:])
+						err := collectOpts(arg[0:i], arg[i+1:])
 						if err != nil {
 							return err
 						}
@@ -181,11 +194,11 @@ func parseArgs(
 			}
 
 			if i == len(arg) {
-				if takeParams(arg) && iArg < len(args)-1 {
-					prevOptTakingParams = arg
+				if takeArgs(arg) && iArg < len(osArgs)-1 {
+					prevOptTakingArgs = arg
 					continue
 				}
-				err := collectOptParams(arg)
+				err := collectOpts(arg)
 				if err != nil {
 					return err
 				}
@@ -193,7 +206,7 @@ func parseArgs(
 
 		} else if strings.HasPrefix(arg, "-") {
 			if len(arg) == 1 {
-				err := collectCmdParams(arg)
+				err := collectArgs(arg)
 				if err != nil {
 					return err
 				}
@@ -201,34 +214,34 @@ func parseArgs(
 			}
 
 			arg := arg[1:]
-			var opt string
+			var name string
 			i := 0
 			for _, r := range arg {
 				if i > 0 {
 					if r == '=' {
-						err := collectOptParams(opt, arg[i+1:])
+						err := collectOpts(name, arg[i+1:])
 						if err != nil {
 							return err
 						}
 						break
 					}
-					err := collectOptParams(opt)
+					err := collectOpts(name)
 					if err != nil {
 						return err
 					}
 				}
-				opt = string(r)
+				name = string(r)
 				if !unicode.Is(rangeOfAlphabets, r) {
-					return OptionHasInvalidChar{Option: opt}
+					return OptionHasInvalidChar{Option: name}
 				}
 				i++
 			}
 
 			if i == len(arg) {
-				if takeParams(opt) && iArg < len(args)-1 {
-					prevOptTakingParams = opt
+				if takeArgs(name) && iArg < len(osArgs)-1 {
+					prevOptTakingArgs = name
 				} else {
-					err := collectOptParams(opt)
+					err := collectOpts(name)
 					if err != nil {
 						return err
 					}
@@ -236,7 +249,7 @@ func parseArgs(
 			}
 
 		} else {
-			err := collectCmdParams(arg)
+			err := collectArgs(arg)
 			if err != nil {
 				return err
 			}

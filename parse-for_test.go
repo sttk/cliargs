@@ -10,11 +10,12 @@ import (
 
 func TestParseFor_emptyOptionStoreAndNoArgs(t *testing.T) {
 	type MyOptions struct{}
-	args := []string{}
+	osArgs := []string{}
 	options := MyOptions{}
-	cmdParams, optCfgs, err := cliargs.ParseFor(args, &options)
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 	assert.Nil(t, err)
-	assert.Equal(t, cmdParams, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, optCfgs, []cliargs.OptCfg{})
 }
 
@@ -50,10 +51,11 @@ func TestParseFor_nonEmptyOptionStoreAndNoArgs(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	cmdParams, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 	assert.Nil(t, err)
-	assert.Equal(t, cmdParams, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 27)
 	assert.False(t, options.BoolVal)
 	assert.Equal(t, options.IntVal, 0)
@@ -144,10 +146,11 @@ func TestParseFor_dontOverwriteOptionsIfNoArgs(t *testing.T) {
 		StringArr:  []string{"ab", "cd", "efg"},
 	}
 
-	args := []string{}
-	cmdParams, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 	assert.Nil(t, err)
-	assert.Equal(t, cmdParams, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 27)
 	assert.True(t, options.BoolVal)
 	assert.Equal(t, options.IntVal, 111)
@@ -180,45 +183,48 @@ func TestParseFor_dontOverwriteOptionsIfNoArgs(t *testing.T) {
 
 func TestParseFor_optionIsBoolAndArgIsName(t *testing.T) {
 	type MyOptions struct {
-		Flag bool `opt:"flag,f"`
+		Flag bool `optcfg:"flag,f"`
 	}
 	options := MyOptions{}
 
-	args := []string{"--flag", "abc"}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{"app", "--flag", "abc"}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{"abc"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"abc"})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.True(t, options.Flag)
 }
 
 func TestParseFor_optionIsBoolAndArgIsAlias(t *testing.T) {
 	type MyOptions struct {
-		Flag bool `opt:"flag,f"`
+		Flag bool `optcfg:"flag,f"`
 	}
 	options := MyOptions{}
 
-	args := []string{"-f", "abc"}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{"path/to/app", "-f", "abc"}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{"abc"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"abc"})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.True(t, options.Flag)
 }
 
 func TestParseFor_optionsAreIntAndArgsAreNames(t *testing.T) {
 	type MyOptions struct {
-		IntVal   int   `opt:"int-val,i"`
-		Int8Val  int8  `opt:"int8-val,j"`
-		Int16Val int16 `opt:"int16-val,k"`
-		Int32Val int32 `opt:"int32-val,m"`
-		Int64Val int64 `opt:"int64-val,n"`
+		IntVal   int   `optcfg:"int-val,i"`
+		Int8Val  int8  `optcfg:"int8-val,j"`
+		Int16Val int16 `optcfg:"int16-val,k"`
+		Int32Val int32 `optcfg:"int32-val,m"`
+		Int64Val int64 `optcfg:"int64-val,n"`
 	}
 	options := MyOptions{}
 
-	args := []string{
+	osArgs := []string{
+		"path/to/app",
 		"--int-val", "1",
 		"--int8-val", "2",
 		"--int16-val", "3",
@@ -226,10 +232,11 @@ func TestParseFor_optionsAreIntAndArgsAreNames(t *testing.T) {
 		"--int64-val", "5",
 		"abc",
 	}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{"abc"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"abc"})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntVal, 1)
 	assert.Equal(t, options.Int8Val, int8(2))
@@ -240,15 +247,16 @@ func TestParseFor_optionsAreIntAndArgsAreNames(t *testing.T) {
 
 func TestParseFor_optionsAreIntAndArgsAreAliases(t *testing.T) {
 	type MyOptions struct {
-		IntVal   int   `opt:"int-val,i"`
-		Int8Val  int8  `opt:"int8-val,j"`
-		Int16Val int16 `opt:"int16-val,k"`
-		Int32Val int32 `opt:"int32-val,m"`
-		Int64Val int64 `opt:"int64-val,n"`
+		IntVal   int   `optcfg:"int-val,i"`
+		Int8Val  int8  `optcfg:"int8-val,j"`
+		Int16Val int16 `optcfg:"int16-val,k"`
+		Int32Val int32 `optcfg:"int32-val,m"`
+		Int64Val int64 `optcfg:"int64-val,n"`
 	}
 	options := MyOptions{}
 
-	args := []string{
+	osArgs := []string{
+		"path/to/app",
 		"-i", "1",
 		"-j", "2",
 		"-k", "3",
@@ -256,10 +264,11 @@ func TestParseFor_optionsAreIntAndArgsAreAliases(t *testing.T) {
 		"-n", "5",
 		"abc",
 	}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{"abc"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"abc"})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntVal, 1)
 	assert.Equal(t, options.Int8Val, int8(2))
@@ -270,15 +279,16 @@ func TestParseFor_optionsAreIntAndArgsAreAliases(t *testing.T) {
 
 func TestParseFor_optionsAreUintAndArgsAreNames(t *testing.T) {
 	type MyOptions struct {
-		UintVal   uint   `opt:"uint-val,i"`
-		Uint8Val  uint8  `opt:"uint8-val,j"`
-		Uint16Val uint16 `opt:"uint16-val,k"`
-		Uint32Val uint32 `opt:"uint32-val,m"`
-		Uint64Val uint64 `opt:"uint64-val,n"`
+		UintVal   uint   `optcfg:"uint-val,i"`
+		Uint8Val  uint8  `optcfg:"uint8-val,j"`
+		Uint16Val uint16 `optcfg:"uint16-val,k"`
+		Uint32Val uint32 `optcfg:"uint32-val,m"`
+		Uint64Val uint64 `optcfg:"uint64-val,n"`
 	}
 	options := MyOptions{}
 
-	args := []string{
+	osArgs := []string{
+		"path/to/app",
 		"--uint-val", "1",
 		"--uint8-val", "2",
 		"--uint16-val", "3",
@@ -286,10 +296,11 @@ func TestParseFor_optionsAreUintAndArgsAreNames(t *testing.T) {
 		"--uint64-val", "5",
 		"abc",
 	}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{"abc"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"abc"})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintVal, uint(1))
 	assert.Equal(t, options.Uint8Val, uint8(2))
@@ -300,15 +311,16 @@ func TestParseFor_optionsAreUintAndArgsAreNames(t *testing.T) {
 
 func TestParseFor_optionsAreUintAndArgsAreAliases(t *testing.T) {
 	type MyOptions struct {
-		UintVal   uint   `opt:"uint-val,i"`
-		Uint8Val  uint8  `opt:"uint8-val,j"`
-		Uint16Val uint16 `opt:"uint16-val,k"`
-		Uint32Val uint32 `opt:"uint32-val,m"`
-		Uint64Val uint64 `opt:"uint64-val,n"`
+		UintVal   uint   `optcfg:"uint-val,i"`
+		Uint8Val  uint8  `optcfg:"uint8-val,j"`
+		Uint16Val uint16 `optcfg:"uint16-val,k"`
+		Uint32Val uint32 `optcfg:"uint32-val,m"`
+		Uint64Val uint64 `optcfg:"uint64-val,n"`
 	}
 	options := MyOptions{}
 
-	args := []string{
+	osArgs := []string{
+		"path/to/app",
 		"-i", "1",
 		"-j", "2",
 		"-k", "3",
@@ -316,10 +328,11 @@ func TestParseFor_optionsAreUintAndArgsAreAliases(t *testing.T) {
 		"-n", "5",
 		"abc",
 	}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{"abc"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"abc"})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintVal, uint(1))
 	assert.Equal(t, options.Uint8Val, uint8(2))
@@ -330,20 +343,22 @@ func TestParseFor_optionsAreUintAndArgsAreAliases(t *testing.T) {
 
 func TestParseFor_optionsAreFloatAndArgsAreNames(t *testing.T) {
 	type MyOptions struct {
-		Float32Val float32 `opt:"float32-val,m"`
-		Float64Val float64 `opt:"float64-val,n"`
+		Float32Val float32 `optcfg:"float32-val,m"`
+		Float64Val float64 `optcfg:"float64-val,n"`
 	}
 	options := MyOptions{}
 
-	args := []string{
+	osArgs := []string{
+		"path/to/app",
 		"--float32-val", "0.1234",
 		"--float64-val", "0.5678",
 		"abc",
 	}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{"abc"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"abc"})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Val, float32(0.1234))
 	assert.Equal(t, options.Float64Val, 0.5678)
@@ -351,20 +366,22 @@ func TestParseFor_optionsAreFloatAndArgsAreNames(t *testing.T) {
 
 func TestParseFor_optionsAreFloatAndArgsAreAliases(t *testing.T) {
 	type MyOptions struct {
-		Float32Val float32 `opt:"float32-val,m"`
-		Float64Val float64 `opt:"float64-val,n"`
+		Float32Val float32 `optcfg:"float32-val,m"`
+		Float64Val float64 `optcfg:"float64-val,n"`
 	}
 	options := MyOptions{}
 
-	args := []string{
+	osArgs := []string{
+		"path/to/app",
 		"-m", "0.1234",
 		"-n", "0.5678",
 		"abc",
 	}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{"abc"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"abc"})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Val, float32(0.1234))
 	assert.Equal(t, options.Float64Val, 0.5678)
@@ -372,55 +389,60 @@ func TestParseFor_optionsAreFloatAndArgsAreAliases(t *testing.T) {
 
 func TestParseFor_optionsAreStringAndArgsAreNames(t *testing.T) {
 	type MyOptions struct {
-		StringVal string `opt:"string-val,s"`
+		StringVal string `optcfg:"string-val,s"`
 	}
 	options := MyOptions{}
 
-	args := []string{
+	osArgs := []string{
+		"path/to/app",
 		"--string-val", "def",
 		"abc",
 	}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{"abc"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"abc"})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringVal, "def")
 }
 
 func TestParseFor_optionsAreStringAndArgsAreAliases(t *testing.T) {
 	type MyOptions struct {
-		StringVal string `opt:"string-val,s"`
+		StringVal string `optcfg:"string-val,s"`
 	}
 	options := MyOptions{}
 
-	args := []string{
+	osArgs := []string{
+		"path/to/app",
 		"-s", "def",
 		"abc",
 	}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{"abc"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"abc"})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringVal, "def")
 }
 
 func TestParseFor_defaultValueIsInt(t *testing.T) {
 	type MyOptions struct {
-		IntVal   int   `opt:"=11"`
-		Int8Val  int8  `opt:"=22"`
-		Int16Val int16 `opt:"=33"`
-		Int32Val int32 `opt:"=44"`
-		Int64Val int64 `opt:"=55"`
+		IntVal   int   `optcfg:"=11"`
+		Int8Val  int8  `optcfg:"=22"`
+		Int16Val int16 `optcfg:"=33"`
+		Int32Val int32 `optcfg:"=44"`
+		Int64Val int64 `optcfg:"=55"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntVal, 11)
 	assert.Equal(t, options.Int8Val, int8(22))
@@ -431,19 +453,20 @@ func TestParseFor_defaultValueIsInt(t *testing.T) {
 
 func TestParseFor_defaultValueIsNegativeInt(t *testing.T) {
 	type MyOptions struct {
-		IntVal   int   `opt:"=-11"`
-		Int8Val  int8  `opt:"=-22"`
-		Int16Val int16 `opt:"=-33"`
-		Int32Val int32 `opt:"=-44"`
-		Int64Val int64 `opt:"=-55"`
+		IntVal   int   `optcfg:"=-11"`
+		Int8Val  int8  `optcfg:"=-22"`
+		Int16Val int16 `optcfg:"=-33"`
+		Int32Val int32 `optcfg:"=-44"`
+		Int64Val int64 `optcfg:"=-55"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntVal, -11)
 	assert.Equal(t, options.Int8Val, int8(-22))
@@ -454,19 +477,20 @@ func TestParseFor_defaultValueIsNegativeInt(t *testing.T) {
 
 func TestParseFor_defaultValueIsUint(t *testing.T) {
 	type MyOptions struct {
-		UintVal   uint   `opt:"=11"`
-		Uint8Val  uint8  `opt:"=22"`
-		Uint16Val uint16 `opt:"=33"`
-		Uint32Val uint32 `opt:"=44"`
-		Uint64Val uint64 `opt:"=55"`
+		UintVal   uint   `optcfg:"=11"`
+		Uint8Val  uint8  `optcfg:"=22"`
+		Uint16Val uint16 `optcfg:"=33"`
+		Uint32Val uint32 `optcfg:"=44"`
+		Uint64Val uint64 `optcfg:"=55"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintVal, uint(11))
 	assert.Equal(t, options.Uint8Val, uint8(22))
@@ -477,16 +501,17 @@ func TestParseFor_defaultValueIsUint(t *testing.T) {
 
 func TestParseFor_defaultValueIsFloat(t *testing.T) {
 	type MyOptions struct {
-		Float32Val float32 `opt:"=0.123"`
-		Float64Val float64 `opt:"=0.456789"`
+		Float32Val float32 `optcfg:"=0.123"`
+		Float64Val float64 `optcfg:"=0.456789"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Val, float32(0.123))
 	assert.Equal(t, options.Float64Val, float64(0.456789))
@@ -494,16 +519,17 @@ func TestParseFor_defaultValueIsFloat(t *testing.T) {
 
 func TestParseFor_defaultValueIsNegativeFloat(t *testing.T) {
 	type MyOptions struct {
-		Float32Val float32 `opt:"=-0.123"`
-		Float64Val float64 `opt:"=-0.456789"`
+		Float32Val float32 `optcfg:"=-0.123"`
+		Float64Val float64 `optcfg:"=-0.456789"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Val, float32(-0.123))
 	assert.Equal(t, options.Float64Val, float64(-0.456789))
@@ -511,19 +537,20 @@ func TestParseFor_defaultValueIsNegativeFloat(t *testing.T) {
 
 func TestParseFor_defaultValueIsIntArrayAndSize0(t *testing.T) {
 	type MyOptions struct {
-		IntArr   []int   `opt:"=[]"`
-		Int8Arr  []int8  `opt:"=[]"`
-		Int16Arr []int16 `opt:"=[]"`
-		Int32Arr []int32 `opt:"=[]"`
-		Int64Arr []int64 `opt:"=[]"`
+		IntArr   []int   `optcfg:"=[]"`
+		Int8Arr  []int8  `optcfg:"=[]"`
+		Int16Arr []int16 `optcfg:"=[]"`
+		Int32Arr []int32 `optcfg:"=[]"`
+		Int64Arr []int64 `optcfg:"=[]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{})
 	assert.Equal(t, options.Int8Arr, []int8{})
@@ -534,11 +561,11 @@ func TestParseFor_defaultValueIsIntArrayAndSize0(t *testing.T) {
 
 func TestParseFor_overwriteIntArrayWithDefaultValueIfSize0(t *testing.T) {
 	type MyOptions struct {
-		IntArr   []int   `opt:"=[]"`
-		Int8Arr  []int8  `opt:"=[]"`
-		Int16Arr []int16 `opt:"=[]"`
-		Int32Arr []int32 `opt:"=[]"`
-		Int64Arr []int64 `opt:"=[]"`
+		IntArr   []int   `optcfg:"=[]"`
+		Int8Arr  []int8  `optcfg:"=[]"`
+		Int16Arr []int16 `optcfg:"=[]"`
+		Int32Arr []int32 `optcfg:"=[]"`
+		Int64Arr []int64 `optcfg:"=[]"`
 	}
 	options := MyOptions{
 		IntArr:   []int{1},
@@ -548,11 +575,12 @@ func TestParseFor_overwriteIntArrayWithDefaultValueIfSize0(t *testing.T) {
 		Int64Arr: []int64{5},
 	}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{})
 	assert.Equal(t, options.Int8Arr, []int8{})
@@ -563,19 +591,20 @@ func TestParseFor_overwriteIntArrayWithDefaultValueIfSize0(t *testing.T) {
 
 func TestParseFor_defaultValueIsIntArrayAndSize1(t *testing.T) {
 	type MyOptions struct {
-		IntArr   []int   `opt:"=[1]"`
-		Int8Arr  []int8  `opt:"=[2]"`
-		Int16Arr []int16 `opt:"=[3]"`
-		Int32Arr []int32 `opt:"=[4]"`
-		Int64Arr []int64 `opt:"=[5]"`
+		IntArr   []int   `optcfg:"=[1]"`
+		Int8Arr  []int8  `optcfg:"=[2]"`
+		Int16Arr []int16 `optcfg:"=[3]"`
+		Int32Arr []int32 `optcfg:"=[4]"`
+		Int64Arr []int64 `optcfg:"=[5]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{1})
 	assert.Equal(t, options.Int8Arr, []int8{2})
@@ -586,11 +615,11 @@ func TestParseFor_defaultValueIsIntArrayAndSize1(t *testing.T) {
 
 func TestParseFor_overwriteIntArrayWithDefaultValueIfSize1(t *testing.T) {
 	type MyOptions struct {
-		IntArr   []int   `opt:"=[1]"`
-		Int8Arr  []int8  `opt:"=[2]"`
-		Int16Arr []int16 `opt:"=[3]"`
-		Int32Arr []int32 `opt:"=[4]"`
-		Int64Arr []int64 `opt:"=[5]"`
+		IntArr   []int   `optcfg:"=[1]"`
+		Int8Arr  []int8  `optcfg:"=[2]"`
+		Int16Arr []int16 `optcfg:"=[3]"`
+		Int32Arr []int32 `optcfg:"=[4]"`
+		Int64Arr []int64 `optcfg:"=[5]"`
 	}
 	options := MyOptions{
 		IntArr:   []int{11},
@@ -600,11 +629,12 @@ func TestParseFor_overwriteIntArrayWithDefaultValueIfSize1(t *testing.T) {
 		Int64Arr: []int64{55},
 	}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{1})
 	assert.Equal(t, options.Int8Arr, []int8{2})
@@ -615,19 +645,20 @@ func TestParseFor_overwriteIntArrayWithDefaultValueIfSize1(t *testing.T) {
 
 func TestParseFor_defaultValueIsIntArrayAndSize2(t *testing.T) {
 	type MyOptions struct {
-		IntArr   []int   `opt:"=[1,2]"`
-		Int8Arr  []int8  `opt:"=[2,3]"`
-		Int16Arr []int16 `opt:"=[3,4]"`
-		Int32Arr []int32 `opt:"=[4,5]"`
-		Int64Arr []int64 `opt:"=[5,6]"`
+		IntArr   []int   `optcfg:"=[1,2]"`
+		Int8Arr  []int8  `optcfg:"=[2,3]"`
+		Int16Arr []int16 `optcfg:"=[3,4]"`
+		Int32Arr []int32 `optcfg:"=[4,5]"`
+		Int64Arr []int64 `optcfg:"=[5,6]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{1, 2})
 	assert.Equal(t, options.Int8Arr, []int8{2, 3})
@@ -638,11 +669,11 @@ func TestParseFor_defaultValueIsIntArrayAndSize2(t *testing.T) {
 
 func TestParseFor_overwriteIntArrayWithDefaultValueIfSize2(t *testing.T) {
 	type MyOptions struct {
-		IntArr   []int   `opt:"=[1,2]"`
-		Int8Arr  []int8  `opt:"=[2,3]"`
-		Int16Arr []int16 `opt:"=[3,4]"`
-		Int32Arr []int32 `opt:"=[4,5]"`
-		Int64Arr []int64 `opt:"=[5,6]"`
+		IntArr   []int   `optcfg:"=[1,2]"`
+		Int8Arr  []int8  `optcfg:"=[2,3]"`
+		Int16Arr []int16 `optcfg:"=[3,4]"`
+		Int32Arr []int32 `optcfg:"=[4,5]"`
+		Int64Arr []int64 `optcfg:"=[5,6]"`
 	}
 	options := MyOptions{
 		IntArr:   []int{11},
@@ -652,11 +683,12 @@ func TestParseFor_overwriteIntArrayWithDefaultValueIfSize2(t *testing.T) {
 		Int64Arr: []int64{55},
 	}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{1, 2})
 	assert.Equal(t, options.Int8Arr, []int8{2, 3})
@@ -667,19 +699,20 @@ func TestParseFor_overwriteIntArrayWithDefaultValueIfSize2(t *testing.T) {
 
 func TestParseFor_defaultValueIsNegativeIntArray(t *testing.T) {
 	type MyOptions struct {
-		IntArr   []int   `opt:"=[-1,-2]"`
-		Int8Arr  []int8  `opt:"=[-2,-3]"`
-		Int16Arr []int16 `opt:"=[-3,-4]"`
-		Int32Arr []int32 `opt:"=[-4,-5]"`
-		Int64Arr []int64 `opt:"=[-5,-6]"`
+		IntArr   []int   `optcfg:"=[-1,-2]"`
+		Int8Arr  []int8  `optcfg:"=[-2,-3]"`
+		Int16Arr []int16 `optcfg:"=[-3,-4]"`
+		Int32Arr []int32 `optcfg:"=[-4,-5]"`
+		Int64Arr []int64 `optcfg:"=[-5,-6]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{-1, -2})
 	assert.Equal(t, options.Int8Arr, []int8{-2, -3})
@@ -690,19 +723,20 @@ func TestParseFor_defaultValueIsNegativeIntArray(t *testing.T) {
 
 func TestParseFor_defaultValueIsIntArraySeparatedByColons(t *testing.T) {
 	type MyOptions struct {
-		IntArr   []int   `opt:"=:[-1:-2]"`
-		Int8Arr  []int8  `opt:"=/[-2/-3]"`
-		Int16Arr []int16 `opt:"=![-3!-4]"`
-		Int32Arr []int32 `opt:"=|[-4|-5]"`
-		Int64Arr []int64 `opt:"='[-5'-6]"`
+		IntArr   []int   `optcfg:"=:[-1:-2]"`
+		Int8Arr  []int8  `optcfg:"=/[-2/-3]"`
+		Int16Arr []int16 `optcfg:"=![-3!-4]"`
+		Int32Arr []int32 `optcfg:"=|[-4|-5]"`
+		Int64Arr []int64 `optcfg:"='[-5'-6]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{-1, -2})
 	assert.Equal(t, options.Int8Arr, []int8{-2, -3})
@@ -713,19 +747,20 @@ func TestParseFor_defaultValueIsIntArraySeparatedByColons(t *testing.T) {
 
 func TestParseFor_defaultValueIsUintArrayAndSize0(t *testing.T) {
 	type MyOptions struct {
-		UintArr   []uint   `opt:"=[]"`
-		Uint8Arr  []uint8  `opt:"=[]"`
-		Uint16Arr []uint16 `opt:"=[]"`
-		Uint32Arr []uint32 `opt:"=[]"`
-		Uint64Arr []uint64 `opt:"=[]"`
+		UintArr   []uint   `optcfg:"=[]"`
+		Uint8Arr  []uint8  `optcfg:"=[]"`
+		Uint16Arr []uint16 `optcfg:"=[]"`
+		Uint32Arr []uint32 `optcfg:"=[]"`
+		Uint64Arr []uint64 `optcfg:"=[]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{})
 	assert.Equal(t, options.Uint8Arr, []uint8{})
@@ -736,11 +771,11 @@ func TestParseFor_defaultValueIsUintArrayAndSize0(t *testing.T) {
 
 func TestParseFor_overwriteUintArrayWithDefaultValueIfSize0(t *testing.T) {
 	type MyOptions struct {
-		UintArr   []uint   `opt:"=[]"`
-		Uint8Arr  []uint8  `opt:"=[]"`
-		Uint16Arr []uint16 `opt:"=[]"`
-		Uint32Arr []uint32 `opt:"=[]"`
-		Uint64Arr []uint64 `opt:"=[]"`
+		UintArr   []uint   `optcfg:"=[]"`
+		Uint8Arr  []uint8  `optcfg:"=[]"`
+		Uint16Arr []uint16 `optcfg:"=[]"`
+		Uint32Arr []uint32 `optcfg:"=[]"`
+		Uint64Arr []uint64 `optcfg:"=[]"`
 	}
 	options := MyOptions{
 		UintArr:   []uint{1},
@@ -750,11 +785,12 @@ func TestParseFor_overwriteUintArrayWithDefaultValueIfSize0(t *testing.T) {
 		Uint64Arr: []uint64{5},
 	}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{})
 	assert.Equal(t, options.Uint8Arr, []uint8{})
@@ -765,19 +801,20 @@ func TestParseFor_overwriteUintArrayWithDefaultValueIfSize0(t *testing.T) {
 
 func TestParseFor_defaultValueIsUintArrayAndSize1(t *testing.T) {
 	type MyOptions struct {
-		UintArr   []uint   `opt:"=[1]"`
-		Uint8Arr  []uint8  `opt:"=[2]"`
-		Uint16Arr []uint16 `opt:"=[3]"`
-		Uint32Arr []uint32 `opt:"=[4]"`
-		Uint64Arr []uint64 `opt:"=[5]"`
+		UintArr   []uint   `optcfg:"=[1]"`
+		Uint8Arr  []uint8  `optcfg:"=[2]"`
+		Uint16Arr []uint16 `optcfg:"=[3]"`
+		Uint32Arr []uint32 `optcfg:"=[4]"`
+		Uint64Arr []uint64 `optcfg:"=[5]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{1})
 	assert.Equal(t, options.Uint8Arr, []uint8{2})
@@ -788,11 +825,11 @@ func TestParseFor_defaultValueIsUintArrayAndSize1(t *testing.T) {
 
 func TestParseFor_overwriteUintArrayWithDefaultValueIfSize1(t *testing.T) {
 	type MyOptions struct {
-		UintArr   []uint   `opt:"=[1]"`
-		Uint8Arr  []uint8  `opt:"=[2]"`
-		Uint16Arr []uint16 `opt:"=[3]"`
-		Uint32Arr []uint32 `opt:"=[4]"`
-		Uint64Arr []uint64 `opt:"=[5]"`
+		UintArr   []uint   `optcfg:"=[1]"`
+		Uint8Arr  []uint8  `optcfg:"=[2]"`
+		Uint16Arr []uint16 `optcfg:"=[3]"`
+		Uint32Arr []uint32 `optcfg:"=[4]"`
+		Uint64Arr []uint64 `optcfg:"=[5]"`
 	}
 	options := MyOptions{
 		UintArr:   []uint{11},
@@ -802,11 +839,12 @@ func TestParseFor_overwriteUintArrayWithDefaultValueIfSize1(t *testing.T) {
 		Uint64Arr: []uint64{55},
 	}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{1})
 	assert.Equal(t, options.Uint8Arr, []uint8{2})
@@ -817,19 +855,20 @@ func TestParseFor_overwriteUintArrayWithDefaultValueIfSize1(t *testing.T) {
 
 func TestParseFor_defaultValueIsUintArrayAndSize2(t *testing.T) {
 	type MyOptions struct {
-		UintArr   []uint   `opt:"=[1,2]"`
-		Uint8Arr  []uint8  `opt:"=[2,3]"`
-		Uint16Arr []uint16 `opt:"=[3,4]"`
-		Uint32Arr []uint32 `opt:"=[4,5]"`
-		Uint64Arr []uint64 `opt:"=[5,6]"`
+		UintArr   []uint   `optcfg:"=[1,2]"`
+		Uint8Arr  []uint8  `optcfg:"=[2,3]"`
+		Uint16Arr []uint16 `optcfg:"=[3,4]"`
+		Uint32Arr []uint32 `optcfg:"=[4,5]"`
+		Uint64Arr []uint64 `optcfg:"=[5,6]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{1, 2})
 	assert.Equal(t, options.Uint8Arr, []uint8{2, 3})
@@ -840,11 +879,11 @@ func TestParseFor_defaultValueIsUintArrayAndSize2(t *testing.T) {
 
 func TestParseFor_overwriteUintArrayWithDefaultValueIfSize2(t *testing.T) {
 	type MyOptions struct {
-		UintArr   []uint   `opt:"=[1,2]"`
-		Uint8Arr  []uint8  `opt:"=[2,3]"`
-		Uint16Arr []uint16 `opt:"=[3,4]"`
-		Uint32Arr []uint32 `opt:"=[4,5]"`
-		Uint64Arr []uint64 `opt:"=[5,6]"`
+		UintArr   []uint   `optcfg:"=[1,2]"`
+		Uint8Arr  []uint8  `optcfg:"=[2,3]"`
+		Uint16Arr []uint16 `optcfg:"=[3,4]"`
+		Uint32Arr []uint32 `optcfg:"=[4,5]"`
+		Uint64Arr []uint64 `optcfg:"=[5,6]"`
 	}
 	options := MyOptions{
 		UintArr:   []uint{11},
@@ -854,11 +893,12 @@ func TestParseFor_overwriteUintArrayWithDefaultValueIfSize2(t *testing.T) {
 		Uint64Arr: []uint64{55},
 	}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{1, 2})
 	assert.Equal(t, options.Uint8Arr, []uint8{2, 3})
@@ -869,19 +909,20 @@ func TestParseFor_overwriteUintArrayWithDefaultValueIfSize2(t *testing.T) {
 
 func TestParseFor_defaultValueIsUintArraySeparatedByColons(t *testing.T) {
 	type MyOptions struct {
-		UintArr   []uint   `opt:"=:[1:2]"`
-		Uint8Arr  []uint8  `opt:"=/[2/3]"`
-		Uint16Arr []uint16 `opt:"=![3!4]"`
-		Uint32Arr []uint32 `opt:"=|[4|5]"`
-		Uint64Arr []uint64 `opt:"='[5'6]"`
+		UintArr   []uint   `optcfg:"=:[1:2]"`
+		Uint8Arr  []uint8  `optcfg:"=/[2/3]"`
+		Uint16Arr []uint16 `optcfg:"=![3!4]"`
+		Uint32Arr []uint32 `optcfg:"=|[4|5]"`
+		Uint64Arr []uint64 `optcfg:"='[5'6]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{1, 2})
 	assert.Equal(t, options.Uint8Arr, []uint8{2, 3})
@@ -892,16 +933,17 @@ func TestParseFor_defaultValueIsUintArraySeparatedByColons(t *testing.T) {
 
 func TestParseFor_defaultValueIsFloatArrayAndSize0(t *testing.T) {
 	type MyOptions struct {
-		Float32Arr []float32 `opt:"=[]"`
-		Float64Arr []float64 `opt:"=[]"`
+		Float32Arr []float32 `optcfg:"=[]"`
+		Float64Arr []float64 `optcfg:"=[]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{})
 	assert.Equal(t, options.Float64Arr, []float64{})
@@ -909,19 +951,20 @@ func TestParseFor_defaultValueIsFloatArrayAndSize0(t *testing.T) {
 
 func TestParseFor_overwriteFloatArrayWithDefaultValueIfSize0(t *testing.T) {
 	type MyOptions struct {
-		Float32Arr []float32 `opt:"=[]"`
-		Float64Arr []float64 `opt:"=[]"`
+		Float32Arr []float32 `optcfg:"=[]"`
+		Float64Arr []float64 `optcfg:"=[]"`
 	}
 	options := MyOptions{
 		Float32Arr: []float32{0.999},
 		Float64Arr: []float64{0.888},
 	}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{})
 	assert.Equal(t, options.Float64Arr, []float64{})
@@ -929,16 +972,17 @@ func TestParseFor_overwriteFloatArrayWithDefaultValueIfSize0(t *testing.T) {
 
 func TestParseFor_defaultValueIsFloatArrayAndSize1(t *testing.T) {
 	type MyOptions struct {
-		Float32Arr []float32 `opt:"=[0.1]"`
-		Float64Arr []float64 `opt:"=[0.2]"`
+		Float32Arr []float32 `optcfg:"=[0.1]"`
+		Float64Arr []float64 `optcfg:"=[0.2]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{0.1})
 	assert.Equal(t, options.Float64Arr, []float64{0.2})
@@ -946,19 +990,20 @@ func TestParseFor_defaultValueIsFloatArrayAndSize1(t *testing.T) {
 
 func TestParseFor_overwriteFloatArrayWithDefaultValueIfSize1(t *testing.T) {
 	type MyOptions struct {
-		Float32Arr []float32 `opt:"=[0.1]"`
-		Float64Arr []float64 `opt:"=[0.2]"`
+		Float32Arr []float32 `optcfg:"=[0.1]"`
+		Float64Arr []float64 `optcfg:"=[0.2]"`
 	}
 	options := MyOptions{
 		Float32Arr: []float32{0.99},
 		Float64Arr: []float64{0.88},
 	}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{0.1})
 	assert.Equal(t, options.Float64Arr, []float64{0.2})
@@ -966,16 +1011,17 @@ func TestParseFor_overwriteFloatArrayWithDefaultValueIfSize1(t *testing.T) {
 
 func TestParseFor_defaultValueIsFloatArrayAndSize2(t *testing.T) {
 	type MyOptions struct {
-		Float32Arr []float32 `opt:"=[0.1,0.2]"`
-		Float64Arr []float64 `opt:"=[0.3,0.4]"`
+		Float32Arr []float32 `optcfg:"=[0.1,0.2]"`
+		Float64Arr []float64 `optcfg:"=[0.3,0.4]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{0.1, 0.2})
 	assert.Equal(t, options.Float64Arr, []float64{0.3, 0.4})
@@ -983,19 +1029,20 @@ func TestParseFor_defaultValueIsFloatArrayAndSize2(t *testing.T) {
 
 func TestParseFor_overwriteFloatArrayWithDefaultValueIfSize2(t *testing.T) {
 	type MyOptions struct {
-		Float32Arr []float32 `opt:"=[0.1,0.2]"`
-		Float64Arr []float64 `opt:"=[0.3,0.4]"`
+		Float32Arr []float32 `optcfg:"=[0.1,0.2]"`
+		Float64Arr []float64 `optcfg:"=[0.3,0.4]"`
 	}
 	options := MyOptions{
 		Float32Arr: []float32{0.99},
 		Float64Arr: []float64{0.88},
 	}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{0.1, 0.2})
 	assert.Equal(t, options.Float64Arr, []float64{0.3, 0.4})
@@ -1003,16 +1050,17 @@ func TestParseFor_overwriteFloatArrayWithDefaultValueIfSize2(t *testing.T) {
 
 func TestParseFor_defaultValueIsNegativeFloatArray(t *testing.T) {
 	type MyOptions struct {
-		Float32Arr []float32 `opt:"=[-0.1,-0.2]"`
-		Float64Arr []float64 `opt:"=[-0.3,-0.4]"`
+		Float32Arr []float32 `optcfg:"=[-0.1,-0.2]"`
+		Float64Arr []float64 `optcfg:"=[-0.3,-0.4]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{-0.1, -0.2})
 	assert.Equal(t, options.Float64Arr, []float64{-0.3, -0.4})
@@ -1020,16 +1068,17 @@ func TestParseFor_defaultValueIsNegativeFloatArray(t *testing.T) {
 
 func TestParseFor_defaultValueIsFloatArraySeparatedByColons(t *testing.T) {
 	type MyOptions struct {
-		Float32Arr []float32 `opt:"=|[-0.1|-0.2]"`
-		Float64Arr []float64 `opt:"='[-0.3'-0.4]"`
+		Float32Arr []float32 `optcfg:"=|[-0.1|-0.2]"`
+		Float64Arr []float64 `optcfg:"='[-0.3'-0.4]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{-0.1, -0.2})
 	assert.Equal(t, options.Float64Arr, []float64{-0.3, -0.4})
@@ -1037,140 +1086,149 @@ func TestParseFor_defaultValueIsFloatArraySeparatedByColons(t *testing.T) {
 
 func TestParseFor_defaultValueIsStringAndSize0(t *testing.T) {
 	type MyOptions struct {
-		StringArr []string `opt:"=[]"`
+		StringArr []string `optcfg:"=[]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{})
 }
 
 func TestParseFor_overwriteStringArrayWithDefaultValueIfSize0(t *testing.T) {
 	type MyOptions struct {
-		StringArr []string `opt:"=[]"`
+		StringArr []string `optcfg:"=[]"`
 	}
 	options := MyOptions{
 		StringArr: []string{"ZZZ"},
 	}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{})
 }
 
 func TestParseFor_defaultValueIsStringArrayAndSize1(t *testing.T) {
 	type MyOptions struct {
-		StringArr []string `opt:"=[ABC]"`
+		StringArr []string `optcfg:"=[ABC]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{"ABC"})
 }
 
 func TestParseFor_overwriteStringArrayWithDefaultValueIfSize1(t *testing.T) {
 	type MyOptions struct {
-		StringArr []string `opt:"=[ABC]"`
+		StringArr []string `optcfg:"=[ABC]"`
 	}
 	options := MyOptions{
 		StringArr: []string{"ZZZ"},
 	}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{"ABC"})
 }
 
 func TestParseFor_defaultValueIsStringArrayAndSize2(t *testing.T) {
 	type MyOptions struct {
-		StringArr []string `opt:"=[ABC,DEF]"`
+		StringArr []string `optcfg:"=[ABC,DEF]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{"ABC", "DEF"})
 }
 
 func TestParseFor_overwriteStringArrayWithDefaultValueIfSize2(t *testing.T) {
 	type MyOptions struct {
-		StringArr []string `opt:"=[ABC,DEF]"`
+		StringArr []string `optcfg:"=[ABC,DEF]"`
 	}
 	options := MyOptions{
 		StringArr: []string{"ZZZ"},
 	}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{"ABC", "DEF"})
 }
 
 func TestParseFor_defaultValueIsStringArraySeparatedByColons(t *testing.T) {
 	type MyOptions struct {
-		StringArr []string `opt:"=|[ABC|DEF]"`
+		StringArr []string `optcfg:"=|[ABC|DEF]"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{"ABC", "DEF"})
 }
 
 func TestParseFor_ignoreEmptyDefaultValueIfOptionIsBool(t *testing.T) {
 	type MyOptions struct {
-		BoolVar bool `opt:"="`
+		BoolVar bool `optcfg:"="`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.False(t, options.BoolVar)
 }
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsInt(t *testing.T) {
 	type MyOptions struct {
-		IntVar int `opt:"int-var="`
+		IntVar int `optcfg:"int-var="`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "FailToParseInt{"+
@@ -1191,14 +1249,15 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsInt(t *testing.T) {
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsUint(t *testing.T) {
 	type MyOptions struct {
-		UintVar uint `opt:"uint-var="`
+		UintVar uint `optcfg:"uint-var="`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "FailToParseUint{"+
@@ -1219,14 +1278,15 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUint(t *testing.T) {
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsFloat(t *testing.T) {
 	type MyOptions struct {
-		Float64Var float64 `opt:"float-var="`
+		Float64Var float64 `optcfg:"float-var="`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "FailToParseFloat{"+
@@ -1247,29 +1307,31 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloat(t *testing.T) {
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsString(t *testing.T) {
 	type MyOptions struct {
-		StringVar string `opt:"str-var="`
+		StringVar string `optcfg:"str-var="`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringVar, "")
 }
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsIntArray(t *testing.T) {
 	type MyOptions struct {
-		IntArr []int `opt:"int-arr="`
+		IntArr []int `optcfg:"int-arr="`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "FailToParseInt{"+
@@ -1290,14 +1352,15 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsIntArray(t *testing.T) {
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsUintArray(t *testing.T) {
 	type MyOptions struct {
-		UintArr []uint `opt:"uint-arr="`
+		UintArr []uint `optcfg:"uint-arr="`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "FailToParseUint{"+
@@ -1318,14 +1381,15 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUintArray(t *testing.T) {
 
 func TestParseFor_errorEmptyDefaultValueIfOptionIsFloatArray(t *testing.T) {
 	type MyOptions struct {
-		Float64Arr []float64 `opt:"float-arr="`
+		Float64Arr []float64 `optcfg:"float-arr="`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "FailToParseFloat{"+
@@ -1346,30 +1410,32 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloatArray(t *testing.T) {
 
 func TestParseFor_optionIsStringArrayAndSetOneEmptyStringByDefaultArray(t *testing.T) {
 	type MyOptions struct {
-		StringArr []string `opt:"str-arr="`
+		StringArr []string `optcfg:"str-arr="`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{""})
 }
 
 func TestParseFor_defaultValueIsIgnoreWhenTypeIsBool(t *testing.T) {
 	type MyOptions struct {
-		BoolVar bool `opt:"bool-var=true"`
+		BoolVar bool `optcfg:"bool-var=true"`
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.False(t, options.BoolVar)
 }
@@ -1380,10 +1446,11 @@ func TestParseFor_errorIfDefaultValueIsInvalidType(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	args := []string{}
-	params, optCfgs, err := cliargs.ParseFor(args, &options)
+	osArgs := []string{}
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, params, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 0) // because of the error
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "IllegalOptionType{"+
@@ -1401,23 +1468,25 @@ func TestParseFor_errorIfDefaultValueIsInvalidType(t *testing.T) {
 
 func TestParseFor_multipleOptsAndMultipleArgs(t *testing.T) {
 	type MyOptions struct {
-		FooBar bool     `opt:"foo-bar,f"`
-		Baz    int      `opt:"baz,b=99"`
-		Qux    string   `opt:"=XXX"`
-		Quux   []string `opt:"quux=/[A/B/C]"`
+		FooBar bool     `optcfg:"foo-bar,f"`
+		Baz    int      `optcfg:"baz,b=99"`
+		Qux    string   `optcfg:"=XXX"`
+		Quux   []string `optcfg:"quux=/[A/B/C]"`
 		Corge  []int
 	}
 	options := MyOptions{}
 
-	args := []string{
+	osArgs := []string{
+		"path/to/app",
 		"--foo-bar", "c1", "-b", "12", "--Qux", "ABC", "c2",
 		"--Corge", "20", "--Corge=21",
 	}
 
-	cmdParams, optCfgs, err := cliargs.ParseFor(args, &options)
+	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmdParams, []string{"c1", "c2"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"c1", "c2"})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.True(t, options.FooBar)
 	assert.Equal(t, options.Baz, 12)
@@ -1428,15 +1497,16 @@ func TestParseFor_multipleOptsAndMultipleArgs(t *testing.T) {
 
 func TestMakeOptCfgsFor_multipleOptsAndMultipleArgs(t *testing.T) {
 	type MyOptions struct {
-		FooBar bool     `opt:"foo-bar,f"`
-		Baz    int      `opt:"baz,b=99"`
-		Qux    string   `opt:"=XXX"`
-		Quux   []string `opt:"quux=/[A/B/C]"`
+		FooBar bool     `optcfg:"foo-bar,f"`
+		Baz    int      `optcfg:"baz,b=99"`
+		Qux    string   `optcfg:"=XXX"`
+		Quux   []string `optcfg:"quux=/[A/B/C]"`
 		Corge  []int
 	}
 	options := MyOptions{}
 
-	args := []string{
+	osArgs := []string{
+		"path/to/app",
 		"--foo-bar", "c1", "-b", "12", "--Qux", "ABC", "c2",
 		"--Corge", "20", "--Corge=21",
 	}
@@ -1445,53 +1515,54 @@ func TestMakeOptCfgsFor_multipleOptsAndMultipleArgs(t *testing.T) {
 	assert.Nil(t, err0)
 	assert.Equal(t, optCfgs[0].Name, "foo-bar")
 	assert.Equal(t, optCfgs[0].Aliases, []string{"f"})
-	assert.False(t, optCfgs[0].HasParam)
+	assert.False(t, optCfgs[0].HasArg)
 	assert.False(t, optCfgs[0].IsArray)
 	assert.Nil(t, optCfgs[0].Default)
 	assert.NotNil(t, optCfgs[0].OnParsed)
 	assert.Equal(t, optCfgs[1].Name, "baz")
 	assert.Equal(t, optCfgs[1].Aliases, []string{"b"})
-	assert.True(t, optCfgs[1].HasParam)
+	assert.True(t, optCfgs[1].HasArg)
 	assert.False(t, optCfgs[1].IsArray)
 	assert.Equal(t, optCfgs[1].Default, []string{"99"})
 	assert.NotNil(t, optCfgs[1].OnParsed)
 	assert.Equal(t, optCfgs[2].Name, "Qux")
 	assert.Equal(t, optCfgs[2].Aliases, []string(nil))
-	assert.True(t, optCfgs[2].HasParam)
+	assert.True(t, optCfgs[2].HasArg)
 	assert.False(t, optCfgs[2].IsArray)
 	assert.Equal(t, optCfgs[2].Default, []string{"XXX"})
 	assert.NotNil(t, optCfgs[2].OnParsed)
 	assert.Equal(t, optCfgs[3].Name, "quux")
 	assert.Equal(t, optCfgs[3].Aliases, []string{})
-	assert.True(t, optCfgs[3].HasParam)
+	assert.True(t, optCfgs[3].HasArg)
 	assert.True(t, optCfgs[3].IsArray)
 	assert.Equal(t, optCfgs[3].Default, []string{"A", "B", "C"})
 	assert.NotNil(t, optCfgs[3].OnParsed)
 	assert.Equal(t, optCfgs[4].Name, "Corge")
 	assert.Equal(t, optCfgs[4].Aliases, []string(nil))
-	assert.True(t, optCfgs[4].HasParam)
+	assert.True(t, optCfgs[4].HasArg)
 	assert.True(t, optCfgs[4].IsArray)
 	assert.Equal(t, optCfgs[4].Default, []string(nil))
 	assert.NotNil(t, optCfgs[4].OnParsed)
 
-	a, err1 := cliargs.ParseWith(args, optCfgs)
+	cmd, err1 := cliargs.ParseWith(osArgs, optCfgs)
 	assert.Nil(t, err1)
-	assert.Equal(t, a.CmdParams(), []string{"c1", "c2"})
-	assert.True(t, a.HasOpt("foo-bar"))
-	assert.True(t, a.HasOpt("baz"))
-	assert.True(t, a.HasOpt("Qux"))
-	assert.True(t, a.HasOpt("quux"))
-	assert.True(t, a.HasOpt("Corge"))
-	assert.Equal(t, a.OptParam("foo-bar"), "")
-	assert.Equal(t, a.OptParam("baz"), "12")
-	assert.Equal(t, a.OptParam("Qux"), "ABC")
-	assert.Equal(t, a.OptParam("quux"), "A")
-	assert.Equal(t, a.OptParam("Corge"), "20")
-	assert.Equal(t, a.OptParams("foo-bar"), []string{})
-	assert.Equal(t, a.OptParams("baz"), []string{"12"})
-	assert.Equal(t, a.OptParams("Qux"), []string{"ABC"})
-	assert.Equal(t, a.OptParams("quux"), []string{"A", "B", "C"})
-	assert.Equal(t, a.OptParams("Corge"), []string{"20", "21"})
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args(), []string{"c1", "c2"})
+	assert.True(t, cmd.HasOpt("foo-bar"))
+	assert.True(t, cmd.HasOpt("baz"))
+	assert.True(t, cmd.HasOpt("Qux"))
+	assert.True(t, cmd.HasOpt("quux"))
+	assert.True(t, cmd.HasOpt("Corge"))
+	assert.Equal(t, cmd.OptArg("foo-bar"), "")
+	assert.Equal(t, cmd.OptArg("baz"), "12")
+	assert.Equal(t, cmd.OptArg("Qux"), "ABC")
+	assert.Equal(t, cmd.OptArg("quux"), "A")
+	assert.Equal(t, cmd.OptArg("Corge"), "20")
+	assert.Equal(t, cmd.OptArgs("foo-bar"), []string{})
+	assert.Equal(t, cmd.OptArgs("baz"), []string{"12"})
+	assert.Equal(t, cmd.OptArgs("Qux"), []string{"ABC"})
+	assert.Equal(t, cmd.OptArgs("quux"), []string{"A", "B", "C"})
+	assert.Equal(t, cmd.OptArgs("Corge"), []string{"20", "21"})
 	assert.True(t, options.FooBar)
 	assert.Equal(t, options.Baz, 12)
 	assert.Equal(t, options.Qux, "ABC")
@@ -1501,17 +1572,18 @@ func TestMakeOptCfgsFor_multipleOptsAndMultipleArgs(t *testing.T) {
 
 func TestParseFor_emptyArrayOfDefaultValueWithNotCommaSeparator(t *testing.T) {
 	type MyOptions struct {
-		Foo []int     `opt:"foo=/[]"`
-		Bar []uint    `opt:"bar=|[]"`
-		Baz []float64 `opt:"baz=@[]"`
-		Qux []string  `opt:"baz=![]"`
+		Foo []int     `optcfg:"foo=/[]"`
+		Bar []uint    `optcfg:"bar=|[]"`
+		Baz []float64 `optcfg:"baz=@[]"`
+		Qux []string  `optcfg:"baz=![]"`
 	}
 	options := MyOptions{}
 
 	args := []string{}
-	cmdParams, optCfgs, err := cliargs.ParseFor(args, &options)
+	cmd, optCfgs, err := cliargs.ParseFor(args, &options)
 	assert.Nil(t, err)
-	assert.Equal(t, cmdParams, []string{})
+	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 4)
 	assert.Equal(t, options.Foo, []int{})
 	assert.Equal(t, options.Bar, []uint{})
@@ -1521,10 +1593,10 @@ func TestParseFor_emptyArrayOfDefaultValueWithNotCommaSeparator(t *testing.T) {
 
 func TestMakeOptCfgsFor_optionDescriptions(t *testing.T) {
 	type MyOptions struct {
-		FooBar bool     `opt:"foo-bar,f" optdesc:"FooBar description"`
-		Baz    int      `opt:"baz,b=99" optdesc:"Baz description"`
-		Qux    string   `opt:"=XXX" optdesc:"Qux description"`
-		Quux   []string `opt:"quux=/[A/B/C]" optdesc:"Quux description"`
+		FooBar bool     `optcfg:"foo-bar,f" optdesc:"FooBar description"`
+		Baz    int      `optcfg:"baz,b=99" optdesc:"Baz description"`
+		Qux    string   `optcfg:"=XXX" optdesc:"Qux description"`
+		Quux   []string `optcfg:"quux=/[A/B/C]" optdesc:"Quux description"`
 		Corge  []int
 	}
 	options := MyOptions{}
@@ -1540,27 +1612,27 @@ func TestMakeOptCfgsFor_optionDescriptions(t *testing.T) {
 
 func TestMakeOptCfgsFor_optionParam(t *testing.T) {
 	type MyOptions struct {
-		FooBar bool     `opt:"foo-bar,f" optparam:"aaa"`
-		Baz    int      `opt:"baz,b=99" optparam:"bbb"`
-		Qux    string   `opt:"=XXX" optparam:"ccc"`
-		Quux   []string `opt:"quux=/[A/B/C]" optparam:"ddd (multiple)"`
+		FooBar bool     `optcfg:"foo-bar,f" optarg:"aaa"`
+		Baz    int      `optcfg:"baz,b=99" optarg:"bbb"`
+		Qux    string   `optcfg:"=XXX" optarg:"ccc"`
+		Quux   []string `optcfg:"quux=/[A/B/C]" optarg:"ddd (multiple)"`
 		Corge  []int
 	}
 	options := MyOptions{}
 
 	optCfgs, err0 := cliargs.MakeOptCfgsFor(&options)
 	assert.Nil(t, err0)
-	assert.Equal(t, optCfgs[0].AtParam, "")
-	assert.Equal(t, optCfgs[1].AtParam, "bbb")
-	assert.Equal(t, optCfgs[2].AtParam, "ccc")
-	assert.Equal(t, optCfgs[3].AtParam, "ddd (multiple)")
-	assert.Equal(t, optCfgs[4].AtParam, "")
+	assert.Equal(t, optCfgs[0].HelpArg, "")
+	assert.Equal(t, optCfgs[1].HelpArg, "bbb")
+	assert.Equal(t, optCfgs[2].HelpArg, "ccc")
+	assert.Equal(t, optCfgs[3].HelpArg, "ddd (multiple)")
+	assert.Equal(t, optCfgs[4].HelpArg, "")
 }
 
 func TestParseFor_optCfgHasUnsupportedType(t *testing.T) {
 	type A struct{ Name string }
 	type MyOptions struct {
-		FooBar A `opt:"foo-bar,f" optdesc:"FooBar description"`
+		FooBar A `optcfg:"foo-bar,f" optdesc:"FooBar description"`
 	}
 
 	options := MyOptions{}
@@ -1582,10 +1654,10 @@ func TestParseFor_optCfgHasUnsupportedType(t *testing.T) {
 
 func TestParseFor_argIsNotPointer(t *testing.T) {
 	type MyOptions struct {
-		FooBar bool     `opt:"foo-bar,f" optdesc:"FooBar description"`
-		Baz    int      `opt:"baz,b=99" optdesc:"Baz description"`
-		Qux    string   `opt:"=XXX" optdesc:"Qux description"`
-		Quux   []string `opt:"quux=/[A/B/C]" optdesc:"Quux description"`
+		FooBar bool     `optcfg:"foo-bar,f" optdesc:"FooBar description"`
+		Baz    int      `optcfg:"baz,b=99" optdesc:"Baz description"`
+		Qux    string   `optcfg:"=XXX" optdesc:"Qux description"`
+		Quux   []string `optcfg:"quux=/[A/B/C]" optdesc:"Quux description"`
 		Corge  []int
 	}
 	options := MyOptions{}

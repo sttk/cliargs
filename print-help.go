@@ -93,7 +93,7 @@ func (iter *HelpIter) Next() (string, IterStatus) {
 //
 // A help text consists of an usage section and options section, and options
 // section consists of title parts and description parts.
-// On a title part, a option name, aliases, and a .AtParam field of OptCfg are
+// On a title part, a option name, aliases, and a .HelpArg field of OptCfg are
 // enumerated.
 // On a description part, a .Desc field of OptCfg is put and it follows a title
 // part with an indent, specified in WrapOpts,
@@ -185,8 +185,8 @@ func makeOptTitle(cfg OptCfg) textAndWidth {
 		}
 	}
 
-	if cfg.HasParam && len(cfg.AtParam) > 0 {
-		title += " " + cfg.AtParam
+	if cfg.HasArg && len(cfg.HelpArg) > 0 {
+		title += " " + cfg.HelpArg
 	}
 
 	w := textWidth(title)

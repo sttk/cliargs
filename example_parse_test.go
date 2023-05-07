@@ -11,31 +11,31 @@ func ExampleParse() {
 		"cmd", "--foo-bar=A", "-a", "--baz", "-bc=3", "qux", "-c=4", "quux",
 	}
 
-	args, err := cliargs.Parse()
+	cmd, err := cliargs.Parse()
 	fmt.Printf("err = %v\n", err)
-	fmt.Printf("args.HasOpt(\"a\") = %v\n", args.HasOpt("a"))
-	fmt.Printf("args.HasOpt(\"b\") = %v\n", args.HasOpt("b"))
-	fmt.Printf("args.HasOpt(\"c\") = %v\n", args.HasOpt("c"))
-	fmt.Printf("args.HasOpt(\"foo-bar\") = %v\n", args.HasOpt("foo-bar"))
-	fmt.Printf("args.HasOpt(\"baz\") = %v\n", args.HasOpt("baz"))
-	fmt.Printf("args.OptParam(\"c\") = %v\n", args.OptParam("c"))
-	fmt.Printf("args.OptParam(\"foo-bar\") = %v\n", args.OptParam("foo-bar"))
-	fmt.Printf("args.OptParams(\"c\") = %v\n", args.OptParams("c"))
-	fmt.Printf("args.OptParams(\"foo-bar\") = %v\n", args.OptParams("foo-bar"))
-	fmt.Printf("args.CmdParams() = %v\n", args.CmdParams())
+	fmt.Printf("cmd.HasOpt(\"a\") = %v\n", cmd.HasOpt("a"))
+	fmt.Printf("cmd.HasOpt(\"b\") = %v\n", cmd.HasOpt("b"))
+	fmt.Printf("cmd.HasOpt(\"c\") = %v\n", cmd.HasOpt("c"))
+	fmt.Printf("cmd.HasOpt(\"foo-bar\") = %v\n", cmd.HasOpt("foo-bar"))
+	fmt.Printf("cmd.HasOpt(\"baz\") = %v\n", cmd.HasOpt("baz"))
+	fmt.Printf("cmd.OptArg(\"c\") = %v\n", cmd.OptArg("c"))
+	fmt.Printf("cmd.OptArg(\"foo-bar\") = %v\n", cmd.OptArg("foo-bar"))
+	fmt.Printf("cmd.OptArgs(\"c\") = %v\n", cmd.OptArgs("c"))
+	fmt.Printf("cmd.OptArgs(\"foo-bar\") = %v\n", cmd.OptArgs("foo-bar"))
+	fmt.Printf("cmd.Args() = %v\n", cmd.Args())
 
 	// Output:
 	// err = <nil>
-	// args.HasOpt("a") = true
-	// args.HasOpt("b") = true
-	// args.HasOpt("c") = true
-	// args.HasOpt("foo-bar") = true
-	// args.HasOpt("baz") = true
-	// args.OptParam("c") = 3
-	// args.OptParam("foo-bar") = A
-	// args.OptParams("c") = [3 4]
-	// args.OptParams("foo-bar") = [A]
-	// args.CmdParams() = [qux quux]
+	// cmd.HasOpt("a") = true
+	// cmd.HasOpt("b") = true
+	// cmd.HasOpt("c") = true
+	// cmd.HasOpt("foo-bar") = true
+	// cmd.HasOpt("baz") = true
+	// cmd.OptArg("c") = 3
+	// cmd.OptArg("foo-bar") = A
+	// cmd.OptArgs("c") = [3 4]
+	// cmd.OptArgs("foo-bar") = [A]
+	// cmd.Args() = [qux quux]
 
 	resetOsArgs()
 }

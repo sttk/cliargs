@@ -110,10 +110,10 @@ func TestMakeHelp_longUsage_twoShortAndLongOptCfg_emptyWrapOpts(t *testing.T) {
 			Desc: "This is the description of --foo option.",
 		},
 		OptCfg{
-			Name:     "bar-baz",
-			Aliases:  []string{"b"},
-			HasParam: true,
-			Desc:     "This is the description of --bar-baz option. This option takes one parameter.",
+			Name:    "bar-baz",
+			Aliases: []string{"b"},
+			HasArg:  true,
+			Desc:    "This is the description of --bar-baz option. This option takes one parameter.",
 		},
 	}
 	wrapOpts := WrapOpts{}
@@ -163,10 +163,10 @@ func TestMakeHelp_longUsage_twoShortAndLongOptCfg_largeIndent(t *testing.T) {
 			Desc: "This is the description of --foo option.",
 		},
 		OptCfg{
-			Name:     "bar-baz",
-			Aliases:  []string{"b"},
-			HasParam: true,
-			Desc:     "This is the description of --bar-baz option. This option takes one parameter.",
+			Name:    "bar-baz",
+			Aliases: []string{"b"},
+			HasArg:  true,
+			Desc:    "This is the description of --bar-baz option. This option takes one parameter.",
 		},
 	}
 	wrapOpts := WrapOpts{Indent: 20}
@@ -216,10 +216,10 @@ func TestMakeHelp_longUsage_twoShortAndLongOptCfg_shortIndent(t *testing.T) {
 			Desc: "This is the description of --foo option.",
 		},
 		OptCfg{
-			Name:     "bar-baz",
-			Aliases:  []string{"b"},
-			HasParam: true,
-			Desc:     "This is the description of --bar-baz option. This option takes one parameter.",
+			Name:    "bar-baz",
+			Aliases: []string{"b"},
+			HasArg:  true,
+			Desc:    "This is the description of --bar-baz option. This option takes one parameter.",
 		},
 	}
 	wrapOpts := WrapOpts{Indent: 10}
@@ -273,10 +273,10 @@ func TestMakeHelp_longUsage_twoShortAndLongOptCfg_margins(t *testing.T) {
 			Desc: "This is the description of --foo option.",
 		},
 		OptCfg{
-			Name:     "bar-baz",
-			Aliases:  []string{"b"},
-			HasParam: true,
-			Desc:     "This is the description of --bar-baz option. This option takes one parameter.",
+			Name:    "bar-baz",
+			Aliases: []string{"b"},
+			HasArg:  true,
+			Desc:    "This is the description of --bar-baz option. This option takes one parameter.",
 		},
 	}
 	wrapOpts := WrapOpts{MarginLeft: 5, MarginRight: 5}
@@ -326,10 +326,10 @@ func TestMakeHelp_optNameIsShortAndOptAliasIsLong(t *testing.T) {
 			Desc: "This is the description of --foo option.",
 		},
 		OptCfg{
-			Name:     "b",
-			Aliases:  []string{"bar-baz"},
-			HasParam: true,
-			Desc:     "This is the description of --bar-baz option. This option takes one parameter.",
+			Name:    "b",
+			Aliases: []string{"bar-baz"},
+			HasArg:  true,
+			Desc:    "This is the description of --bar-baz option. This option takes one parameter.",
 		},
 	}
 	wrapOpts := WrapOpts{MarginLeft: 5, MarginRight: 5}
@@ -379,10 +379,10 @@ func TestMakeHelp_marginsAndIndentExceedLineWidth(t *testing.T) {
 			Desc: "This is the description of --foo option.",
 		},
 		OptCfg{
-			Name:     "b",
-			Aliases:  []string{"bar-baz"},
-			HasParam: true,
-			Desc:     "This is the description of --bar-baz option. This option takes one parameter.",
+			Name:    "b",
+			Aliases: []string{"bar-baz"},
+			HasArg:  true,
+			Desc:    "This is the description of --bar-baz option. This option takes one parameter.",
 		},
 	}
 	wrapOpts := WrapOpts{MarginLeft: 50, MarginRight: 50, Indent: 10}
@@ -402,34 +402,34 @@ func TestMakeHelp_marginsAndIndentExceedLineWidth(t *testing.T) {
 	}
 }
 
-func TestMakeHelp_useAtParam(t *testing.T) {
+func TestMakeHelp_useHelpArg(t *testing.T) {
 	usage := longUsage
 	optCfgs := []OptCfg{
 		OptCfg{
-			Name:     "d",
-			Aliases:  []string{"data"},
-			HasParam: true,
-			Desc:     "This is the description of --data option.",
-			AtParam:  "<data>",
+			Name:    "d",
+			Aliases: []string{"data"},
+			HasArg:  true,
+			Desc:    "This is the description of --data option.",
+			HelpArg: "<data>",
 		},
 		OptCfg{
-			Name:     "f",
-			Aliases:  []string{"fail"},
-			HasParam: false,
-			Desc:     "This is the description of --fail option.",
+			Name:    "f",
+			Aliases: []string{"fail"},
+			HasArg:  false,
+			Desc:    "This is the description of --fail option.",
 		},
 		OptCfg{
-			Name:     "o",
-			Aliases:  []string{"output"},
-			HasParam: true,
-			Desc:     "This is the description of --output option.",
-			AtParam:  "<file>",
+			Name:    "o",
+			Aliases: []string{"output"},
+			HasArg:  true,
+			Desc:    "This is the description of --output option.",
+			HelpArg: "<file>",
 		},
 		OptCfg{
-			Name:     "s",
-			Aliases:  []string{"silent"},
-			HasParam: false,
-			Desc:     "This is the description of --silent option.",
+			Name:    "s",
+			Aliases: []string{"silent"},
+			HasArg:  false,
+			Desc:    "This is the description of --silent option.",
 		},
 	}
 	wrapOpts := WrapOpts{}
@@ -486,10 +486,10 @@ func TestPrintHelp(t *testing.T) {
 			Desc: "This is the description of --foo option.",
 		},
 		OptCfg{
-			Name:     "b",
-			Aliases:  []string{"bar-baz"},
-			HasParam: true,
-			Desc:     "This is the description of --bar-baz option. This option takes one parameter.",
+			Name:    "b",
+			Aliases: []string{"bar-baz"},
+			HasArg:  true,
+			Desc:    "This is the description of --bar-baz option. This option takes one parameter.",
 		},
 	}
 	wrapOpts := WrapOpts{MarginLeft: 5, MarginRight: 5, Indent: 10}
@@ -506,10 +506,10 @@ func TestPrintHelp_error(t *testing.T) {
 			Desc: "This is the description of --foo option.",
 		},
 		OptCfg{
-			Name:     "b",
-			Aliases:  []string{"bar-baz"},
-			HasParam: true,
-			Desc:     "This is the description of --bar-baz option. This option takes one parameter.",
+			Name:    "b",
+			Aliases: []string{"bar-baz"},
+			HasArg:  true,
+			Desc:    "This is the description of --bar-baz option. This option takes one parameter.",
 		},
 	}
 	wrapOpts := WrapOpts{MarginLeft: 50, MarginRight: 50, Indent: 10}

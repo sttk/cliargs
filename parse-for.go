@@ -12,7 +12,7 @@ import (
 )
 
 // OptionStoreIsNotChangeable is an error which indicates that the second
-// parameter of ParseFor function, which is set options produced by parsing
+// argument of ParseFor function, which is set options produced by parsing
 // command line arguments, is not a pointer.
 type OptionStoreIsNotChangeable struct{}
 
@@ -21,7 +21,7 @@ func (e OptionStoreIsNotChangeable) Error() string {
 }
 
 // FailToParseInt is an error reaason which indicates that an option
-// parameter in command line arguments should be an integer but is invalid.
+// argument in command line arguments should be an integer but is invalid.
 type FailToParseInt struct {
 	Option  string
 	Field   string
@@ -40,7 +40,7 @@ func (e FailToParseInt) Unwrap() error {
 	return e.cause
 }
 
-// FailToParseUint is an error which indicates that an option parameter in
+// FailToParseUint is an error which indicates that an option argument in
 // command line arguments should be an unsigned integer but is invalid.
 type FailToParseUint struct {
 	Option  string
@@ -60,7 +60,7 @@ func (e FailToParseUint) Unwrap() error {
 	return e.cause
 }
 
-// FailToParseFloat is an error which indicates that an option parameter in
+// FailToParseFloat is an error which indicates that an option argument in
 // command line arguments should be a floating point number but is invalid.
 type FailToParseFloat struct {
 	Option  string
@@ -96,18 +96,18 @@ func (e IllegalOptionType) Error() string {
 }
 
 // ParseFor is a function to parse command line arguments and set their values
-// to the option store which is the second parameter of this function.
-// This function divides command line arguments to command parameters and
+// to the option store which is the second argument of this function.
+// This function divides command line arguments to command arguments and
 // options, then stores the options to the option store, and returns the
-// command parameters with the generated option configuratins.
+// command arguments with the generated option configuratins.
 //
 // The configurations of options are determined by types and struct tags of
 // fields of the option store.
-// If the type is bool, the option takes no parameter.
+// If the type is bool, the option takes no argument.
 // If the type is integer, floating point number or string, the option can
-// takes one  option parameter, therefore it can appear once in command line
+// takes one  option argument, therefore it can appear once in command line
 // arguments.
-// If the type is an array, the option can takes multiple option parameters,
+// If the type is an array, the option can takes multiple option arguments,
 // therefore it can appear multiple times in command line arguments.
 //
 // A struct tag can specify an option name, aliases, and a default value.
@@ -122,7 +122,7 @@ func (e IllegalOptionType) Error() string {
 //
 // The string after the "=" mark is default value(s).
 // If the type of the option is a boolean, the string after "=" mark is ignored
-// because a boolean option takes no option parameter.
+// because a boolean option takes no option argument.
 // If the type of the option is a number or a string, the whole string after
 // "=" mark is a default value.
 // If the type of the option is an array, the string after "=" mark have to be
@@ -137,18 +137,14 @@ func (e IllegalOptionType) Error() string {
 // string but an empty array.
 // If you want to specify an array which contains only an empty string, write
 // nothing after "=" mark, like `opt:"name="`.
-func ParseFor(args []string, options any) ([]string, []OptCfg, error) {
+func ParseFor(osArgs []string, options any) (Cmd, []OptCfg, error) {
 	optCfgs, err := MakeOptCfgsFor(options)
 	if err != nil {
-		return empty, optCfgs, err
+		return Cmd{args: empty}, optCfgs, err
 	}
 
-	a, err := ParseWith(args, optCfgs)
-	if err != nil {
-		return empty, optCfgs, err
-	}
-
-	return a.cmdParams, optCfgs, nil
+	cmd, err := ParseWith(osArgs, optCfgs)
+	return cmd, optCfgs, err
 }
 
 // MakeOptCfgsFor is a function to make a OptCfg array from fields of the
@@ -181,7 +177,7 @@ func MakeOptCfgsFor(options any) ([]OptCfg, error) {
 }
 
 func newOptCfg(fld reflect.StructField) OptCfg {
-	opt := fld.Tag.Get("opt")
+	opt := fld.Tag.Get("optcfg")
 	arr := strings.SplitN(opt, "=", 2)
 	names := strings.Split(arr[0], ",")
 
@@ -196,16 +192,16 @@ func newOptCfg(fld reflect.StructField) OptCfg {
 	}
 
 	isArray := false
-	hasParam := true
+	hasArg := true
 	switch fld.Type.Kind() {
 	case reflect.Slice | reflect.Array:
 		isArray = true
 	case reflect.Bool:
-		hasParam = false
+		hasArg = false
 	}
 
 	var defaults []string
-	if len(arr) > 1 && hasParam {
+	if len(arr) > 1 && hasArg {
 		def := arr[1]
 		n := len(def)
 		if !isArray {
@@ -229,21 +225,21 @@ func newOptCfg(fld reflect.StructField) OptCfg {
 		}
 	}
 
-	var atparam string
-	if hasParam {
-		atparam = fld.Tag.Get("optparam")
+	var helpArg string
+	if hasArg {
+		helpArg = fld.Tag.Get("optarg")
 	}
 
 	desc := fld.Tag.Get("optdesc")
 
 	return OptCfg{
-		Name:     name,
-		Aliases:  aliases,
-		HasParam: hasParam,
-		IsArray:  isArray,
-		Default:  defaults,
-		Desc:     desc,
-		AtParam:  atparam,
+		Name:    name,
+		Aliases: aliases,
+		HasArg:  hasArg,
+		IsArray: isArray,
+		Default: defaults,
+		Desc:    desc,
+		HelpArg: helpArg,
 	}
 }
 
