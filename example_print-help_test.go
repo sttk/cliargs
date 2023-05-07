@@ -7,10 +7,10 @@ import (
 
 func ExamplePrintHelp() {
 	type MyOptions struct {
-		FooBar bool     `opt:"foo-bar,f" optdesc:"FooBar is a flag.\nThis flag is foo bar."`
-		Baz    int      `opt:"baz,b=99" optdesc:"Baz is a integer."`
-		Qux    string   `opt:"=XXX" optdesc:"Qux is a string."`
-		Quux   []string `opt:"quux=[A,B,C]" optdesc:"Quux is a string array."`
+		FooBar bool     `optcfg:"foo-bar,f" optdesc:"FooBar is a flag.\nThis flag is foo bar."`
+		Baz    int      `optcfg:"baz,b=99" optdesc:"Baz is a integer."`
+		Qux    string   `optcfg:"=XXX" optdesc:"Qux is a string."`
+		Quux   []string `optcfg:"quux=[A,B,C]" optdesc:"Quux is a string array."`
 	}
 	options := MyOptions{}
 	optCfgs, _ := cliargs.MakeOptCfgsFor(&options)
@@ -35,10 +35,10 @@ func ExamplePrintHelp() {
 
 func ExampleMakeHelp() {
 	type MyOptions struct {
-		FooBar bool     `opt:"foo-bar,f" optdesc:"FooBar is a flag.\nThis flag is foo bar."`
-		Baz    int      `opt:"baz,b=99" optdesc:"Baz is a integer."`
-		Qux    string   `opt:"=XXX" optdesc:"Qux is a string."`
-		Quux   []string `opt:"quux=[A,B,C]" optdesc:"Quux is a string array."`
+		FooBar bool     `optcfg:"foo-bar,f" optdesc:"FooBar is a flag.\nThis flag is foo bar."`
+		Baz    int      `optcfg:"baz,b=99" optdesc:"Baz is a integer."`
+		Qux    string   `optcfg:"=XXX" optdesc:"Qux is a string."`
+		Quux   []string `optcfg:"quux=[A,B,C]" optdesc:"Quux is a string array."`
 	}
 	options := MyOptions{}
 	optCfgs, _ := cliargs.MakeOptCfgsFor(&options)
