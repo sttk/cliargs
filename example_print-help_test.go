@@ -5,48 +5,48 @@ import (
 	"github.com/sttk-go/cliargs"
 )
 
-func ExamplePrintHelp() {
+func ExampleHelp_Print() {
 	type MyOptions struct {
 		FooBar bool     `optcfg:"foo-bar,f" optdesc:"FooBar is a flag.\nThis flag is foo bar."`
-		Baz    int      `optcfg:"baz,b=99" optdesc:"Baz is a integer."`
-		Qux    string   `optcfg:"=XXX" optdesc:"Qux is a string."`
+		Baz    int      `optcfg:"baz,b=99" optdesc:"Baz is a integer." optarg:"<num>"`
+		Qux    string   `optcfg:"=XXX" optdesc:"Qux is a string." optarg:"<text>"`
 		Quux   []string `optcfg:"quux=[A,B,C]" optdesc:"Quux is a string array."`
 	}
 	options := MyOptions{}
 	optCfgs, _ := cliargs.MakeOptCfgsFor(&options)
-	wrapOpts := cliargs.WrapOpts{MarginLeft: 5, MarginRight: 2, Indent: 10}
 
-	usage := "This is the usage section."
-	err := cliargs.PrintHelp(usage, optCfgs, wrapOpts)
-	fmt.Printf("\nerr = %v\n", err)
+	help := cliargs.NewHelp(5, 2)
+	help.AddText("This is the usage section.")
+	help.AddOpts(optCfgs, 10, 1)
+
+	help.Print()
 
 	// Output:
 	//      This is the usage section.
-	//      --foo-bar, -f
-	//                FooBar is a flag.
-	//                This flag is foo bar.
-	//      --baz, -b
-	//                Baz is a integer.
-	//      --Qux     Qux is a string.
-	//      --quux    Quux is a string array.
-	//
-	// err = <nil>
+	//       --foo-bar, -f
+	//                 FooBar is a flag.
+	//                 This flag is foo bar.
+	//       --baz, -b <num>
+	//                 Baz is a integer.
+	//       --Qux <text>
+	//                 Qux is a string.
+	//       --quux    Quux is a string array.
 }
 
-func ExampleMakeHelp() {
+func ExampleHelp_Iter() {
 	type MyOptions struct {
 		FooBar bool     `optcfg:"foo-bar,f" optdesc:"FooBar is a flag.\nThis flag is foo bar."`
-		Baz    int      `optcfg:"baz,b=99" optdesc:"Baz is a integer."`
-		Qux    string   `optcfg:"=XXX" optdesc:"Qux is a string."`
+		Baz    int      `optcfg:"baz,b=99" optdesc:"Baz is a integer." optarg:"<num>"`
+		Qux    string   `optcfg:"=XXX" optdesc:"Qux is a string." optarg:"<text>"`
 		Quux   []string `optcfg:"quux=[A,B,C]" optdesc:"Quux is a string array."`
 	}
 	options := MyOptions{}
 	optCfgs, _ := cliargs.MakeOptCfgsFor(&options)
-	wrapOpts := cliargs.WrapOpts{MarginLeft: 5, MarginRight: 2}
 
-	usage := "This is the usage section."
-	iter, err := cliargs.MakeHelp(usage, optCfgs, wrapOpts)
-	fmt.Printf("\nerr = %v\n", err)
+	help := cliargs.NewHelp(5, 2)
+	help.AddText("This is the usage section.")
+	help.AddOpts(optCfgs, 10, 1)
+	iter := help.Iter()
 
 	for {
 		line, status := iter.Next()
@@ -57,11 +57,13 @@ func ExampleMakeHelp() {
 	}
 
 	// Output:
-	// err = <nil>
 	//      This is the usage section.
-	//      --foo-bar, -f  FooBar is a flag.
-	//                     This flag is foo bar.
-	//      --baz, -b      Baz is a integer.
-	//      --Qux          Qux is a string.
-	//      --quux         Quux is a string array.
+	//       --foo-bar, -f
+	//                 FooBar is a flag.
+	//                 This flag is foo bar.
+	//       --baz, -b <num>
+	//                 Baz is a integer.
+	//       --Qux <text>
+	//                 Qux is a string.
+	//       --quux    Quux is a string array.
 }

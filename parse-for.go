@@ -225,9 +225,9 @@ func newOptCfg(fld reflect.StructField) OptCfg {
 		}
 	}
 
-	var helpArg string
+	var optArg string
 	if hasArg {
-		helpArg = fld.Tag.Get("optarg")
+		optArg = fld.Tag.Get("optarg")
 	}
 
 	desc := fld.Tag.Get("optdesc")
@@ -239,7 +239,7 @@ func newOptCfg(fld reflect.StructField) OptCfg {
 		IsArray: isArray,
 		Default: defaults,
 		Desc:    desc,
-		HelpArg: helpArg,
+		ArgHelp: optArg,
 	}
 }
 

@@ -36,7 +36,7 @@ func ExampleParseFor() {
 	fmt.Printf("optCfgs[1].IsArray = %v\n", optCfgs[1].IsArray)
 	fmt.Printf("optCfgs[1].Default = %v\n", optCfgs[1].Default)
 	fmt.Printf("optCfgs[1].Desc = %v\n", optCfgs[1].Desc)
-	fmt.Printf("optCfgs[1].HelpArg = %v\n", optCfgs[1].HelpArg)
+	fmt.Printf("optCfgs[1].ArgHelp = %v\n", optCfgs[1].ArgHelp)
 
 	fmt.Printf("optCfgs[2].Name = %v\n", optCfgs[2].Name)
 	fmt.Printf("optCfgs[2].Aliases = %v\n", optCfgs[2].Aliases)
@@ -44,7 +44,7 @@ func ExampleParseFor() {
 	fmt.Printf("optCfgs[2].IsArray = %v\n", optCfgs[2].IsArray)
 	fmt.Printf("optCfgs[2].Default = %v\n", optCfgs[2].Default)
 	fmt.Printf("optCfgs[2].Desc = %v\n", optCfgs[2].Desc)
-	fmt.Printf("optCfgs[2].HelpArg = %v\n", optCfgs[2].HelpArg)
+	fmt.Printf("optCfgs[2].ArgHelp = %v\n", optCfgs[2].ArgHelp)
 
 	fmt.Printf("options.FooBar = %v\n", options.FooBar)
 	fmt.Printf("options.Baz = %v\n", options.Baz)
@@ -66,14 +66,14 @@ func ExampleParseFor() {
 	// optCfgs[1].IsArray = false
 	// optCfgs[1].Default = [99]
 	// optCfgs[1].Desc = Baz description.
-	// optCfgs[1].HelpArg = <num>
+	// optCfgs[1].ArgHelp = <num>
 	// optCfgs[2].Name = qux
 	// optCfgs[2].Aliases = [q]
 	// optCfgs[2].HasArg = true
 	// optCfgs[2].IsArray = true
 	// optCfgs[2].Default = [A B C]
 	// optCfgs[2].Desc = Qux description.
-	// optCfgs[2].HelpArg = <text>
+	// optCfgs[2].ArgHelp = <text>
 	// options.FooBar = true
 	// options.Baz = 12
 	// options.Qux = [D E]
@@ -106,7 +106,7 @@ func ExampleMakeOptCfgsFor() {
 	fmt.Printf("optCfgs[1].IsArray = %v\n", optCfgs[1].IsArray)
 	fmt.Printf("optCfgs[1].Default = %v\n", optCfgs[1].Default)
 	fmt.Printf("optCfgs[1].Desc = %v\n", optCfgs[1].Desc)
-	fmt.Printf("optCfgs[1].HelpArg = %v\n", optCfgs[1].HelpArg)
+	fmt.Printf("optCfgs[1].ArgHelp = %v\n", optCfgs[1].ArgHelp)
 	fmt.Println()
 	fmt.Printf("optCfgs[2].Name = %v\n", optCfgs[2].Name)
 	fmt.Printf("optCfgs[2].Aliases = %v\n", optCfgs[2].Aliases)
@@ -114,7 +114,7 @@ func ExampleMakeOptCfgsFor() {
 	fmt.Printf("optCfgs[2].IsArray = %v\n", optCfgs[2].IsArray)
 	fmt.Printf("optCfgs[2].Default = %v\n", optCfgs[2].Default)
 	fmt.Printf("optCfgs[2].Desc = %v\n", optCfgs[2].Desc)
-	fmt.Printf("optCfgs[2].HelpArg = %v\n", optCfgs[2].HelpArg)
+	fmt.Printf("optCfgs[2].ArgHelp = %v\n", optCfgs[2].ArgHelp)
 	fmt.Println()
 	fmt.Printf("optCfgs[3].Name = %v\n", optCfgs[3].Name)
 	fmt.Printf("optCfgs[3].Aliases = %v\n", optCfgs[3].Aliases)
@@ -122,7 +122,7 @@ func ExampleMakeOptCfgsFor() {
 	fmt.Printf("optCfgs[3].IsArray = %v\n", optCfgs[3].IsArray)
 	fmt.Printf("optCfgs[3].Default = %v\n", optCfgs[3].Default)
 	fmt.Printf("optCfgs[3].Desc = %v\n", optCfgs[3].Desc)
-	fmt.Printf("optCfgs[3].HelpArg = %v\n", optCfgs[3].HelpArg)
+	fmt.Printf("optCfgs[3].ArgHelp = %v\n", optCfgs[3].ArgHelp)
 	fmt.Println()
 	fmt.Printf("optCfgs[4].Name = %v\n", optCfgs[4].Name)
 	fmt.Printf("optCfgs[4].Aliases = %v\n", optCfgs[4].Aliases)
@@ -148,7 +148,7 @@ func ExampleMakeOptCfgsFor() {
 	// optCfgs[1].IsArray = false
 	// optCfgs[1].Default = [99]
 	// optCfgs[1].Desc = Baz description
-	// optCfgs[1].HelpArg = <number>
+	// optCfgs[1].ArgHelp = <number>
 	//
 	// optCfgs[2].Name = Qux
 	// optCfgs[2].Aliases = []
@@ -156,7 +156,7 @@ func ExampleMakeOptCfgsFor() {
 	// optCfgs[2].IsArray = false
 	// optCfgs[2].Default = [XXX]
 	// optCfgs[2].Desc = Qux description
-	// optCfgs[2].HelpArg = <string>
+	// optCfgs[2].ArgHelp = <string>
 	//
 	// optCfgs[3].Name = quux
 	// optCfgs[3].Aliases = []
@@ -164,7 +164,7 @@ func ExampleMakeOptCfgsFor() {
 	// optCfgs[3].IsArray = true
 	// optCfgs[3].Default = [A B C]
 	// optCfgs[3].Desc = Quux description
-	// optCfgs[3].HelpArg = <array elem>
+	// optCfgs[3].ArgHelp = <array elem>
 	//
 	// optCfgs[4].Name = Corge
 	// optCfgs[4].Aliases = []
