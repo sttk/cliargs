@@ -1,7 +1,6 @@
 package cliargs_test
 
 import (
-	//"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/sttk-go/cliargs"
 	"testing"
