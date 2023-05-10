@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// Help is a struct type which holds help text blocks and help options block.
 type Help struct {
 	marginLeft, marginRight int
 	blocks                  []block
@@ -21,6 +22,9 @@ type block struct {
 	texts                           []string
 }
 
+// NewHelp is a function to create a Help instance.
+// This function can optionally take left margin and right margin as variadic
+// arguments.
 func NewHelp(wrapOpts ...int) Help {
 	var help Help
 	if len(wrapOpts) > 0 {
@@ -33,6 +37,7 @@ func NewHelp(wrapOpts ...int) Help {
 	return help
 }
 
+// Iter is a method which creates a HelpIter instance.
 func (help Help) Iter() HelpIter {
 	if len(help.blocks) == 0 {
 		return HelpIter{}
@@ -55,12 +60,17 @@ func (help Help) Iter() HelpIter {
 	}
 }
 
+// HelpIter is a struct type to iterate lines of help texts.
 type HelpIter struct {
 	lineWidth int
 	blocks    []block
 	blockIter blockIter
 }
 
+// Next is a method which returns a line of a help text and a status which
+// indicates this HelpIter has more texts or not.
+// If there are more lines, the returned IterStatus value is ITER_HAS_MORE,
+// otherwise the value is ITER_NO_MORE.
 func (iter *HelpIter) Next() (string, IterStatus) {
 	line, status := iter.blockIter.next()
 	if status == ITER_NO_MORE {
@@ -121,6 +131,9 @@ func (iter *blockIter) next() (string, IterStatus) {
 	return line, status
 }
 
+// AddText is a method which adds a text to this Help instance.
+// And this method can optionally set indent, left margin, and right margin as
+// variadic arguments, too.
 func (help *Help) AddText(text string, wrapOpts ...int) {
 	b := block{
 		marginLeft:  help.marginLeft,
@@ -139,6 +152,9 @@ func (help *Help) AddText(text string, wrapOpts ...int) {
 	help.blocks = append(help.blocks, b)
 }
 
+// AddOpts is a method which adds OptCfg(s) to this Help instance.
+// And this method can optionally set indent, left margin, and right margin as
+// variadic arguments, too.
 func (help *Help) AddOpts(optCfgs []OptCfg, wrapOpts ...int) {
 	b := block{
 		marginLeft:  help.marginLeft,
@@ -243,6 +259,7 @@ func textWidth(text string) int {
 	return w
 }
 
+// Print is a method which prints help texts to standard output.
 func (help Help) Print() {
 	iter := help.Iter()
 
