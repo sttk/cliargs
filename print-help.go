@@ -51,12 +51,7 @@ func (help Help) Iter() HelpIter {
 	return HelpIter{
 		lineWidth: lineWidth,
 		blocks:    help.blocks,
-		blockIter: newBlockIter(
-			help.blocks[0].texts,
-			lineWidth-help.blocks[0].marginLeft-help.blocks[0].marginRight,
-			help.blocks[0].indent,
-			help.blocks[0].marginLeft,
-		),
+		blockIter: newBlockIter(help.blocks[0], lineWidth),
 	}
 }
 
@@ -78,12 +73,7 @@ func (iter *HelpIter) Next() (string, IterStatus) {
 			return line, ITER_NO_MORE
 		}
 		iter.blocks = iter.blocks[1:]
-		iter.blockIter = newBlockIter(
-			iter.blocks[0].texts,
-			iter.lineWidth-iter.blocks[0].marginLeft-iter.blocks[0].marginRight,
-			iter.blocks[0].indent,
-			iter.blocks[0].marginLeft,
-		)
+		iter.blockIter = newBlockIter(iter.blocks[0], iter.lineWidth)
 	}
 	return line, ITER_HAS_MORE
 }
@@ -96,15 +86,19 @@ type blockIter struct {
 	lineIter lineIter
 }
 
-func newBlockIter(texts []string, lineWidth, indent, margin int) blockIter {
-	if len(texts) == 0 {
+func newBlockIter(b block, lineWidth int) blockIter {
+	if len(b.texts) == 0 {
+		return blockIter{}
+	}
+	printWidth := lineWidth - b.marginLeft - b.marginRight
+	if printWidth <= b.indent {
 		return blockIter{}
 	}
 	return blockIter{
-		texts:    texts,
-		indent:   indent,
-		margin:   strings.Repeat(" ", margin),
-		lineIter: newLineIter(texts[0], lineWidth),
+		texts:    b.texts,
+		indent:   b.indent,
+		margin:   strings.Repeat(" ", b.marginLeft),
+		lineIter: newLineIter(b.texts[0], printWidth),
 	}
 }
 

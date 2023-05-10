@@ -490,9 +490,93 @@ func TestAddOpts_hasAnyOption_withIndent(t *testing.T) {
 	assert.Equal(t, status, cliargs.ITER_NO_MORE)
 }
 
+func TestNewHelp_ifLineWidthLessThanSumOfMargins(t *testing.T) {
+	help := cliargs.NewHelp(71, 10)
+	iter := help.Iter()
+
+	line, status := iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+}
+
+func TestAddText_ifLineWidthLessThanSumOfMargins(t *testing.T) {
+	help := cliargs.NewHelp(10, 40)
+	help.AddText("abcdefg", 10, 10, 10)
+	help.AddText("hijklmn", 10, 10)
+	help.AddText("opqrstu", 10, 10, 11)
+	iter := help.Iter()
+
+	line, status := iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "                    hijklmn")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+}
+
+func TestAddOpts_ifLineWidthLessThanSunOfMargins(t *testing.T) {
+	help := cliargs.NewHelp(10, 30)
+	help.AddOpts([]cliargs.OptCfg{
+		cliargs.OptCfg{
+			Name: "foo-bar",
+			Desc: "This is a description of option.",
+		},
+	}, 10, 10, 20)
+	help.AddOpts([]cliargs.OptCfg{
+		cliargs.OptCfg{
+			Name: "baz",
+			Desc: "This is a description of option.",
+		},
+	}, 10, 10)
+	help.AddOpts([]cliargs.OptCfg{
+		cliargs.OptCfg{
+			Name: "qux",
+			Desc: "This is a description of option.",
+		},
+	}, 10, 10, 21)
+	iter := help.Iter()
+
+	line, status := iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "                    --baz     This is a ")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "                              description of ")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "                              option.")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+}
+
 func TestPrint_curl(t *testing.T) {
-	// The source of the following text is the output of `curl --help` in curl 7.87.0
-	// https://curl.se/docs/copyright.html
+	// The source of the following text is the output of `curl --help` in
+	// curl 7.87.0. (https://curl.se/docs/copyright.html)
 
 	help := cliargs.NewHelp()
 
