@@ -11,34 +11,74 @@ import (
 	"strings"
 )
 
-// MarginsAndIndentExceedLineWidth is an error which indicates that the sum of
-// left margin, right margin, and indent is greater than line width.
-// It means that there are no width to print texts.
-type MarginsAndIndentExceedLineWidth struct {
-	LineWidth, MarginLeft, MarginRight, Indent int
+type Help struct {
+	marginLeft, marginRight int
+	blocks                  []block
 }
 
-func (e MarginsAndIndentExceedLineWidth) Error() string {
-	return fmt.Sprintf("MarginsAndIndentExceedLineWidth{"+
-		"LineWidth:%d,MarginLeft:%d,MarginRight:%d,Indent:%d}",
-		e.LineWidth, e.MarginLeft, e.MarginRight, e.Indent)
+type block struct {
+	indent, marginLeft, marginRight int
+	texts                           []string
 }
 
-// WrapOpts is a struct type which holds options for wrapping texts.
-// This struct type has the following field for wrap options: MarginLeft,
-// MarginRight, and Indent.
-// MarginLeft and MarginRight is space widths on both sides, and these are
-// applied to all lines.
-// Indent is a space width on left side, and this is applied to second line or
-// later of each option.
-type WrapOpts struct {
-	MarginLeft  int
-	MarginRight int
-	Indent      int
+func NewHelp(wrapOpts ...int) Help {
+	var help Help
+	if len(wrapOpts) > 0 {
+		help.marginLeft = wrapOpts[0]
+	}
+	if len(wrapOpts) > 1 {
+		help.marginRight = wrapOpts[1]
+	}
+	help.blocks = make([]block, 0, 2)
+	return help
 }
 
-// HelpIter is a struct type to iterate lines of a help text.
+func (help Help) Iter() HelpIter {
+	if len(help.blocks) == 0 {
+		return HelpIter{}
+	}
+
+	lineWidth, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		lineWidth = 80
+	}
+
+	return HelpIter{
+		lineWidth: lineWidth,
+		blocks:    help.blocks,
+		blockIter: newBlockIter(
+			help.blocks[0].texts,
+			lineWidth-help.blocks[0].marginLeft-help.blocks[0].marginRight,
+			help.blocks[0].indent,
+			help.blocks[0].marginLeft,
+		),
+	}
+}
+
 type HelpIter struct {
+	lineWidth int
+	blocks    []block
+	blockIter blockIter
+}
+
+func (iter *HelpIter) Next() (string, IterStatus) {
+	line, status := iter.blockIter.next()
+	if status == ITER_NO_MORE {
+		if len(iter.blocks) <= 1 {
+			return line, ITER_NO_MORE
+		}
+		iter.blocks = iter.blocks[1:]
+		iter.blockIter = newBlockIter(
+			iter.blocks[0].texts,
+			iter.lineWidth-iter.blocks[0].marginLeft-iter.blocks[0].marginRight,
+			iter.blocks[0].indent,
+			iter.blocks[0].marginLeft,
+		)
+	}
+	return line, ITER_HAS_MORE
+}
+
+type blockIter struct {
 	texts    []string
 	index    int
 	indent   int
@@ -46,11 +86,11 @@ type HelpIter struct {
 	lineIter lineIter
 }
 
-func newHelpIter(texts []string, lineWidth, indent, margin int) HelpIter {
+func newBlockIter(texts []string, lineWidth, indent, margin int) blockIter {
 	if len(texts) == 0 {
-		return HelpIter{}
+		return blockIter{}
 	}
-	return HelpIter{
+	return blockIter{
 		texts:    texts,
 		indent:   indent,
 		margin:   strings.Repeat(" ", margin),
@@ -58,11 +98,7 @@ func newHelpIter(texts []string, lineWidth, indent, margin int) HelpIter {
 	}
 }
 
-// Next is a method which returns a line of a help text and a status which
-// indicates this HelpIter has more texts or not.
-// If there are more lines, the returned IterStatus value is ITER_HAS_MORE,
-// otherwise the value is ITER_NO_MORE.
-func (iter *HelpIter) Next() (string, IterStatus) {
+func (iter *blockIter) next() (string, IterStatus) {
 	if len(iter.texts) == 0 {
 		return "", ITER_NO_MORE
 	}
@@ -81,91 +117,98 @@ func (iter *HelpIter) Next() (string, IterStatus) {
 		return line, ITER_HAS_MORE
 	}
 
-	if iter.index > 0 {
-		iter.lineIter.setIndent(iter.indent)
-	}
+	iter.lineIter.setIndent(iter.indent)
 	return line, status
 }
 
-// MakeHelp is a function to make a line iterator of a help text.
-// This function makes a help text from a usage text, option configurations
-// ([]OptCfg), and wrap options (WrapOpts).
-//
-// A help text consists of an usage section and options section, and options
-// section consists of title parts and description parts.
-// On a title part, a option name, aliases, and a .HelpArg field of OptCfg are
-// enumerated.
-// On a description part, a .Desc field of OptCfg is put and it follows a title
-// part with an indent, specified in WrapOpts,
-//
-// On the both sides of a help text, left margin and right margin of which size
-// are specified in WrapOpts can be put.
-// These margins are applied to all lines of a help text.
-//
-// The sum of left margin, right margin, and indent have to be less than the
-// line width, because if not, there is no width to output texts.
-// The line width is obtained from the terminal width.
-func MakeHelp(
-	usage string, optCfgs []OptCfg, wrapOpts WrapOpts,
-) (HelpIter, error) {
-	lineWidth, _, err := term.GetSize(int(os.Stdout.Fd()))
-	if err != nil {
-		lineWidth = 80
+func (help *Help) AddText(text string, wrapOpts ...int) {
+	b := block{
+		marginLeft:  help.marginLeft,
+		marginRight: help.marginRight,
 	}
-
-	tw := make([]textAndWidth, len(optCfgs))
-	indent := 0
-
-	i := 0
-	for _, cfg := range optCfgs {
-		if cfg.Name == anyOption {
-			continue
-		}
-		tw[i] = makeOptTitle(cfg)
-		if indent < tw[i].width {
-			indent = tw[i].width
-		}
-		i++
+	if len(wrapOpts) > 0 {
+		b.indent = wrapOpts[0]
 	}
-	if i != len(tw) {
-		tw = tw[0:i]
+	if len(wrapOpts) > 1 {
+		b.marginLeft += wrapOpts[1]
 	}
-
-	indent += 2
-	if wrapOpts.Indent > 0 {
-		indent = wrapOpts.Indent
+	if len(wrapOpts) > 2 {
+		b.marginRight += wrapOpts[2]
 	}
-
-	if (wrapOpts.MarginLeft + wrapOpts.MarginRight + indent) >= lineWidth {
-		return HelpIter{}, MarginsAndIndentExceedLineWidth{
-			LineWidth:   lineWidth,
-			MarginLeft:  wrapOpts.MarginLeft,
-			MarginRight: wrapOpts.MarginRight,
-			Indent:      indent,
-		}
-	}
-	lineWidth -= wrapOpts.MarginLeft + wrapOpts.MarginRight
-
-	texts := make([]string, 1+len(tw))
-	texts[0] = usage
-	i = 0
-	for _, cfg := range optCfgs {
-		if cfg.Name == anyOption {
-			continue
-		}
-		texts[i+1] = makeOptHelp(tw[i], cfg, indent)
-		i++
-	}
-
-	return newHelpIter(texts, lineWidth, indent, wrapOpts.MarginLeft), nil
+	b.texts = []string{text}
+	help.blocks = append(help.blocks, b)
 }
 
-type textAndWidth struct {
-	text  string
-	width int
+func (help *Help) AddOpts(optCfgs []OptCfg, wrapOpts ...int) {
+	b := block{
+		marginLeft:  help.marginLeft,
+		marginRight: help.marginRight,
+	}
+	if len(wrapOpts) > 0 {
+		b.indent = wrapOpts[0]
+	}
+	if len(wrapOpts) > 1 {
+		b.marginLeft += wrapOpts[1]
+	}
+	if len(wrapOpts) > 2 {
+		b.marginRight += wrapOpts[2]
+	}
+
+	texts := make([]string, len(optCfgs))
+
+	if b.indent > 0 {
+		i := 0
+		for _, cfg := range optCfgs {
+			if cfg.Name == anyOption {
+				continue
+			}
+			texts[i] = makeOptTitle(cfg)
+			width := textWidth(texts[i])
+			if width+2 > b.indent {
+				texts[i] += "\n" + strings.Repeat(" ", b.indent) + cfg.Desc
+			} else {
+				texts[i] += strings.Repeat(" ", b.indent-width) + cfg.Desc
+			}
+			i++
+		}
+		texts = texts[0:i]
+
+	} else {
+		widths := make([]int, len(texts))
+		indent := 0
+
+		i := 0
+		for _, cfg := range optCfgs {
+			if cfg.Name == anyOption {
+				continue
+			}
+			texts[i] = makeOptTitle(cfg)
+			widths[i] = textWidth(texts[i])
+			if indent < widths[i] {
+				indent = widths[i]
+			}
+			i++
+		}
+		texts = texts[0:i]
+		indent += 2
+
+		b.indent = indent
+
+		i = 0
+		for _, cfg := range optCfgs {
+			if cfg.Name == anyOption {
+				continue
+			}
+			texts[i] += strings.Repeat(" ", indent-widths[i]) + cfg.Desc
+			i++
+		}
+	}
+
+	b.texts = texts
+	help.blocks = append(help.blocks, b)
 }
 
-func makeOptTitle(cfg OptCfg) textAndWidth {
+func makeOptTitle(cfg OptCfg) string {
 	title := cfg.Name
 	switch len(title) {
 	case 0:
@@ -185,12 +228,11 @@ func makeOptTitle(cfg OptCfg) textAndWidth {
 		}
 	}
 
-	if cfg.HasArg && len(cfg.HelpArg) > 0 {
-		title += " " + cfg.HelpArg
+	if cfg.HasArg && len(cfg.ArgHelp) > 0 {
+		title += " " + cfg.ArgHelp
 	}
 
-	w := textWidth(title)
-	return textAndWidth{text: title, width: w}
+	return title
 }
 
 func textWidth(text string) int {
@@ -201,22 +243,8 @@ func textWidth(text string) int {
 	return w
 }
 
-func makeOptHelp(tw textAndWidth, cfg OptCfg, indent int) string {
-	w := tw.width
-	if w+2 > indent {
-		return tw.text + "\n" + strings.Repeat(" ", indent) + cfg.Desc
-	} else {
-		return tw.text + strings.Repeat(" ", indent-w) + cfg.Desc
-	}
-}
-
-// PrintHelp is a function which output a help text to stdout.
-// This function calls MakeHelp function to make a help text inside itself.
-func PrintHelp(usage string, optCfgs []OptCfg, wrapOpts WrapOpts) error {
-	iter, err := MakeHelp(usage, optCfgs, wrapOpts)
-	if err != nil {
-		return err
-	}
+func (help Help) Print() {
+	iter := help.Iter()
 
 	for {
 		line, status := iter.Next()
@@ -225,5 +253,4 @@ func PrintHelp(usage string, optCfgs []OptCfg, wrapOpts WrapOpts) error {
 			break
 		}
 	}
-	return nil
 }

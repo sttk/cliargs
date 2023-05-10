@@ -1622,11 +1622,11 @@ func TestMakeOptCfgsFor_optionParam(t *testing.T) {
 
 	optCfgs, err0 := cliargs.MakeOptCfgsFor(&options)
 	assert.Nil(t, err0)
-	assert.Equal(t, optCfgs[0].HelpArg, "")
-	assert.Equal(t, optCfgs[1].HelpArg, "bbb")
-	assert.Equal(t, optCfgs[2].HelpArg, "ccc")
-	assert.Equal(t, optCfgs[3].HelpArg, "ddd (multiple)")
-	assert.Equal(t, optCfgs[4].HelpArg, "")
+	assert.Equal(t, optCfgs[0].ArgHelp, "")
+	assert.Equal(t, optCfgs[1].ArgHelp, "bbb")
+	assert.Equal(t, optCfgs[2].ArgHelp, "ccc")
+	assert.Equal(t, optCfgs[3].ArgHelp, "ddd (multiple)")
+	assert.Equal(t, optCfgs[4].ArgHelp, "")
 }
 
 func TestParseFor_optCfgHasUnsupportedType(t *testing.T) {
