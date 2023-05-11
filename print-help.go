@@ -146,6 +146,27 @@ func (help *Help) AddText(text string, wrapOpts ...int) {
 	help.blocks = append(help.blocks, b)
 }
 
+// AddTexts is a method which adds an array of texts to this Help instance.
+// And this method can optionally set indent, left margin, and right margin as
+// variadic arguments, too.
+func (help *Help) AddTexts(texts []string, wrapOpts ...int) {
+	b := block{
+		marginLeft:  help.marginLeft,
+		marginRight: help.marginRight,
+	}
+	if len(wrapOpts) > 0 {
+		b.indent = wrapOpts[0]
+	}
+	if len(wrapOpts) > 1 {
+		b.marginLeft += wrapOpts[1]
+	}
+	if len(wrapOpts) > 2 {
+		b.marginRight += wrapOpts[2]
+	}
+	b.texts = texts
+	help.blocks = append(help.blocks, b)
+}
+
 // AddOpts is a method which adds OptCfg(s) to this Help instance.
 // And this method can optionally set indent, left margin, and right margin as
 // variadic arguments, too.
