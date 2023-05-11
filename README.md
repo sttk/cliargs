@@ -24,7 +24,7 @@ This library provides three ways to parse command line arguments.
 
 ### 1. Parse CLI arguments without configurations
 
-The way uses `Parse` function.
+This way uses `Parse` function.
 This function automatically divides command line arguments to options and command arguments.
 
 Command line arguments starting with `-` or `--` are options, and others are command arguments.
@@ -58,7 +58,7 @@ cmd.OptArgs("z")        // [2 3]
 ### 2. Parse CLI arguments with configurations
 
 This way uses `ParseWith` function.
-This function takes an array of option configurations: `[]OptCfg` as an argument, and divides command line arguments with this configurations.
+This function takes an array of option configurations: `[]OptCfg` as the second argument, and divides command line arguments with this configurations.
 
 An option configuration has fields: `.Name`, `.Aliases`, `.HasArg`, `.IsArray`, `.Default`, `.Desc`, and `.ArgHelp`.
 
@@ -120,6 +120,10 @@ This is the usage description.
 
 ### 3. Parse CLI arguments for an option store with struct tags
 
+This way uses `ParseFor` function.
+This function takes a pointer of a structure which holds option values after parsing as the second argument.
+This structure is needed to have struct tags for its fields.
+`ParseFor` creates an option configuration array (`[]OptCfg`) from these struct tags, and uses it to parse command line arguments.
 
 ```
 // osArgs := []string{"app", "--foo-bar", "hoge", "--baz", "1", "-z=2", "-x", "fuga"}
