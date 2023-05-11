@@ -28,7 +28,7 @@ This way uses `Parse` function.
 This function automatically divides command line arguments to options and command arguments.
 
 Command line arguments starting with `-` or `--` are options, and others are command arguments.
-If it is wanted an option to have an argument, make `=` and the argument follow the option name, e.g. `foo=123`.
+If an option is wanted to have an argument, make `=` and the argument follow the option name, e.g. `foo=123`.
 
 `--` makes all command line arguments after it command arguments, even they start with `-` or `--`.
 
