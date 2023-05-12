@@ -210,6 +210,136 @@ func TestAddText_Indent(t *testing.T) {
 	assert.Equal(t, status, cliargs.ITER_NO_MORE)
 }
 
+func TestAddTexts_zeroText(t *testing.T) {
+	help := cliargs.NewHelp()
+	help.AddTexts([]string{})
+	iter := help.Iter()
+
+	line, status := iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+
+	help = cliargs.NewHelp()
+	help.AddTexts([]string(nil))
+	iter = help.Iter()
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+}
+
+func TestAddTexts_oneText(t *testing.T) {
+	help := cliargs.NewHelp()
+	help.AddTexts([]string{
+		"a12345678 b12345678 c12345678 d12345678 " +
+			"e12345678 f12345678 g12345678 h12345678 i123"})
+	iter := help.Iter()
+
+	line, status := iter.Next()
+	assert.Equal(t, line, "a12345678 b12345678 c12345678 d12345678 "+
+		"e12345678 f12345678 g12345678 h12345678 ")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "i123")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+}
+
+func TestAddTexts_multipleTexts(t *testing.T) {
+	help := cliargs.NewHelp()
+	help.AddTexts([]string{
+		"a12345678 b12345678 c12345678 d12345678 " +
+			"e12345678 f12345678 g12345678 h12345678 i123",
+		"j12345678 k12345678 l12345678 m12345678 " +
+			"n12345678 o12345678 p12345678 q12345678 r123",
+	})
+	iter := help.Iter()
+
+	line, status := iter.Next()
+	assert.Equal(t, line, "a12345678 b12345678 c12345678 d12345678 "+
+		"e12345678 f12345678 g12345678 h12345678 ")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "i123")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "j12345678 k12345678 l12345678 m12345678 "+
+		"n12345678 o12345678 p12345678 q12345678 ")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "r123")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+}
+
+func TestAddTexts_withIndent(t *testing.T) {
+	help := cliargs.NewHelp()
+	help.AddTexts([]string{
+		"a12345678  123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789",
+		"b1234      123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789",
+	}, 11)
+	iter := help.Iter()
+
+	line, status := iter.Next()
+	assert.Equal(t, line, "a12345678  123456789 123456789 123456789 123456789 123456789 123456789 123456789")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "           123456789 123456789")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "b1234      123456789 123456789 123456789 123456789 123456789 123456789 123456789")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "           123456789 123456789")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+}
+
+func TestAddTexts_withMargins(t *testing.T) {
+	help := cliargs.NewHelp(2, 2)
+	help.AddTexts([]string{
+		"a12345678  123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789",
+		"b1234      123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789",
+	}, 11, 5, 3)
+	iter := help.Iter()
+
+	line, status := iter.Next()
+	assert.Equal(t, line, "       a12345678  123456789 123456789 123456789 123456789 123456789 ")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "                  123456789 123456789 123456789 123456789")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "       b1234      123456789 123456789 123456789 123456789 123456789 ")
+	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "                  123456789 123456789 123456789 123456789")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+
+	line, status = iter.Next()
+	assert.Equal(t, line, "")
+	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+}
+
 func TestAddOpts_zeroOpts(t *testing.T) {
 	help := cliargs.NewHelp()
 	help.AddOpts([]cliargs.OptCfg{})
