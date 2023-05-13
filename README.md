@@ -21,7 +21,7 @@ import "github.com/sttk-go/cliargs"
 ```
 
 
-## Usage examples
+## Usage
 
 The usage of this library is described on the overview in the go package document.
 
