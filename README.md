@@ -10,7 +10,7 @@ This library provides the following functionalities:
     - This library supports not `-ofoo` but `-o=foo` as an alternative to `-o foo` for short option.
 - Supports parsing with option configurations.
 - Supports parsing with a struct which stores option values and has struct tags of fields.
-- Enable to parse command line arguments including sub commands.
+- Is able to parse command line arguments including sub commands.
 - Generates help text from option configurations.
 
 
