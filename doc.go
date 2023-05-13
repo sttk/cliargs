@@ -191,7 +191,7 @@ And optarg is what to specify a text for an option argument value in help text.
 	           //   },
 	           // }
 
-The following help text is generated from the above optCfgs (without Help#Print but Help#Iter).
+The following help text is generated from the above optCfgs (without Help#Print but Help#Iter in this example).
 
 	help := cliargs.NewHelp()
 	help.AddText("This is the usage description.")
