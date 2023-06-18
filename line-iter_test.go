@@ -2,8 +2,9 @@ package cliargs
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLineIter_Next_emptyText(t *testing.T) {

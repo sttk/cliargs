@@ -17,7 +17,7 @@ This library provides the following functionalities:
 ## Import this package
 
 ```
-import "github.com/sttk-go/cliargs"
+import "github.com/sttk/cliargs"
 ```
 
 
@@ -25,7 +25,7 @@ import "github.com/sttk-go/cliargs"
 
 The usage of this library is described on the overview in the go package document.
 
-See https://pkg.go.dev/github.com/sttk-go/cliargs#pkg-overview
+See https://pkg.go.dev/github.com/sttk/cliargs#pkg-overview
 
 
 ## Supporting Go versions
@@ -38,18 +38,22 @@ This library supports Go 1.18 or later.
 % gvm-fav
 Now using version go1.18.10
 go version go1.18.10 darwin/amd64
-ok  	github.com/sttk-go/cliargs	0.135s	coverage: 99.2% of statements
+go: downloading golang.org/x/term v0.9.0
+go: downloading golang.org/x/sys v0.9.0
+ok  	github.com/sttk/cliargs	0.303s	coverage: 99.2% of statements
 
-Now using version go1.19.5
-go version go1.19.5 darwin/amd64
-ok  	github.com/sttk-go/cliargs	0.136s	coverage: 99.2% of statements
+Now using version go1.19.10
+go version go1.19.10 darwin/amd64
+go: downloading golang.org/x/term v0.9.0
+go: downloading golang.org/x/sys v0.9.0
+ok  	github.com/sttk/cliargs	0.240s	coverage: 99.2% of statements
 
-Now using version go1.20
-go version go1.20 darwin/amd64
-ok  	github.com/sttk-go/cliargs	0.139s	coverage: 99.2% of statements
+Now using version go1.20.5
+go version go1.20.5 darwin/amd64
+ok  	github.com/sttk/cliargs	0.136s	coverage: 99.2% of statements
 
-Back to go1.20
-Now using version go1.20
+Back to go1.20.5
+Now using version go1.20.5
 ```
 
 ## License
@@ -60,11 +64,11 @@ This program is free software under MIT License.<br>
 See the file LICENSE in this distribution for more details.
 
 
-[repo-url]: https://github.com/sttk-go/cliargs
-[pkg-dev-img]: https://pkg.go.dev/badge/github.com/sttk-go/cliargs.svg
-[pkg-dev-url]: https://pkg.go.dev/github.com/sttk-go/cliargs
-[ci-img]: https://github.com/sttk-go/cliargs/actions/workflows/go.yml/badge.svg?branch=main
-[ci-url]: https://github.com/sttk-go/cliargs/actions
+[repo-url]: https://github.com/sttk/cliargs-go
+[pkg-dev-img]: https://pkg.go.dev/badge/github.com/sttk/cliargs.svg
+[pkg-dev-url]: https://pkg.go.dev/github.com/sttk/cliargs
+[ci-img]: https://github.com/sttk/cliargs-go/actions/workflows/go.yml/badge.svg?branch=main
+[ci-url]: https://github.com/sttk/cliargs-go/actions
 [mit-img]: https://img.shields.io/badge/license-MIT-green.svg
 [mit-url]: https://opensource.org/licenses/MIT
 

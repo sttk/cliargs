@@ -1,10 +1,12 @@
 package cliargs_test
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/sttk-go/cliargs"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/sttk/cliargs"
 )
 
 var osArgs []string = os.Args

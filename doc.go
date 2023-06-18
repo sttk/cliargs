@@ -3,7 +3,7 @@
 // See the file LICENSE in this distribution for more details.
 
 /*
-Package github.com/sttk-go/cliargs is a library to parse command line
+Package github.com/sttk/cliargs is a library to parse command line
 arguments.
 
 # Parse without configurations
