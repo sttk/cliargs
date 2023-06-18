@@ -1,8 +1,9 @@
 package cliargs
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewRuneBuffer_empty(t *testing.T) {

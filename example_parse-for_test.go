@@ -2,7 +2,8 @@ package cliargs_test
 
 import (
 	"fmt"
-	"github.com/sttk-go/cliargs"
+
+	"github.com/sttk/cliargs"
 )
 
 func ExampleParseFor() {

@@ -2,10 +2,12 @@ package cliargs_test
 
 import (
 	"errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/sttk-go/cliargs"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/sttk/cliargs"
 )
 
 func TestParseFor_emptyOptionStoreAndNoArgs(t *testing.T) {

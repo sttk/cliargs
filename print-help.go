@@ -6,9 +6,10 @@ package cliargs
 
 import (
 	"fmt"
-	"golang.org/x/term"
 	"os"
 	"strings"
+
+	"golang.org/x/term"
 )
 
 // Help is a struct type which holds help text blocks and help options block.

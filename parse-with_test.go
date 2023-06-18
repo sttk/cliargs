@@ -1,9 +1,11 @@
 package cliargs_test
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/sttk-go/cliargs"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/sttk/cliargs"
 )
 
 func TestParseWith_zeroCfgAndZeroArg(t *testing.T) {
