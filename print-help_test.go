@@ -12,13 +12,13 @@ func TestNewHelp_empty(t *testing.T) {
 	help := cliargs.NewHelp()
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddText_oneLine_withNoWrapping(t *testing.T) {
@@ -26,13 +26,13 @@ func TestAddText_oneLine_withNoWrapping(t *testing.T) {
 	help.AddText("abc")
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "abc")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddText_multiLines_withNoWrapping(t *testing.T) {
@@ -40,17 +40,17 @@ func TestAddText_multiLines_withNoWrapping(t *testing.T) {
 	help.AddText("abc\ndef")
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "abc")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "def")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddText_oneLine_withWrapping(t *testing.T) {
@@ -58,17 +58,17 @@ func TestAddText_oneLine_withWrapping(t *testing.T) {
 	help.AddText("a123456789b123456789c123456789d123456789e123456789f123456789g123456789h123456789i12345")
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "a123456789b123456789c123456789d123456789e123456789f123456789g123456789h123456789")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "i12345")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddText_multiLines_withWrapping(t *testing.T) {
@@ -76,25 +76,25 @@ func TestAddText_multiLines_withWrapping(t *testing.T) {
 	help.AddText("a123456789b123456789c123456789d123456789e123456789f123456789g123456789h123456789i12345\n6789j123456789k123456789l123456789m123456789n123456789o123456789p123456789q12345678")
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "a123456789b123456789c123456789d123456789e123456789f123456789g123456789h123456789")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "i12345")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "6789j123456789k123456789l123456789m123456789n123456789o123456789p123456789q12345")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "678")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddText_marginLeftByNewArgHelp(t *testing.T) {
@@ -102,17 +102,17 @@ func TestAddText_marginLeftByNewArgHelp(t *testing.T) {
 	help.AddText("abc\ndef")
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "     abc")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "     def")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddText_marginLeftAndMarginRightByNewArgHelps(t *testing.T) {
@@ -120,21 +120,21 @@ func TestAddText_marginLeftAndMarginRightByNewArgHelps(t *testing.T) {
 	help.AddText("a123456789b123456789c123456789d123456789e123456789f123456789g123456789h123456789i12345\n6789")
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "     a123456789b123456789c123456789d123456789e123456789f123456789g123456789h1")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "     23456789i12345")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "     6789")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddText_marginLeftByiAddHelpTextArg(t *testing.T) {
@@ -142,17 +142,17 @@ func TestAddText_marginLeftByiAddHelpTextArg(t *testing.T) {
 	help.AddText("abc\ndef", 0, 5)
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "     abc")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "     def")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddText_marginLeftAndMarginRightByddHelpTextArgs(t *testing.T) {
@@ -160,21 +160,21 @@ func TestAddText_marginLeftAndMarginRightByddHelpTextArgs(t *testing.T) {
 	help.AddText("a123456789b123456789c123456789d123456789e123456789f123456789g123456789h123456789i12345\n6789", 0, 5, 3)
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "     a123456789b123456789c123456789d123456789e123456789f123456789g123456789h1")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "     23456789i12345")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "     6789")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddText_Indent(t *testing.T) {
@@ -183,33 +183,33 @@ func TestAddText_Indent(t *testing.T) {
 	help.AddText("a123456789b123456789c123456789d123456789e123456789f123456789g123456789h123456789i12345\n6789", 5)
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "a123456789b123456789c123456789d123456789e123456789f123456789g123456789h123456789")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "        i12345")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "        6789")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "a123456789b123456789c123456789d123456789e123456789f123456789g123456789h123456789")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "     i12345")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "     6789")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddTexts_zeroText(t *testing.T) {
@@ -217,17 +217,17 @@ func TestAddTexts_zeroText(t *testing.T) {
 	help.AddTexts([]string{})
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
 	help = cliargs.NewHelp()
 	help.AddTexts([]string(nil))
 	iter = help.Iter()
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddTexts_oneText(t *testing.T) {
@@ -237,18 +237,18 @@ func TestAddTexts_oneText(t *testing.T) {
 			"e12345678 f12345678 g12345678 h12345678 i123"})
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "a12345678 b12345678 c12345678 d12345678 "+
-		"e12345678 f12345678 g12345678 h12345678 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+		"e12345678 f12345678 g12345678 h12345678")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "i123")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddTexts_multipleTexts(t *testing.T) {
@@ -261,27 +261,27 @@ func TestAddTexts_multipleTexts(t *testing.T) {
 	})
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "a12345678 b12345678 c12345678 d12345678 "+
-		"e12345678 f12345678 g12345678 h12345678 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+		"e12345678 f12345678 g12345678 h12345678")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "i123")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "j12345678 k12345678 l12345678 m12345678 "+
-		"n12345678 o12345678 p12345678 q12345678 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+		"n12345678 o12345678 p12345678 q12345678")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "r123")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddTexts_withIndent(t *testing.T) {
@@ -292,25 +292,25 @@ func TestAddTexts_withIndent(t *testing.T) {
 	}, 11)
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "a12345678  123456789 123456789 123456789 123456789 123456789 123456789 123456789")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "           123456789 123456789")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "b1234      123456789 123456789 123456789 123456789 123456789 123456789 123456789")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "           123456789 123456789")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddTexts_withMargins(t *testing.T) {
@@ -321,25 +321,25 @@ func TestAddTexts_withMargins(t *testing.T) {
 	}, 11, 5, 3)
 	iter := help.Iter()
 
-	line, status := iter.Next()
-	assert.Equal(t, line, "       a12345678  123456789 123456789 123456789 123456789 123456789 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	line, more := iter.Next()
+	assert.Equal(t, line, "       a12345678  123456789 123456789 123456789 123456789 123456789")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "                  123456789 123456789 123456789 123456789")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
-	assert.Equal(t, line, "       b1234      123456789 123456789 123456789 123456789 123456789 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	line, more = iter.Next()
+	assert.Equal(t, line, "       b1234      123456789 123456789 123456789 123456789 123456789")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "                  123456789 123456789 123456789 123456789")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddOpts_zeroOpts(t *testing.T) {
@@ -347,13 +347,13 @@ func TestAddOpts_zeroOpts(t *testing.T) {
 	help.AddOpts([]cliargs.OptCfg{})
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddOpts_oneOpts_withNoWrapping(t *testing.T) {
@@ -366,13 +366,13 @@ func TestAddOpts_oneOpts_withNoWrapping(t *testing.T) {
 	})
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "--foo-bar  This is a description of option.")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddOpts_oneOpts_withWrapping(t *testing.T) {
@@ -386,17 +386,17 @@ func TestAddOpts_oneOpts_withWrapping(t *testing.T) {
 	})
 	iter := help.Iter()
 
-	line, status := iter.Next()
-	assert.Equal(t, line, "--foo-bar, -f, --foo, -b, --bar  a12345678 b12345678 c12345678 d12345678 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	line, more := iter.Next()
+	assert.Equal(t, line, "--foo-bar, -f, --foo, -b, --bar  a12345678 b12345678 c12345678 d12345678")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "                                 e12345678 f12345678 g12345678")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddOpts_oneOpts_withMarginsByNewHelpArg(t *testing.T) {
@@ -412,17 +412,17 @@ func TestAddOpts_oneOpts_withMarginsByNewHelpArg(t *testing.T) {
 	})
 	iter := help.Iter()
 
-	line, status := iter.Next()
-	assert.Equal(t, line, "     --foo-bar, -f <text>  a12345678 b12345678 c12345678 d12345678 e12345678 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	line, more := iter.Next()
+	assert.Equal(t, line, "     --foo-bar, -f <text>  a12345678 b12345678 c12345678 d12345678 e12345678")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "                           f12345678 g12345678 h12345678")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddOpts_oneOpts_withMarginsByAddOptsArg(t *testing.T) {
@@ -438,17 +438,17 @@ func TestAddOpts_oneOpts_withMarginsByAddOptsArg(t *testing.T) {
 	}, 0, 5, 3)
 	iter := help.Iter()
 
-	line, status := iter.Next()
-	assert.Equal(t, line, "     --foo-bar, -f <text>  a12345678 b12345678 c12345678 d12345678 e12345678 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	line, more := iter.Next()
+	assert.Equal(t, line, "     --foo-bar, -f <text>  a12345678 b12345678 c12345678 d12345678 e12345678")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "                           f12345678 g12345678 h12345678")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddOpts_oneOpts_withMarginsByNewHelpArgAndAddOptsArg(t *testing.T) {
@@ -464,17 +464,17 @@ func TestAddOpts_oneOpts_withMarginsByNewHelpArgAndAddOptsArg(t *testing.T) {
 	}, 0, 3, 1)
 	iter := help.Iter()
 
-	line, status := iter.Next()
-	assert.Equal(t, line, "     --foo-bar, -f <text>  a12345678 b12345678 c12345678 d12345678 e12345678 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	line, more := iter.Next()
+	assert.Equal(t, line, "     --foo-bar, -f <text>  a12345678 b12345678 c12345678 d12345678 e12345678")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "                           f12345678 g12345678 h12345678")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddOpts_oneOpts_withIndentLongerThanTitle(t *testing.T) {
@@ -490,17 +490,17 @@ func TestAddOpts_oneOpts_withIndentLongerThanTitle(t *testing.T) {
 	}, 25)
 	iter := help.Iter()
 
-	line, status := iter.Next()
-	assert.Equal(t, line, "--foo-bar, -f <text>     a12345678 b12345678 c12345678 d12345678 e12345678 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	line, more := iter.Next()
+	assert.Equal(t, line, "--foo-bar, -f <text>     a12345678 b12345678 c12345678 d12345678 e12345678")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "                         f12345678 g12345678 h12345678")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddOpts_oneOpts_withIndentShorterThanTitle(t *testing.T) {
@@ -516,21 +516,21 @@ func TestAddOpts_oneOpts_withIndentShorterThanTitle(t *testing.T) {
 	}, 10)
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "--foo-bar, -f <text>")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
-	assert.Equal(t, line, "          a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	line, more = iter.Next()
+	assert.Equal(t, line, "          a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "          h12345678")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddOpts_multipleOpts(t *testing.T) {
@@ -551,25 +551,25 @@ func TestAddOpts_multipleOpts(t *testing.T) {
 	})
 	iter := help.Iter()
 
-	line, status := iter.Next()
-	assert.Equal(t, line, "--foo-bar, -f <text>  a12345678 b12345678 c12345678 d12345678 e12345678 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	line, more := iter.Next()
+	assert.Equal(t, line, "--foo-bar, -f <text>  a12345678 b12345678 c12345678 d12345678 e12345678")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "                      f12345678 g12345678 h12345678")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
-	assert.Equal(t, line, "--baz, -b             i12345678 j12345678 k12345678 l12345678 m12345678 ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	line, more = iter.Next()
+	assert.Equal(t, line, "--baz, -b             i12345678 j12345678 k12345678 l12345678 m12345678")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "                      n12345678 o12345678 p12345678")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddOpts_hasAnyOption(t *testing.T) {
@@ -586,13 +586,13 @@ func TestAddOpts_hasAnyOption(t *testing.T) {
 	})
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "--foo-bar  a12345678 b12345678")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddOpts_hasAnyOption_withIndent(t *testing.T) {
@@ -609,30 +609,30 @@ func TestAddOpts_hasAnyOption_withIndent(t *testing.T) {
 	}, 5)
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "--foo-bar")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "     a12345678 b12345678")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestNewHelp_ifLineWidthLessThanSumOfMargins(t *testing.T) {
 	help := cliargs.NewHelp(71, 10)
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddText_ifLineWidthLessThanSumOfMargins(t *testing.T) {
@@ -642,21 +642,21 @@ func TestAddText_ifLineWidthLessThanSumOfMargins(t *testing.T) {
 	help.AddText("opqrstu", 10, 10, 11)
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "                    hijklmn")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestAddOpts_ifLineWidthLessThanSunOfMargins(t *testing.T) {
@@ -681,29 +681,29 @@ func TestAddOpts_ifLineWidthLessThanSunOfMargins(t *testing.T) {
 	}, 10, 10, 21)
 	iter := help.Iter()
 
-	line, status := iter.Next()
+	line, more := iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
-	assert.Equal(t, line, "                    --baz     This is a ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	line, more = iter.Next()
+	assert.Equal(t, line, "                    --baz     This is a")
+	assert.True(t, more)
 
-	line, status = iter.Next()
-	assert.Equal(t, line, "                              description of ")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	line, more = iter.Next()
+	assert.Equal(t, line, "                              description of")
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "                              option.")
-	assert.Equal(t, status, cliargs.ITER_HAS_MORE)
+	assert.True(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 
-	line, status = iter.Next()
+	line, more = iter.Next()
 	assert.Equal(t, line, "")
-	assert.Equal(t, status, cliargs.ITER_NO_MORE)
+	assert.False(t, more)
 }
 
 func TestPrint_curl(t *testing.T) {

@@ -50,9 +50,9 @@ func ExampleHelp_Iter() {
 	iter := help.Iter()
 
 	for {
-		line, status := iter.Next()
+		line, more := iter.Next()
 		fmt.Println(line)
-		if status == cliargs.ITER_NO_MORE {
+		if !more {
 			break
 		}
 	}
