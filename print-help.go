@@ -6,10 +6,8 @@ package cliargs
 
 import (
 	"fmt"
-	"os"
-	"strings"
 
-	"golang.org/x/term"
+	"github.com/sttk/linebreak"
 )
 
 // Help is a struct type which holds help text blocks and help options block.
@@ -44,10 +42,7 @@ func (help Help) Iter() HelpIter {
 		return HelpIter{}
 	}
 
-	lineWidth, _, err := term.GetSize(int(os.Stdout.Fd()))
-	if err != nil {
-		lineWidth = 80
-	}
+	lineWidth := linebreak.TermWidth()
 
 	return HelpIter{
 		lineWidth: lineWidth,
@@ -67,16 +62,16 @@ type HelpIter struct {
 // indicates this HelpIter has more texts or not.
 // If there are more lines, the returned IterStatus value is ITER_HAS_MORE,
 // otherwise the value is ITER_NO_MORE.
-func (iter *HelpIter) Next() (string, IterStatus) {
-	line, status := iter.blockIter.next()
-	if status == ITER_NO_MORE {
+func (iter *HelpIter) Next() (string, bool) {
+	line, more := iter.blockIter.next()
+	if !more {
 		if len(iter.blocks) <= 1 {
-			return line, ITER_NO_MORE
+			return line, false
 		}
 		iter.blocks = iter.blocks[1:]
 		iter.blockIter = newBlockIter(iter.blocks[0], iter.lineWidth)
 	}
-	return line, ITER_HAS_MORE
+	return line, true
 }
 
 type blockIter struct {
@@ -84,7 +79,7 @@ type blockIter struct {
 	index    int
 	indent   int
 	margin   string
-	lineIter lineIter
+	lineIter linebreak.LineIter
 }
 
 func newBlockIter(b block, lineWidth int) blockIter {
@@ -98,32 +93,32 @@ func newBlockIter(b block, lineWidth int) blockIter {
 	return blockIter{
 		texts:    b.texts,
 		indent:   b.indent,
-		margin:   strings.Repeat(" ", b.marginLeft),
-		lineIter: newLineIter(b.texts[0], printWidth),
+		margin:   linebreak.Spaces(b.marginLeft),
+		lineIter: linebreak.New(b.texts[0], printWidth),
 	}
 }
 
-func (iter *blockIter) next() (string, IterStatus) {
+func (iter *blockIter) next() (string, bool) {
 	if len(iter.texts) == 0 {
-		return "", ITER_NO_MORE
+		return "", false
 	}
 
-	line, status := iter.lineIter.Next()
+	line, more := iter.lineIter.Next()
 	if len(line) > 0 {
 		line = iter.margin + line
 	}
-	if status == ITER_NO_MORE {
+	if !more {
 		iter.index++
 		if iter.index >= len(iter.texts) {
-			return line, status
+			return line, more
 		}
-		iter.lineIter.resetText(iter.texts[iter.index])
-		iter.lineIter.setIndent(0)
-		return line, ITER_HAS_MORE
+		iter.lineIter.Init(iter.texts[iter.index])
+		iter.lineIter.SetIndent("")
+		return line, true
 	}
 
-	iter.lineIter.setIndent(iter.indent)
-	return line, status
+	iter.lineIter.SetIndent(linebreak.Spaces(iter.indent))
+	return line, more
 }
 
 // AddText is a method which adds a text to this Help instance.
@@ -195,11 +190,11 @@ func (help *Help) AddOpts(optCfgs []OptCfg, wrapOpts ...int) {
 				continue
 			}
 			texts[i] = makeOptTitle(cfg)
-			width := textWidth(texts[i])
+			width := linebreak.TextWidth(texts[i])
 			if width+2 > b.indent {
-				texts[i] += "\n" + strings.Repeat(" ", b.indent) + cfg.Desc
+				texts[i] += "\n" + linebreak.Spaces(b.indent) + cfg.Desc
 			} else {
-				texts[i] += strings.Repeat(" ", b.indent-width) + cfg.Desc
+				texts[i] += linebreak.Spaces(b.indent-width) + cfg.Desc
 			}
 			i++
 		}
@@ -215,7 +210,7 @@ func (help *Help) AddOpts(optCfgs []OptCfg, wrapOpts ...int) {
 				continue
 			}
 			texts[i] = makeOptTitle(cfg)
-			widths[i] = textWidth(texts[i])
+			widths[i] = linebreak.TextWidth(texts[i])
 			if indent < widths[i] {
 				indent = widths[i]
 			}
@@ -231,7 +226,7 @@ func (help *Help) AddOpts(optCfgs []OptCfg, wrapOpts ...int) {
 			if cfg.Name == anyOption {
 				continue
 			}
-			texts[i] += strings.Repeat(" ", indent-widths[i]) + cfg.Desc
+			texts[i] += linebreak.Spaces(indent-widths[i]) + cfg.Desc
 			i++
 		}
 	}
@@ -267,22 +262,14 @@ func makeOptTitle(cfg OptCfg) string {
 	return title
 }
 
-func textWidth(text string) int {
-	w := 0
-	for _, r := range text {
-		w += runeWidth(r)
-	}
-	return w
-}
-
 // Print is a method which prints help texts to standard output.
 func (help Help) Print() {
 	iter := help.Iter()
 
 	for {
-		line, status := iter.Next()
+		line, more := iter.Next()
 		fmt.Println(line)
-		if status == ITER_NO_MORE {
+		if !more {
 			break
 		}
 	}
