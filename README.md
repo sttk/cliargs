@@ -38,22 +38,22 @@ This library supports Go 1.18 or later.
 % gvm-fav
 Now using version go1.18.10
 go version go1.18.10 darwin/amd64
-go: downloading golang.org/x/term v0.9.0
-go: downloading golang.org/x/sys v0.9.0
-ok  	github.com/sttk/cliargs	0.303s	coverage: 99.2% of statements
+ok  	github.com/sttk/cliargs	0.162s	coverage: 99.0% of statements
 
-Now using version go1.19.10
-go version go1.19.10 darwin/amd64
-go: downloading golang.org/x/term v0.9.0
-go: downloading golang.org/x/sys v0.9.0
-ok  	github.com/sttk/cliargs	0.240s	coverage: 99.2% of statements
+Now using version go1.19.13
+go version go1.19.13 darwin/amd64
+ok  	github.com/sttk/cliargs	0.166s	coverage: 99.0% of statements
 
-Now using version go1.20.5
-go version go1.20.5 darwin/amd64
-ok  	github.com/sttk/cliargs	0.136s	coverage: 99.2% of statements
+Now using version go1.20.8
+go version go1.20.8 darwin/amd64
+ok  	github.com/sttk/cliargs	0.123s	coverage: 99.0% of statements
 
-Back to go1.20.5
-Now using version go1.20.5
+Now using version go1.21.1
+go version go1.21.1 darwin/amd64
+ok  	github.com/sttk/cliargs	0.123s	coverage: 99.0% of statements
+
+Back to go1.21.1
+Now using version go1.21.1
 ```
 
 ## License
