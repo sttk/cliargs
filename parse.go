@@ -157,7 +157,7 @@ L0:
 				if firstErr == nil {
 					firstErr = err
 				}
-				continue
+				continue L0
 			}
 
 		} else if len(prevOptTakingArgs) > 0 {
@@ -166,14 +166,14 @@ L0:
 				if firstErr == nil {
 					firstErr = err
 				}
-				continue
+				continue L0
 			}
 			prevOptTakingArgs = ""
 
 		} else if strings.HasPrefix(arg, "--") {
 			if len(arg) == 2 {
 				isNonOpt = true
-				continue
+				continue L0
 			}
 
 			arg = arg[2:]
@@ -210,14 +210,14 @@ L0:
 			if i == len(arg) {
 				if takeArgs(arg) && iArg < len(osArgs)-1 {
 					prevOptTakingArgs = arg
-					continue
+					continue L0
 				}
 				err := collectOpts(arg)
 				if err != nil {
 					if firstErr == nil {
 						firstErr = err
 					}
-					continue
+					continue L0
 				}
 			}
 
@@ -229,7 +229,7 @@ L0:
 						firstErr = err
 					}
 				}
-				continue
+				continue L0
 			}
 
 			arg := arg[1:]
@@ -238,34 +238,37 @@ L0:
 			for _, r := range arg {
 				if i > 0 {
 					if r == '=' {
-						err := collectOpts(name, arg[i+1:])
+						if len(name) > 0 {
+							err := collectOpts(name, arg[i+1:])
+							if err != nil {
+								if firstErr == nil {
+									firstErr = err
+								}
+							}
+						}
+						continue L0
+					}
+					if len(name) > 0 {
+						err := collectOpts(name)
 						if err != nil {
 							if firstErr == nil {
 								firstErr = err
 							}
-							continue L0
 						}
-						break
-					}
-					err := collectOpts(name)
-					if err != nil {
-						if firstErr == nil {
-							firstErr = err
-						}
-						continue
 					}
 				}
-				name = string(r)
 				if !unicode.Is(rangeOfAlphabets, r) {
 					if firstErr == nil {
-						firstErr = OptionHasInvalidChar{Option: name}
+						firstErr = OptionHasInvalidChar{Option: string(r)}
 					}
-					continue
+					name = ""
+				} else {
+					name = string(r)
 				}
 				i++
 			}
 
-			if i == len(arg) {
+			if i == len(arg) && len(name) > 0 {
 				if takeArgs(name) && iArg < len(osArgs)-1 {
 					prevOptTakingArgs = name
 				} else {
@@ -274,7 +277,7 @@ L0:
 						if firstErr == nil {
 							firstErr = err
 						}
-						continue
+						continue L0
 					}
 				}
 			}
@@ -285,7 +288,7 @@ L0:
 				if firstErr == nil {
 					firstErr = err
 				}
-				continue
+				continue L0
 			}
 		}
 	}

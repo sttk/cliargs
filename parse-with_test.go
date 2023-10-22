@@ -874,3 +874,74 @@ func TestParseWith_multipleArgs(t *testing.T) {
 	assert.Equal(t, cmd.OptArgs("corge"), []string{"99"})
 	assert.Equal(t, cmd.Args(), []string{"qux", "quux"})
 }
+
+func TestParseWith_parseAllArgsEvenIfError(t *testing.T) {
+	optCfgs := []cliargs.OptCfg{
+		cliargs.OptCfg{Name: "foo", Aliases: []string{"f"}},
+	}
+
+	osArgs := []string{"app", "-ef", "bar"}
+
+	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
+	assert.Equal(t, cmd.Name, "app")
+
+	assert.True(t, cmd.HasOpt("foo"))
+	assert.False(t, cmd.HasOpt("f"))
+	assert.False(t, cmd.HasOpt("e"))
+	assert.Equal(t, cmd.Args(), []string{"bar"})
+
+	switch casted := err.(type) {
+	case cliargs.UnconfiguredOption:
+		assert.Equal(t, casted.Option, "e")
+	default:
+		assert.Fail(t, err.Error())
+	}
+}
+
+func TestParseWith_parseAllArgsEvenIfShortOptionValueIsError(t *testing.T) {
+	optCfgs := []cliargs.OptCfg{
+		cliargs.OptCfg{Name: "e"},
+		cliargs.OptCfg{Name: "foo", Aliases: []string{"f"}},
+	}
+
+	osArgs := []string{"app", "-ef=123", "bar"}
+
+	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
+	assert.Equal(t, cmd.Name, "app")
+
+	assert.False(t, cmd.HasOpt("foo"))
+	assert.False(t, cmd.HasOpt("f"))
+	assert.True(t, cmd.HasOpt("e"))
+	assert.Equal(t, cmd.Args(), []string{"bar"})
+
+	switch casted := err.(type) {
+	case cliargs.OptionTakesNoArg:
+		assert.Equal(t, casted.Option, "foo")
+	default:
+		assert.Fail(t, err.Error())
+	}
+}
+
+func TestParseWith_parseAllArgsEvenIfLongOptionValueIsError(t *testing.T) {
+	optCfgs := []cliargs.OptCfg{
+		cliargs.OptCfg{Name: "e"},
+		cliargs.OptCfg{Name: "foo", Aliases: []string{"f"}},
+	}
+
+	osArgs := []string{"app", "--foo=123", "-e", "bar"}
+
+	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
+	assert.Equal(t, cmd.Name, "app")
+
+	assert.False(t, cmd.HasOpt("foo"))
+	assert.False(t, cmd.HasOpt("f"))
+	assert.True(t, cmd.HasOpt("e"))
+	assert.Equal(t, cmd.Args(), []string{"bar"})
+
+	switch casted := err.(type) {
+	case cliargs.OptionTakesNoArg:
+		assert.Equal(t, casted.Option, "foo")
+	default:
+		assert.Fail(t, err.Error())
+	}
+}

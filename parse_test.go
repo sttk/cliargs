@@ -534,7 +534,7 @@ func TestParse_multipleArgs(t *testing.T) {
 func TestParse_parseAllArgsEvenIfError(t *testing.T) {
 	defer resetOsArgs()
 
-	os.Args = []string{"/path/to/app", "--foo", "--1", "--bar", "--2", "baz"}
+	os.Args = []string{"/path/to/app", "--foo", "--1", "-b2ar", "--3", "baz"}
 
 	cmd, err := cliargs.Parse()
 
@@ -547,8 +547,11 @@ func TestParse_parseAllArgsEvenIfError(t *testing.T) {
 
 	assert.Equal(t, cmd.Name, "app")
 	assert.True(t, cmd.HasOpt("foo"))
-	assert.True(t, cmd.HasOpt("bar"))
+	assert.True(t, cmd.HasOpt("b"))
+	assert.True(t, cmd.HasOpt("a"))
+	assert.True(t, cmd.HasOpt("r"))
 	assert.False(t, cmd.HasOpt("1"))
 	assert.False(t, cmd.HasOpt("2"))
+	assert.False(t, cmd.HasOpt("3"))
 	assert.Equal(t, cmd.Args(), []string{"baz"})
 }
