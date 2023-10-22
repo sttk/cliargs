@@ -322,17 +322,17 @@ func TestParse_illegalLongOptIfIncludingInvalidChar(t *testing.T) {
 	default:
 		assert.Fail(t, err.Error())
 	}
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
-	assert.False(t, cmd.HasOpt("a"))
+	assert.True(t, cmd.HasOpt("a"))
 	assert.Equal(t, cmd.OptArg("a"), "")
-	assert.Equal(t, cmd.OptArgs("a"), []string(nil))
+	assert.Equal(t, cmd.OptArgs("a"), []string{})
 	assert.False(t, cmd.HasOpt("alphabet"))
 	assert.Equal(t, cmd.OptArg("alphabet"), "")
 	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
-	assert.False(t, cmd.HasOpt("s"))
+	assert.True(t, cmd.HasOpt("s"))
 	assert.Equal(t, cmd.OptArg("s"), "")
-	assert.Equal(t, cmd.OptArgs("s"), []string(nil))
+	assert.Equal(t, cmd.OptArgs("s"), []string{})
 	assert.False(t, cmd.HasOpt("silent"))
 	assert.Equal(t, cmd.OptArg("silent"), "")
 	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
@@ -355,7 +355,7 @@ func TestParse_illegalLongOptIfFirstCharIsNumber(t *testing.T) {
 	default:
 		assert.Fail(t, err.Error())
 	}
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.False(t, cmd.HasOpt("a"))
 	assert.Equal(t, cmd.OptArg("a"), "")
@@ -388,7 +388,7 @@ func TestParse_illegalLongOptIfFirstCharIsHyphen(t *testing.T) {
 	default:
 		assert.Fail(t, err.Error())
 	}
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.False(t, cmd.HasOpt("a"))
 	assert.Equal(t, cmd.OptArg("a"), "")
@@ -423,17 +423,17 @@ func TestParse_IllegalCharInShortOpt(t *testing.T) {
 	default:
 		assert.Fail(t, err.Error())
 	}
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.False(t, cmd.HasOpt("a"))
 	assert.Equal(t, cmd.OptArg("a"), "")
 	assert.Equal(t, cmd.OptArgs("a"), []string(nil))
-	assert.False(t, cmd.HasOpt("alphabet"))
+	assert.True(t, cmd.HasOpt("alphabet"))
 	assert.Equal(t, cmd.OptArg("alphabet"), "")
-	assert.Equal(t, cmd.OptArgs("alphabet"), []string(nil))
-	assert.False(t, cmd.HasOpt("s"))
+	assert.Equal(t, cmd.OptArgs("alphabet"), []string{})
+	assert.True(t, cmd.HasOpt("s"))
 	assert.Equal(t, cmd.OptArg("s"), "")
-	assert.Equal(t, cmd.OptArgs("s"), []string(nil))
+	assert.Equal(t, cmd.OptArgs("s"), []string{})
 	assert.False(t, cmd.HasOpt("silent"))
 	assert.Equal(t, cmd.OptArg("silent"), "")
 	assert.Equal(t, cmd.OptArgs("silent"), []string(nil))
@@ -529,4 +529,29 @@ func TestParse_multipleArgs(t *testing.T) {
 	assert.Equal(t, cmd.OptArg("baz"), "")
 	assert.Equal(t, cmd.OptArgs("baz"), []string{})
 	assert.Equal(t, cmd.Args(), []string{"qux", "quux"})
+}
+
+func TestParse_parseAllArgsEvenIfError(t *testing.T) {
+	defer resetOsArgs()
+
+	os.Args = []string{"/path/to/app", "--foo", "--1", "-b2ar", "--3", "baz"}
+
+	cmd, err := cliargs.Parse()
+
+	switch casted := err.(type) {
+	case cliargs.OptionHasInvalidChar:
+		assert.Equal(t, casted.Option, "1")
+	default:
+		assert.Fail(t, err.Error())
+	}
+
+	assert.Equal(t, cmd.Name, "app")
+	assert.True(t, cmd.HasOpt("foo"))
+	assert.True(t, cmd.HasOpt("b"))
+	assert.True(t, cmd.HasOpt("a"))
+	assert.True(t, cmd.HasOpt("r"))
+	assert.False(t, cmd.HasOpt("1"))
+	assert.False(t, cmd.HasOpt("2"))
+	assert.False(t, cmd.HasOpt("3"))
+	assert.Equal(t, cmd.Args(), []string{"baz"})
 }

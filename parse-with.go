@@ -130,17 +130,22 @@ type OptCfg struct {
 // If you want to allow other options, add an option configuration of which
 // Name is "*" (but HasParam and IsArray of this configuration is ignored).
 func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
+	var cmdName string
+	if len(osArgs) > 0 {
+		cmdName = path.Base(osArgs[0])
+	}
+
 	hasAnyOpt := false
 	cfgMap := make(map[string]int)
 	for i, cfg := range optCfgs {
 		if !cfg.HasArg {
 			if cfg.IsArray {
 				err := ConfigIsArrayButHasNoArg{Option: cfg.Name}
-				return Cmd{args: empty}, err
+				return Cmd{Name: cmdName, args: empty}, err
 			}
 			if cfg.Default != nil {
 				err := ConfigHasDefaultButHasNoArg{Option: cfg.Name}
-				return Cmd{args: empty}, err
+				return Cmd{Name: cmdName, args: empty}, err
 			}
 		}
 		if cfg.Name == anyOption {
@@ -210,20 +215,12 @@ func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 		return nil
 	}
 
-	var cmdName string
-	if len(osArgs) > 0 {
-		cmdName = path.Base(osArgs[0])
-	}
-
 	var osArgs1 []string
 	if len(osArgs) > 1 {
 		osArgs1 = osArgs[1:]
 	}
 
 	err := parseArgs(osArgs1, collectArg, collectOpt, takeArg)
-	if err != nil {
-		return Cmd{args: empty}, err
-	}
 
 	for _, cfg := range optCfgs {
 		arr, exists := opts[cfg.Name]
@@ -232,12 +229,12 @@ func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 			opts[cfg.Name] = arr
 		}
 		if cfg.OnParsed != nil {
-			err = (*cfg.OnParsed)(arr)
-			if err != nil {
-				return Cmd{args: empty}, err
+			e := (*cfg.OnParsed)(arr)
+			if e != nil && err == nil {
+				err = e
 			}
 		}
 	}
 
-	return Cmd{Name: cmdName, args: args, opts: opts}, nil
+	return Cmd{Name: cmdName, args: args, opts: opts}, err
 }

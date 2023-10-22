@@ -6,6 +6,7 @@ package cliargs
 
 import (
 	"fmt"
+	"path"
 	"reflect"
 	"strconv"
 	"strings"
@@ -140,7 +141,11 @@ func (e IllegalOptionType) Error() string {
 func ParseFor(osArgs []string, options any) (Cmd, []OptCfg, error) {
 	optCfgs, err := MakeOptCfgsFor(options)
 	if err != nil {
-		return Cmd{args: empty}, optCfgs, err
+		var cmdName string
+		if len(osArgs) > 0 {
+			cmdName = path.Base(osArgs[0])
+		}
+		return Cmd{Name: cmdName, args: empty}, optCfgs, err
 	}
 
 	cmd, err := ParseWith(osArgs, optCfgs)
