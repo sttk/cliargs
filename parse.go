@@ -130,9 +130,6 @@ func Parse() (Cmd, error) {
 	}
 
 	err := parseArgs(osArgs1, collectArgs, collectOpts, _false)
-	if err != nil {
-		return Cmd{args: empty}, err
-	}
 
 	return Cmd{Name: cmdName, args: args, opts: opts}, err
 }
@@ -150,18 +147,26 @@ func parseArgs(
 
 	isNonOpt := false
 	prevOptTakingArgs := ""
+	var firstErr error = nil
 
+L0:
 	for iArg, arg := range osArgs {
 		if isNonOpt {
 			err := collectArgs(arg)
 			if err != nil {
-				return err
+				if firstErr == nil {
+					firstErr = err
+				}
+				continue
 			}
 
 		} else if len(prevOptTakingArgs) > 0 {
 			err := collectOpts(prevOptTakingArgs, arg)
 			if err != nil {
-				return err
+				if firstErr == nil {
+					firstErr = err
+				}
+				continue
 			}
 			prevOptTakingArgs = ""
 
@@ -178,16 +183,25 @@ func parseArgs(
 					if r == '=' {
 						err := collectOpts(arg[0:i], arg[i+1:])
 						if err != nil {
-							return err
+							if firstErr == nil {
+								firstErr = err
+							}
+							continue L0
 						}
 						break
 					}
 					if !unicode.Is(rangeOfAlNumMarks, r) {
-						return OptionHasInvalidChar{Option: arg}
+						if firstErr == nil {
+							firstErr = OptionHasInvalidChar{Option: arg}
+						}
+						continue L0
 					}
 				} else {
 					if !unicode.Is(rangeOfAlphabets, r) {
-						return OptionHasInvalidChar{Option: arg}
+						if firstErr == nil {
+							firstErr = OptionHasInvalidChar{Option: arg}
+						}
+						continue L0
 					}
 				}
 				i++
@@ -200,7 +214,10 @@ func parseArgs(
 				}
 				err := collectOpts(arg)
 				if err != nil {
-					return err
+					if firstErr == nil {
+						firstErr = err
+					}
+					continue
 				}
 			}
 
@@ -208,7 +225,9 @@ func parseArgs(
 			if len(arg) == 1 {
 				err := collectArgs(arg)
 				if err != nil {
-					return err
+					if firstErr == nil {
+						firstErr = err
+					}
 				}
 				continue
 			}
@@ -221,18 +240,27 @@ func parseArgs(
 					if r == '=' {
 						err := collectOpts(name, arg[i+1:])
 						if err != nil {
-							return err
+							if firstErr == nil {
+								firstErr = err
+							}
+							continue L0
 						}
 						break
 					}
 					err := collectOpts(name)
 					if err != nil {
-						return err
+						if firstErr == nil {
+							firstErr = err
+						}
+						continue
 					}
 				}
 				name = string(r)
 				if !unicode.Is(rangeOfAlphabets, r) {
-					return OptionHasInvalidChar{Option: name}
+					if firstErr == nil {
+						firstErr = OptionHasInvalidChar{Option: name}
+					}
+					continue
 				}
 				i++
 			}
@@ -243,7 +271,10 @@ func parseArgs(
 				} else {
 					err := collectOpts(name)
 					if err != nil {
-						return err
+						if firstErr == nil {
+							firstErr = err
+						}
+						continue
 					}
 				}
 			}
@@ -251,10 +282,13 @@ func parseArgs(
 		} else {
 			err := collectArgs(arg)
 			if err != nil {
-				return err
+				if firstErr == nil {
+					firstErr = err
+				}
+				continue
 			}
 		}
 	}
 
-	return nil
+	return firstErr
 }

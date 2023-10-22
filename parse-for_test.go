@@ -12,11 +12,11 @@ import (
 
 func TestParseFor_emptyOptionStoreAndNoArgs(t *testing.T) {
 	type MyOptions struct{}
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	options := MyOptions{}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, optCfgs, []cliargs.OptCfg{})
 }
@@ -53,10 +53,10 @@ func TestParseFor_nonEmptyOptionStoreAndNoArgs(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 27)
 	assert.False(t, options.BoolVal)
@@ -148,10 +148,10 @@ func TestParseFor_dontOverwriteOptionsIfNoArgs(t *testing.T) {
 		StringArr:  []string{"ab", "cd", "efg"},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 27)
 	assert.True(t, options.BoolVal)
@@ -189,7 +189,7 @@ func TestParseFor_optionIsBoolAndArgIsName(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{"app", "--flag", "abc"}
+	osArgs := []string{"path/to/app", "--flag", "abc"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
@@ -439,11 +439,11 @@ func TestParseFor_defaultValueIsInt(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"./app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntVal, 11)
@@ -463,11 +463,11 @@ func TestParseFor_defaultValueIsNegativeInt(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntVal, -11)
@@ -487,11 +487,11 @@ func TestParseFor_defaultValueIsUint(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"./app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintVal, uint(11))
@@ -508,11 +508,11 @@ func TestParseFor_defaultValueIsFloat(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Val, float32(0.123))
@@ -526,11 +526,11 @@ func TestParseFor_defaultValueIsNegativeFloat(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Val, float32(-0.123))
@@ -547,11 +547,11 @@ func TestParseFor_defaultValueIsIntArrayAndSize0(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{})
@@ -577,11 +577,11 @@ func TestParseFor_overwriteIntArrayWithDefaultValueIfSize0(t *testing.T) {
 		Int64Arr: []int64{5},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{})
@@ -601,11 +601,11 @@ func TestParseFor_defaultValueIsIntArrayAndSize1(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{1})
@@ -631,11 +631,11 @@ func TestParseFor_overwriteIntArrayWithDefaultValueIfSize1(t *testing.T) {
 		Int64Arr: []int64{55},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{1})
@@ -655,11 +655,11 @@ func TestParseFor_defaultValueIsIntArrayAndSize2(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{1, 2})
@@ -685,11 +685,11 @@ func TestParseFor_overwriteIntArrayWithDefaultValueIfSize2(t *testing.T) {
 		Int64Arr: []int64{55},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{1, 2})
@@ -709,11 +709,11 @@ func TestParseFor_defaultValueIsNegativeIntArray(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{-1, -2})
@@ -733,11 +733,11 @@ func TestParseFor_defaultValueIsIntArraySeparatedByColons(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.IntArr, []int{-1, -2})
@@ -757,11 +757,11 @@ func TestParseFor_defaultValueIsUintArrayAndSize0(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{})
@@ -787,11 +787,11 @@ func TestParseFor_overwriteUintArrayWithDefaultValueIfSize0(t *testing.T) {
 		Uint64Arr: []uint64{5},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{})
@@ -811,11 +811,11 @@ func TestParseFor_defaultValueIsUintArrayAndSize1(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{1})
@@ -841,11 +841,11 @@ func TestParseFor_overwriteUintArrayWithDefaultValueIfSize1(t *testing.T) {
 		Uint64Arr: []uint64{55},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{1})
@@ -865,11 +865,11 @@ func TestParseFor_defaultValueIsUintArrayAndSize2(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{1, 2})
@@ -895,11 +895,11 @@ func TestParseFor_overwriteUintArrayWithDefaultValueIfSize2(t *testing.T) {
 		Uint64Arr: []uint64{55},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"./app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{1, 2})
@@ -919,11 +919,11 @@ func TestParseFor_defaultValueIsUintArraySeparatedByColons(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 5)
 	assert.Equal(t, options.UintArr, []uint{1, 2})
@@ -940,11 +940,11 @@ func TestParseFor_defaultValueIsFloatArrayAndSize0(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"./app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{})
@@ -961,11 +961,11 @@ func TestParseFor_overwriteFloatArrayWithDefaultValueIfSize0(t *testing.T) {
 		Float64Arr: []float64{0.888},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"./app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{})
@@ -979,11 +979,11 @@ func TestParseFor_defaultValueIsFloatArrayAndSize1(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{0.1})
@@ -1000,11 +1000,11 @@ func TestParseFor_overwriteFloatArrayWithDefaultValueIfSize1(t *testing.T) {
 		Float64Arr: []float64{0.88},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{0.1})
@@ -1018,11 +1018,11 @@ func TestParseFor_defaultValueIsFloatArrayAndSize2(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{0.1, 0.2})
@@ -1039,11 +1039,11 @@ func TestParseFor_overwriteFloatArrayWithDefaultValueIfSize2(t *testing.T) {
 		Float64Arr: []float64{0.88},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{0.1, 0.2})
@@ -1057,11 +1057,11 @@ func TestParseFor_defaultValueIsNegativeFloatArray(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{-0.1, -0.2})
@@ -1075,11 +1075,11 @@ func TestParseFor_defaultValueIsFloatArraySeparatedByColons(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 2)
 	assert.Equal(t, options.Float32Arr, []float32{-0.1, -0.2})
@@ -1092,11 +1092,11 @@ func TestParseFor_defaultValueIsStringAndSize0(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{})
@@ -1110,11 +1110,11 @@ func TestParseFor_overwriteStringArrayWithDefaultValueIfSize0(t *testing.T) {
 		StringArr: []string{"ZZZ"},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{})
@@ -1126,11 +1126,11 @@ func TestParseFor_defaultValueIsStringArrayAndSize1(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{"ABC"})
@@ -1144,11 +1144,11 @@ func TestParseFor_overwriteStringArrayWithDefaultValueIfSize1(t *testing.T) {
 		StringArr: []string{"ZZZ"},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{"ABC"})
@@ -1160,11 +1160,11 @@ func TestParseFor_defaultValueIsStringArrayAndSize2(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{"ABC", "DEF"})
@@ -1178,11 +1178,11 @@ func TestParseFor_overwriteStringArrayWithDefaultValueIfSize2(t *testing.T) {
 		StringArr: []string{"ZZZ"},
 	}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{"ABC", "DEF"})
@@ -1194,11 +1194,11 @@ func TestParseFor_defaultValueIsStringArraySeparatedByColons(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{"ABC", "DEF"})
@@ -1210,11 +1210,11 @@ func TestParseFor_ignoreEmptyDefaultValueIfOptionIsBool(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.False(t, options.BoolVar)
@@ -1226,10 +1226,10 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsInt(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
@@ -1255,10 +1255,10 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUint(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
@@ -1284,10 +1284,10 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloat(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
@@ -1313,11 +1313,11 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsString(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringVar, "")
@@ -1329,10 +1329,10 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsIntArray(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
@@ -1358,10 +1358,10 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUintArray(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
@@ -1387,10 +1387,10 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloatArray(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.NotNil(t, err)
@@ -1416,11 +1416,11 @@ func TestParseFor_optionIsStringArrayAndSetOneEmptyStringByDefaultArray(t *testi
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.Equal(t, options.StringArr, []string{""})
@@ -1432,11 +1432,11 @@ func TestParseFor_defaultValueIsIgnoreWhenTypeIsBool(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 1)
 	assert.False(t, options.BoolVar)
@@ -1448,10 +1448,10 @@ func TestParseFor_errorIfDefaultValueIsInvalidType(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	osArgs := []string{}
+	osArgs := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 0) // because of the error
 	assert.NotNil(t, err)
@@ -1581,10 +1581,10 @@ func TestParseFor_emptyArrayOfDefaultValueWithNotCommaSeparator(t *testing.T) {
 	}
 	options := MyOptions{}
 
-	args := []string{}
+	args := []string{"/path/to/app"}
 	cmd, optCfgs, err := cliargs.ParseFor(args, &options)
 	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "")
+	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.Equal(t, len(optCfgs), 4)
 	assert.Equal(t, options.Foo, []int{})
