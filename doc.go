@@ -86,17 +86,17 @@ option value in help text.
 	}
 
 	cmd, err := cliargs.ParseWith(optCfgs)
-	cmd.Name                  // app
-	cmd.Args()                // [hoge fuga]
-	cmd.HasOption("foo-bar")  // true
-	cmd.HasOption("baz")      // true
-	cmd.HasOption("x")        // true, due to "*" config
-	cmd.OptionArg("foo-bar")  // true
-	cmd.OptionArg("baz")      // 1
-	cmd.OptionArg("x")        // true
-	cmd.OptionArgs("foo-bar") // []
-	cmd.OptionArgs("baz")     // [1 2]
-	cmd.OptionArgs("x")       // []
+	cmd.Name                // app
+	cmd.Args()              // [hoge fuga]
+	cmd.HasOpt("foo-bar")   // true
+	cmd.HasOpt("baz")       // true
+	cmd.HasOpt("x")         // true, due to "*" config
+	cmd.OptArg("foo-bar")   // true
+	cmd.OptArg("baz")       // 1
+	cmd.OptArg("x")         // true
+	cmd.OptArgs("foo-bar")  // []
+	cmd.OptArgs("baz")      // [1 2]
+	cmd.OptArgs("x")        // []
 
 This library provides Help struct which generates help text from a OptCfg
 array.
