@@ -12,12 +12,25 @@ import (
 	"unicode"
 )
 
+// InvalidOption is an error interface which provides method declarations
+// to retrieve the option that caused this error and an error message.
+type InvalidOption interface {
+	GetOpt() string
+	Error() string
+}
+
 // OptionHasInvalidChar is an error which indicates that an invalid character
 // is found in the option.
 type OptionHasInvalidChar struct{ Option string }
 
+// Error is the method to retrieve the message of this error.
 func (e OptionHasInvalidChar) Error() string {
 	return fmt.Sprintf("OptionHasInvalidChar{Option:%s}", e.Option)
+}
+
+// GetOpt is the method to retrieve the option that caused this error.
+func (e OptionHasInvalidChar) GetOpt() string {
+	return e.Option
 }
 
 var (

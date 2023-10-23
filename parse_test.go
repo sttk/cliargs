@@ -316,12 +316,19 @@ func TestParse_illegalLongOptIfIncludingInvalidChar(t *testing.T) {
 
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionHasInvalidChar{Option:abc%def}")
-	switch err.(type) {
+	switch e := err.(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, err.(cliargs.OptionHasInvalidChar).Option, "abc%def")
+		assert.Equal(t, e.Option, "abc%def")
 	default:
 		assert.Fail(t, err.Error())
 	}
+	switch e := err.(type) {
+	case cliargs.InvalidOption:
+		assert.Equal(t, e.GetOpt(), "abc%def")
+	default:
+		assert.Fail(t, err.Error())
+	}
+
 	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.True(t, cmd.HasOpt("a"))
@@ -349,12 +356,19 @@ func TestParse_illegalLongOptIfFirstCharIsNumber(t *testing.T) {
 
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionHasInvalidChar{Option:1abc}")
-	switch err.(type) {
+	switch e := err.(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, err.(cliargs.OptionHasInvalidChar).Option, "1abc")
+		assert.Equal(t, e.Option, "1abc")
 	default:
 		assert.Fail(t, err.Error())
 	}
+	switch e := err.(type) {
+	case cliargs.InvalidOption:
+		assert.Equal(t, e.GetOpt(), "1abc")
+	default:
+		assert.Fail(t, err.Error())
+	}
+
 	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.False(t, cmd.HasOpt("a"))
@@ -382,12 +396,19 @@ func TestParse_illegalLongOptIfFirstCharIsHyphen(t *testing.T) {
 
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionHasInvalidChar{Option:-aaa=123}")
-	switch err.(type) {
+	switch e := err.(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, err.(cliargs.OptionHasInvalidChar).Option, "-aaa=123")
+		assert.Equal(t, e.Option, "-aaa=123")
 	default:
 		assert.Fail(t, err.Error())
 	}
+	switch e := err.(type) {
+	case cliargs.InvalidOption:
+		assert.Equal(t, e.GetOpt(), "-aaa=123")
+	default:
+		assert.Fail(t, err.Error())
+	}
+
 	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.False(t, cmd.HasOpt("a"))
@@ -417,12 +438,19 @@ func TestParse_IllegalCharInShortOpt(t *testing.T) {
 
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionHasInvalidChar{Option:@}")
-	switch err.(type) {
+	switch e := err.(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, err.(cliargs.OptionHasInvalidChar).Option, "@")
+		assert.Equal(t, e.Option, "@")
 	default:
 		assert.Fail(t, err.Error())
 	}
+	switch e := err.(type) {
+	case cliargs.InvalidOption:
+		assert.Equal(t, e.GetOpt(), "@")
+	default:
+		assert.Fail(t, err.Error())
+	}
+
 	assert.Equal(t, cmd.Name, "app")
 	assert.Equal(t, cmd.Args(), []string{})
 	assert.False(t, cmd.HasOpt("a"))
@@ -538,9 +566,15 @@ func TestParse_parseAllArgsEvenIfError(t *testing.T) {
 
 	cmd, err := cliargs.Parse()
 
-	switch casted := err.(type) {
+	switch e := err.(type) {
 	case cliargs.OptionHasInvalidChar:
-		assert.Equal(t, casted.Option, "1")
+		assert.Equal(t, e.Option, "1")
+	default:
+		assert.Fail(t, err.Error())
+	}
+	switch e := err.(type) {
+	case cliargs.InvalidOption:
+		assert.Equal(t, e.GetOpt(), "1")
 	default:
 		assert.Fail(t, err.Error())
 	}
