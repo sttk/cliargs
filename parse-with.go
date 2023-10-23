@@ -14,8 +14,14 @@ import (
 // (.IsArray = true) but must have no option argument (.HasArg = false).
 type ConfigIsArrayButHasNoArg struct{ Option string }
 
+// Error is the method to retrieve the message of this error.
 func (e ConfigIsArrayButHasNoArg) Error() string {
 	return fmt.Sprintf("ConfigIsArrayButHasNoArg{Option:%s}", e.Option)
+}
+
+// GetOpt is the method to retrieve the option that caused this error.
+func (e ConfigIsArrayButHasNoArg) GetOpt() string {
+	return e.Option
 }
 
 // ConfigHasDefaultButHasNoArg is an error which indicates that an option
@@ -23,16 +29,28 @@ func (e ConfigIsArrayButHasNoArg) Error() string {
 // (.Default != nil) but must have no option argument (.HasArg = false).
 type ConfigHasDefaultButHasNoArg struct{ Option string }
 
+// Error is the method to retrieve the message of this error.
 func (e ConfigHasDefaultButHasNoArg) Error() string {
 	return fmt.Sprintf("ConfigHasDefaultButHasNoArg{Option:%s}", e.Option)
+}
+
+// GetOpt is the method to retrieve the option that caused this error.
+func (e ConfigHasDefaultButHasNoArg) GetOpt() string {
+	return e.Option
 }
 
 // UnconfiguredOption is an error which indicates that there is no
 // configuration about the input option.
 type UnconfiguredOption struct{ Option string }
 
+// Error is the method to retrieve the message of this error.
 func (e UnconfiguredOption) Error() string {
 	return fmt.Sprintf("UnconfiguredOption{Option:%s}", e.Option)
+}
+
+// GetOpt is the method to retrieve the option that caused this error.
+func (e UnconfiguredOption) GetOpt() string {
+	return e.Option
 }
 
 // OptionNeedsArg is an error which indicates that an option is input with
@@ -40,8 +58,14 @@ func (e UnconfiguredOption) Error() string {
 // argument (.HasArg = true).
 type OptionNeedsArg struct{ Option string }
 
+// Error is the method to retrieve the message of this error.
 func (e OptionNeedsArg) Error() string {
 	return fmt.Sprintf("OptionNeedsArg{Option:%s}", e.Option)
+}
+
+// GetOpt is the method to retrieve the option that caused this error.
+func (e OptionNeedsArg) GetOpt() string {
+	return e.Option
 }
 
 // OptionTakesNoArg is an error which indicates that an option isinput with
@@ -49,8 +73,14 @@ func (e OptionNeedsArg) Error() string {
 // arguments (.HasArg = false).
 type OptionTakesNoArg struct{ Option string }
 
+// Error is the method to retrieve the message of this error.
 func (e OptionTakesNoArg) Error() string {
 	return fmt.Sprintf("OptionTakesNoArg{Option:%s}", e.Option)
+}
+
+// GetOpt is the method to retrieve the option that caused this error.
+func (e OptionTakesNoArg) GetOpt() string {
+	return e.Option
 }
 
 // OptionIsNotArray is an error which indicates that an option is input with
@@ -58,8 +88,14 @@ func (e OptionTakesNoArg) Error() string {
 // the option is not an array (.IsArray = false).
 type OptionIsNotArray struct{ Option string }
 
+// Error is the method to retrieve the message of this error.
 func (e OptionIsNotArray) Error() string {
 	return fmt.Sprintf("OptionIsNotArray{Option:%s}", e.Option)
+}
+
+// GetOpt is the method to retrieve the option that caused this error.
+func (e OptionIsNotArray) GetOpt() string {
+	return e.Option
 }
 
 const anyOption = "*"
