@@ -247,11 +247,11 @@ And help text can be generated as follows:
 	// (stdout)
 	// This is the usage of this command.
 	//
-	// OPTIONS
+	// OPTIONS:
 	//   --foo     The description of foo option.
 	//   ...
 	//
-	// SUB COMMANDS
+	// SUB COMMANDS:
 	// list        The description of list sub-command.
 	//   --bar     The description of bar option.
 	//   ...
