@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Takayuki Sato. All Rights Reserved.
+// Copyright (C) 2023-2024 Takayuki Sato. All Rights Reserved.
 // This program is free software under MIT License.
 // See the file LICENSE in this distribution for more details.
 
@@ -12,14 +12,14 @@ import (
 	"unicode"
 )
 
-// InvalidOption is an error interface which provides method declarations
-// to retrieve the option that caused this error and an error message.
+// InvalidOption is the error interface which provides method declarations
+// to retrieve an option that caused this error and an error message.
 type InvalidOption interface {
 	GetOpt() string
 	Error() string
 }
 
-// OptionHasInvalidChar is an error which indicates that an invalid character
+// OptionHasInvalidChar is the error which indicates that an invalid character
 // is found in the option.
 type OptionHasInvalidChar struct{ Option string }
 
@@ -51,25 +51,25 @@ var (
 	}
 )
 
-// Cmd is a structure which contains a command name, command arguments, and
+// Cmd is the structure which contains a command name, command arguments, and
 // option arguments that are parsed from command line arguments without
 // configurations.
-// And this provides methods to check if they are specified or to obtain them.
+// And this provides methods to check if they are specified and to obtain them.
 type Cmd struct {
 	Name string
 	args []string
 	opts map[string][]string
 }
 
-// HasOpt is a method which checks if the option is specified in command line
+// HasOpt is the method which checks if the option is specified in command line
 // arguments.
 func (cmd Cmd) HasOpt(name string) bool {
 	_, exists := cmd.opts[name]
 	return exists
 }
 
-// OptArg is a method to get a option argument which is firstly specified
-// with opt in command line arguments.
+// OptArg is the method to get the first option argument of the specified named
+// option.
 func (cmd Cmd) OptArg(name string) string {
 	arr := cmd.opts[name]
 	// If no entry, map returns a nil slice.
@@ -82,19 +82,20 @@ func (cmd Cmd) OptArg(name string) string {
 	}
 }
 
-// OptArgs is a method to get option arguments which are all specified with
-// name in command line arguments.
+// OptArgs is the method to get the option arguments which are all specified
+// with name in command line arguments.
 func (cmd Cmd) OptArgs(name string) []string {
 	return cmd.opts[name]
 }
 
-// Args is a method to get command arguments which are specified in command
+// Args is the method to get command arguments which are specified in command
 // line arguments and are not associated with any options.
 func (cmd Cmd) Args() []string {
 	return cmd.args
 }
 
-// Parse is a function to parse command line arguments without configurations.
+// Parse is the function to parse command line arguments without
+// configurations.
 // This function divides command line arguments to command arguments, which
 // are not associated with any options, and options, of which each has a name
 // and option arguments.

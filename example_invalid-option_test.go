@@ -10,9 +10,9 @@ import (
 func ExampleInvalidOption() {
 	optCfgs := []cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:    "foo",
-			Default: []string{"123"},
-			HasArg:  false,
+			Name:     "foo",
+			Defaults: []string{"123"},
+			HasArg:   false,
 		},
 	}
 
@@ -23,6 +23,6 @@ func ExampleInvalidOption() {
 	fmt.Printf("option: %s\n", ee.GetOpt())
 
 	// Output:
-	// error type: cliargs.ConfigHasDefaultButHasNoArg
+	// error type: cliargs.ConfigHasDefaultsButHasNoArg
 	// option: foo
 }

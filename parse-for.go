@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Takayuki Sato. All Rights Reserved.
+// Copyright (C) 2023-2024 Takayuki Sato. All Rights Reserved.
 // This program is free software under MIT License.
 // See the file LICENSE in this distribution for more details.
 
@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-// OptionStoreIsNotChangeable is an error which indicates that the second
+// OptionStoreIsNotChangeable is the error which indicates that the second
 // argument of ParseFor function, which is set options produced by parsing
 // command line arguments, is not a pointer.
 type OptionStoreIsNotChangeable struct{}
@@ -21,7 +21,7 @@ func (e OptionStoreIsNotChangeable) Error() string {
 	return "OptionStoreIsNotChangeable{}"
 }
 
-// FailToParseInt is an error reaason which indicates that an option
+// FailToParseInt is the error reaason which indicates that an option
 // argument in command line arguments should be an integer but is invalid.
 type FailToParseInt struct {
 	Option  string
@@ -41,7 +41,7 @@ func (e FailToParseInt) Unwrap() error {
 	return e.cause
 }
 
-// FailToParseUint is an error which indicates that an option argument in
+// FailToParseUint is the error which indicates that an option argument in
 // command line arguments should be an unsigned integer but is invalid.
 type FailToParseUint struct {
 	Option  string
@@ -61,7 +61,7 @@ func (e FailToParseUint) Unwrap() error {
 	return e.cause
 }
 
-// FailToParseFloat is an error which indicates that an option argument in
+// FailToParseFloat is the error which indicates that an option argument in
 // command line arguments should be a floating point number but is invalid.
 type FailToParseFloat struct {
 	Option  string
@@ -81,7 +81,7 @@ func (e FailToParseFloat) Unwrap() error {
 	return e.cause
 }
 
-// IllegalOptionType is an error which indicates that a type of a field of the
+// IllegalOptionType is the error which indicates that a type of a field of the
 // option store is neither a boolean, a number, a string, nor an array of
 // numbers or strings.
 type IllegalOptionType struct {
@@ -96,8 +96,8 @@ func (e IllegalOptionType) Error() string {
 		e.Option, e.Field, e.Type.String())
 }
 
-// ParseFor is a function to parse command line arguments and set their values
-// to the option store which is the second argument of this function.
+// ParseFor is the function to parse command line arguments and set their
+// values to the option store which is the second argument of this function.
 // This function divides command line arguments to command arguments and
 // options, then stores the options to the option store, and returns the
 // command arguments with the generated option configuratins.
@@ -238,13 +238,13 @@ func newOptCfg(fld reflect.StructField) OptCfg {
 	desc := fld.Tag.Get("optdesc")
 
 	return OptCfg{
-		Name:    name,
-		Aliases: aliases,
-		HasArg:  hasArg,
-		IsArray: isArray,
-		Default: defaults,
-		Desc:    desc,
-		ArgHelp: optArg,
+		Name:     name,
+		Aliases:  aliases,
+		HasArg:   hasArg,
+		IsArray:  isArray,
+		Defaults: defaults,
+		Desc:     desc,
+		ArgHelp:  optArg,
 	}
 }
 
