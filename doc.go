@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Takayuki Sato. All Rights Reserved.
+// Copyright (C) 2023-2024 Takayuki Sato. All Rights Reserved.
 // This program is free software under MIT License.
 // See the file LICENSE in this distribution for more details.
 
@@ -50,14 +50,14 @@ This function takes an array of option configurations: []OptCfg as the second
 argument, and divides command line arguments to options and command arguments
 with this configurations.
 
-An option configuration has fields: Name, Aliases, HasArg, IsArray, Default,
+An option configuration has fields: Name, Aliases, HasArg, IsArray, Defaults,
 Desc, and ArgHelp.
 Name field is an option name and it is used as an argument of the functions:
 Cmd#HasOpt, Cmd#OptArg, and Cmd#OptArgs.
 Aliases field is an array of option aliases.
 HasArg field indicates the option requires one or more values.
 IsArray field indicates the option can have multiple values.
-Default field is an array of string which is used as default one or more
+Defaults field is an array of string which is used as default one or more
 values if the option is not specified.
 Desc field is a description of the option for help text.
 ArgHelp field is a text which is output after option name and aliases as an
@@ -75,7 +75,7 @@ option value in help text.
 	        Aliases:[]string{"z"},
 	        HasArg:true,
 	        IsArray: true,
-	        Default: [9,8,7],
+	        Defaults: [9,8,7],
 	        Desc:"This is description of baz.",
 	        ArgHelp:"<text>",
 	    },
@@ -168,7 +168,7 @@ And optarg is what to specify a text for an option argument value in help text.
 	           //     Desc: "This is description of foo-bar.",
 	           //     HasArg: false,
 	           //     IsArray: false,
-	           //     Default: []string(nil),
+	           //     Defaults: []string(nil),
 	           //     ArgHelp: "",
 	           //   },
 	           //   OptCfg{
@@ -177,7 +177,7 @@ And optarg is what to specify a text for an option argument value in help text.
 	           //     Desc: "This is description of baz.",
 	           //     HasArg: true,
 	           //     IsArray: true,
-	           //     Default: []string{"9","8","7"},
+	           //     Defaults: []string{"9","8","7"},
 	           //     ArgHelp: "<num>",
 	           //   },
 	           //   OptCfg{
@@ -186,7 +186,7 @@ And optarg is what to specify a text for an option argument value in help text.
 	           //     Desc: "This is description of qux.",
 	           //     HasArg: false,
 	           //     IsArray: false,
-	           //     Default: []string(nil),
+	           //     Defaults: []string(nil),
 	           //     ArgHelp: "",
 	           //   },
 	           // }

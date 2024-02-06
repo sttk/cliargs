@@ -884,8 +884,8 @@ func TestParseWith_oneCfgIsNotArrayButOptsAreMultiple(t *testing.T) {
 func TestParseWith_specifyDefault(t *testing.T) {
 	osArgs := []string{"app"}
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "bar", HasArg: true, Default: []string{"A"}},
-		cliargs.OptCfg{Name: "baz", HasArg: true, IsArray: true, Default: []string{"A"}},
+		cliargs.OptCfg{Name: "bar", HasArg: true, Defaults: []string{"A"}},
+		cliargs.OptCfg{Name: "baz", HasArg: true, IsArray: true, Defaults: []string{"A"}},
 	}
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
@@ -904,16 +904,16 @@ func TestParseWith_specifyDefault(t *testing.T) {
 
 func TestParseWith_oneCfgHasNoArgButHasDefault(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar", HasArg: false, Default: []string{"A"}},
+		cliargs.OptCfg{Name: "foo-bar", HasArg: false, Defaults: []string{"A"}},
 	}
 
 	osArgs := []string{"app"}
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "ConfigHasDefaultButHasNoArg{Option:foo-bar}")
+	assert.Equal(t, err.Error(), "ConfigHasDefaultsButHasNoArg{Option:foo-bar}")
 	switch e := err.(type) {
-	case cliargs.ConfigHasDefaultButHasNoArg:
+	case cliargs.ConfigHasDefaultsButHasNoArg:
 		assert.Equal(t, e.Option, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
@@ -946,7 +946,7 @@ func TestParseWith_multipleArgs(t *testing.T) {
 			HasArg:  true,
 			IsArray: true,
 		},
-		cliargs.OptCfg{Name: "corge", HasArg: true, Default: []string{"99"}},
+		cliargs.OptCfg{Name: "corge", HasArg: true, Defaults: []string{"99"}},
 		cliargs.OptCfg{Name: "*"},
 	}
 

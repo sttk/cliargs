@@ -21,9 +21,9 @@ func ExampleParseWith() {
 			IsArray: true,
 		},
 		cliargs.OptCfg{
-			Name:    "corge",
-			HasArg:  true,
-			Default: []string{"99"},
+			Name:     "corge",
+			HasArg:   true,
+			Defaults: []string{"99"},
 		},
 		cliargs.OptCfg{
 			Name: "*",

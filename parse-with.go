@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Takayuki Sato. All Rights Reserved.
+// Copyright (C) 2023-2024 Takayuki Sato. All Rights Reserved.
 // This program is free software under MIT License.
 // See the file LICENSE in this distribution for more details.
 
@@ -9,7 +9,7 @@ import (
 	"path"
 )
 
-// ConfigIsArrayButHasNoArg is an error which indicates that an option
+// ConfigIsArrayButHasNoArg is the error which indicates that an option
 // configuration contradicts that the option must be an array
 // (.IsArray = true) but must have no option argument (.HasArg = false).
 type ConfigIsArrayButHasNoArg struct{ Option string }
@@ -24,22 +24,22 @@ func (e ConfigIsArrayButHasNoArg) GetOpt() string {
 	return e.Option
 }
 
-// ConfigHasDefaultButHasNoArg is an error which indicates that an option
+// ConfigHasDefaultsButHasNoArg is the error which indicates that an option
 // configuration contradicts that the option has default value
-// (.Default != nil) but must have no option argument (.HasArg = false).
-type ConfigHasDefaultButHasNoArg struct{ Option string }
+// (.Defaults != nil) but must have no option argument (.HasArg = false).
+type ConfigHasDefaultsButHasNoArg struct{ Option string }
 
 // Error is the method to retrieve the message of this error.
-func (e ConfigHasDefaultButHasNoArg) Error() string {
-	return fmt.Sprintf("ConfigHasDefaultButHasNoArg{Option:%s}", e.Option)
+func (e ConfigHasDefaultsButHasNoArg) Error() string {
+	return fmt.Sprintf("ConfigHasDefaultsButHasNoArg{Option:%s}", e.Option)
 }
 
 // GetOpt is the method to retrieve the option that caused this error.
-func (e ConfigHasDefaultButHasNoArg) GetOpt() string {
+func (e ConfigHasDefaultsButHasNoArg) GetOpt() string {
 	return e.Option
 }
 
-// UnconfiguredOption is an error which indicates that there is no
+// UnconfiguredOption is the error which indicates that there is no
 // configuration about the input option.
 type UnconfiguredOption struct{ Option string }
 
@@ -53,7 +53,7 @@ func (e UnconfiguredOption) GetOpt() string {
 	return e.Option
 }
 
-// OptionNeedsArg is an error which indicates that an option is input with
+// OptionNeedsArg is the error which indicates that an option is input with
 // no option argument though its option configuration requires option
 // argument (.HasArg = true).
 type OptionNeedsArg struct{ Option string }
@@ -68,7 +68,7 @@ func (e OptionNeedsArg) GetOpt() string {
 	return e.Option
 }
 
-// OptionTakesNoArg is an error which indicates that an option isinput with
+// OptionTakesNoArg is the error which indicates that an option is input with
 // an option argument though its option configuration does not accept option
 // arguments (.HasArg = false).
 type OptionTakesNoArg struct{ Option string }
@@ -83,7 +83,7 @@ func (e OptionTakesNoArg) GetOpt() string {
 	return e.Option
 }
 
-// OptionIsNotArray is an error which indicates that an option is input with
+// OptionIsNotArray is the error which indicates that an option is input with
 // an option argument multiple times though its option configuration specifies
 // the option is not an array (.IsArray = false).
 type OptionIsNotArray struct{ Option string }
@@ -100,9 +100,9 @@ func (e OptionIsNotArray) GetOpt() string {
 
 const anyOption = "*"
 
-// OptCfg is a structure that represents an option configuration.
+// OptCfg is the structure that represents an option configuration.
 // An option configuration consists of fields: Name, Aliases, HasArg,
-// IsArray, Default, OnParsed, Desc, and ArgHelp.
+// IsArray, Defaults, OnParsed, Desc, and ArgHelp.
 //
 // Name is the option name and Aliases are the another names.
 // Options given by those names in command line arguments are all registered to
@@ -117,8 +117,8 @@ const anyOption = "*"
 // If both HasArg and IsArray are false, the option can take no option
 // argument.
 //
-// Default is the field to specify the default value for when the option is not
-// given in command line arguments.
+// Defaults is the field to specify the default value for when the option is
+// not given in command line arguments.
 //
 // OnParsed is the field for the event handler which is called when the option
 // has been parsed.
@@ -135,13 +135,13 @@ type OptCfg struct {
 	Aliases  []string
 	HasArg   bool
 	IsArray  bool
-	Default  []string
+	Defaults []string
 	OnParsed *func([]string) error
 	Desc     string
 	ArgHelp  string
 }
 
-// ParseWith is a function which parses command line arguments with option
+// ParseWith is the function which parses command line arguments with option
 // configurations.
 // This function divides command line arguments to command arguments and
 // options, and an option consists of a name and option arguments.
@@ -150,21 +150,21 @@ type OptCfg struct {
 // see the comment of the function.
 //
 // This function allows only options declared in option configurations.
-// A option configuration has fields: Name, Aliases, HasArg, IsArray, and
-// Default, ArgHelp.
+// A option configuration has fields: Name, Aliases, HasArg, IsArray, Defaults,
+// Desc and ArgHelp.
 // When an option matches Name or includes in Aliases in an option
-// configuration, the option is registered in Args with the Name.
-// If both HasParam and IsArray are true, the option can has one or multiple
-// option parameters, and if HasParam is true and IsArray is false, the option
-// can has only one option parameter, otherwise the option cannot have option
-// parameter.
-// If Default is specified and the option is not given in command line
-// arguments, the value of Default is set to the option parameter.
+// configuration, the option is registered into Cmd with the Name.
+// If both HasArg and IsArray are true, the option can have one or multiple
+// option arguments, and if HasArg is true and IsArray is false, the option
+// can have only one option argument, otherwise the option cannot have option
+// argument.
+// If Defaults is specified and the option is not given in command line
+// arguments, the value of Defaults is set to the option argument.
 //
 // If options not declared in option configurations are given in command line
 // arguments, this function basically returns UnconfiguredOption error.
 // If you want to allow other options, add an option configuration of which
-// Name is "*" (but HasParam and IsArray of this configuration is ignored).
+// Name is "*" (but HasArg and IsArray of this configuration is ignored).
 func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 	var cmdName string
 	if len(osArgs) > 0 {
@@ -179,8 +179,8 @@ func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 				err := ConfigIsArrayButHasNoArg{Option: cfg.Name}
 				return Cmd{Name: cmdName, args: empty}, err
 			}
-			if cfg.Default != nil {
-				err := ConfigHasDefaultButHasNoArg{Option: cfg.Name}
+			if cfg.Defaults != nil {
+				err := ConfigHasDefaultsButHasNoArg{Option: cfg.Name}
 				return Cmd{Name: cmdName, args: empty}, err
 			}
 		}
@@ -260,8 +260,8 @@ func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 
 	for _, cfg := range optCfgs {
 		arr, exists := opts[cfg.Name]
-		if !exists && cfg.Default != nil {
-			arr = cfg.Default
+		if !exists && cfg.Defaults != nil {
+			arr = cfg.Defaults
 			opts[cfg.Name] = arr
 		}
 		if cfg.OnParsed != nil {
