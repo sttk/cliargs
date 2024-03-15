@@ -6,6 +6,7 @@ package cliargs
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/sttk/linebreak"
 )
@@ -42,7 +43,7 @@ func (help Help) Iter() HelpIter {
 		return HelpIter{}
 	}
 
-	lineWidth := linebreak.TermWidth()
+	lineWidth := linebreak.TermCols()
 
 	return HelpIter{
 		lineWidth: lineWidth,
@@ -93,7 +94,7 @@ func newBlockIter(b block, lineWidth int) blockIter {
 	return blockIter{
 		texts:    b.texts,
 		indent:   b.indent,
-		margin:   linebreak.Spaces(b.marginLeft),
+		margin:   strings.Repeat(" ", b.marginLeft),
 		lineIter: linebreak.New(b.texts[0], printWidth),
 	}
 }
@@ -117,7 +118,7 @@ func (iter *blockIter) next() (string, bool) {
 		return line, true
 	}
 
-	iter.lineIter.SetIndent(linebreak.Spaces(iter.indent))
+	iter.lineIter.SetIndent(strings.Repeat(" ", iter.indent))
 	return line, more
 }
 
@@ -192,9 +193,9 @@ func (help *Help) AddOpts(optCfgs []OptCfg, wrapOpts ...int) {
 			texts[i] = makeOptTitle(cfg)
 			width := linebreak.TextWidth(texts[i])
 			if width+2 > b.indent {
-				texts[i] += "\n" + linebreak.Spaces(b.indent) + cfg.Desc
+				texts[i] += "\n" + strings.Repeat(" ", b.indent) + cfg.Desc
 			} else {
-				texts[i] += linebreak.Spaces(b.indent-width) + cfg.Desc
+				texts[i] += strings.Repeat(" ", b.indent-width) + cfg.Desc
 			}
 			i++
 		}
@@ -226,7 +227,7 @@ func (help *Help) AddOpts(optCfgs []OptCfg, wrapOpts ...int) {
 			if cfg.Name == anyOption {
 				continue
 			}
-			texts[i] += linebreak.Spaces(indent-widths[i]) + cfg.Desc
+			texts[i] += strings.Repeat(" ", indent-widths[i]) + cfg.Desc
 			i++
 		}
 	}
