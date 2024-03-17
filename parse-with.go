@@ -194,7 +194,7 @@ func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 		}
 	}
 
-	var takeArg = func(opt string) bool {
+	var takeArgs = func(opt string) bool {
 		i, exists := cfgMap[opt]
 		if exists {
 			return optCfgs[i].HasArg
@@ -205,11 +205,10 @@ func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 	var args = make([]string, 0)
 	var opts = make(map[string][]string)
 
-	var collectArg = func(a ...string) error {
+	var collectArgs = func(a ...string) {
 		args = append(args, a...)
-		return nil
 	}
-	var collectOpt = func(name string, a ...string) error {
+	var collectOpts = func(name string, a ...string) error {
 		i, exists := cfgMap[name]
 		if !exists {
 			if !hasAnyOpt {
@@ -256,7 +255,7 @@ func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 		osArgs1 = osArgs[1:]
 	}
 
-	err := parseArgs(osArgs1, collectArg, collectOpt, takeArg)
+	err := parseArgs(osArgs1, collectArgs, collectOpts, takeArgs)
 
 	for _, cfg := range optCfgs {
 		arr, exists := opts[cfg.Name]

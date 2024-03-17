@@ -120,9 +120,8 @@ func Parse() (Cmd, error) {
 	var args = make([]string, 0)
 	var opts = make(map[string][]string)
 
-	var collectArgs = func(a ...string) error {
+	var collectArgs = func(a ...string) {
 		args = append(args, a...)
-		return nil
 	}
 	var collectOpts = func(name string, a ...string) error {
 		arr, exists := opts[name]
@@ -154,7 +153,7 @@ func _false(_ string) bool {
 
 func parseArgs(
 	osArgs []string,
-	collectArgs func(...string) error,
+	collectArgs func(...string),
 	collectOpts func(string, ...string) error,
 	takeArgs func(string) bool,
 ) error {
@@ -166,13 +165,7 @@ func parseArgs(
 L0:
 	for iArg, arg := range osArgs {
 		if isNonOpt {
-			err := collectArgs(arg)
-			if err != nil {
-				if firstErr == nil {
-					firstErr = err
-				}
-				continue L0
-			}
+			collectArgs(arg)
 
 		} else if len(prevOptTakingArgs) > 0 {
 			err := collectOpts(prevOptTakingArgs, arg)
@@ -237,12 +230,7 @@ L0:
 
 		} else if strings.HasPrefix(arg, "-") {
 			if len(arg) == 1 {
-				err := collectArgs(arg)
-				if err != nil {
-					if firstErr == nil {
-						firstErr = err
-					}
-				}
+				collectArgs(arg)
 				continue L0
 			}
 
@@ -297,13 +285,7 @@ L0:
 			}
 
 		} else {
-			err := collectArgs(arg)
-			if err != nil {
-				if firstErr == nil {
-					firstErr = err
-				}
-				continue L0
-			}
+			collectArgs(arg)
 		}
 	}
 
