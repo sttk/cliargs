@@ -68,7 +68,8 @@ func (e OptionNameIsDuplicated) GetOpt() string {
 	return e.Name
 }
 
-// UnconfiguredOption
+// UnconfiguredOption is the error which indicates that there is no
+// configuration about the input option.
 type UnconfiguredOption struct{ Name string }
 
 // Error is the method to retrieve the message of this error.
@@ -81,21 +82,9 @@ func (e UnconfiguredOption) GetOpt() string {
 	return e.Name
 }
 
-// OptionTakesNoArg
-type OptionTakesNoArg struct{ Name, StoreKey string }
-
-// Error is the method to retrieve the message of this error.
-func (e OptionTakesNoArg) Error() string {
-	return fmt.Sprintf("OptionTakesNoArg{Name:%s,StoreKey:%s}",
-		e.Name, e.StoreKey)
-}
-
-// GetOpt is the method to retrieve the store key that caused this error.
-func (e OptionTakesNoArg) GetOpt() string {
-	return e.Name
-}
-
-// OptionNeedsArg
+// OptionNeedsArg is the error which indicates that an option is input with
+// no option argument though its option configuration requires option
+// argument (.HasArg = true).
 type OptionNeedsArg struct{ Name, StoreKey string }
 
 // Error is the method to retrieve the message of this error.
@@ -109,7 +98,25 @@ func (e OptionNeedsArg) GetOpt() string {
 	return e.Name
 }
 
-// OptionIsNotArray
+// OptionTakesNoArg is the error which indicates that an option is input with
+// an option argument though its option configuration does not accept option
+// arguments (.HasArg = false).
+type OptionTakesNoArg struct{ Name, StoreKey string }
+
+// Error is the method to retrieve the message of this error.
+func (e OptionTakesNoArg) Error() string {
+	return fmt.Sprintf("OptionTakesNoArg{Name:%s,StoreKey:%s}",
+		e.Name, e.StoreKey)
+}
+
+// GetOpt is the method to retrieve the store key that caused this error.
+func (e OptionTakesNoArg) GetOpt() string {
+	return e.Name
+}
+
+// OptionIsNotArray is the error which indicates that an option is input with
+// an option argument multiple times though its option configuration specifies
+// the option is not an array (.IsArray = false).
 type OptionIsNotArray struct{ Name, StoreKey string }
 
 // Error is the method to retrieve the message of this error.
