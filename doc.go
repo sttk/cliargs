@@ -3,8 +3,7 @@
 // See the file LICENSE in this distribution for more details.
 
 /*
-Package github.com/sttk/cliargs is a library to parse command line
-arguments.
+Package github.com/sttk/cliargs is a library to parse command line arguments.
 
 # Parse without configurations
 
@@ -15,8 +14,8 @@ command arguments.
 
 Command line arguments starting with - or -- are options, and others are
 command arguments.
-If you want to specify a value to an option, follows "=" after the option like
-foo=123.
+If you want to specify a value to an option, follows "=" and the value after
+the option, like foo=123.
 
 All command line arguments after -- are command arguments, even they starts
 with - or --.
@@ -211,8 +210,10 @@ The following help text is generated from the above optCfgs (without Help#Print 
 
 # Parse command line arguments including sub commands
 
-This library provides the function FindFirstArg which returns an index, an argument, an existent flag.
-This function can be used to parse command line arguments including sub commands, as follows:
+This library provides the function FindFirstArg which returns an index, an
+argument, an existent flag.
+This function can be used to parse command line arguments including sub
+commands, as follows:
 
 	i, arg, exists := cliargs.FindFirstArg(osArgs)
 	if !exists { return }
