@@ -17,6 +17,7 @@ import (
 // command line arguments, is not a pointer.
 type OptionStoreIsNotChangeable struct{}
 
+// Error is the method to retrieve the message of this error.
 func (e OptionStoreIsNotChangeable) Error() string {
 	return "OptionStoreIsNotChangeable{}"
 }
@@ -31,12 +32,14 @@ type FailToParseInt struct {
 	cause   error
 }
 
+// Error is the method to retrieve the message of this error.
 func (e FailToParseInt) Error() string {
 	return fmt.Sprintf("FailToParseInt{"+
 		"Option:%s,Field:%s,Input:%s,BitSize:%d,cause:%s}",
 		e.Option, e.Field, e.Input, e.BitSize, e.cause.Error())
 }
 
+// Unwrap is the method to retrieve an error that caused this error.
 func (e FailToParseInt) Unwrap() error {
 	return e.cause
 }
@@ -51,12 +54,14 @@ type FailToParseUint struct {
 	cause   error
 }
 
+// Error is the method to retrieve the message of this error.
 func (e FailToParseUint) Error() string {
 	return fmt.Sprintf("FailToParseUint{"+
 		"Option:%s,Field:%s,Input:%s,BitSize:%d,cause:%s}",
 		e.Option, e.Field, e.Input, e.BitSize, e.cause.Error())
 }
 
+// Unwrap is the method to retrieve an error that caused this error.
 func (e FailToParseUint) Unwrap() error {
 	return e.cause
 }
@@ -71,12 +76,14 @@ type FailToParseFloat struct {
 	cause   error
 }
 
+// Error is the method to retrieve the message of this error.
 func (e FailToParseFloat) Error() string {
 	return fmt.Sprintf("FailToParseFloat{"+
 		"Option:%s,Field:%s,Input:%s,BitSize:%d,cause:%s}",
 		e.Option, e.Field, e.Input, e.BitSize, e.cause.Error())
 }
 
+// Unwrap is the method to retrieve an error that caused this error.
 func (e FailToParseFloat) Unwrap() error {
 	return e.cause
 }
@@ -90,6 +97,7 @@ type IllegalOptionType struct {
 	Type   reflect.Type
 }
 
+// Error is the method to retrieve the message of this error.
 func (e IllegalOptionType) Error() string {
 	return fmt.Sprintf("IllegalOptionType{"+
 		"Option:%s,Field:%s,Type:%s}",
@@ -133,10 +141,10 @@ func (e IllegalOptionType) Error() string {
 // before the open square bracket, like :[elem1:elem2:elem3].
 // It's useful when some array elements include commas.
 //
-// NOTE: A default value of a string array option in a struct tag is [], like
-// `opt:"name=[]"`, it doesn't represent an array which contains only an empty
-// string but an empty array.
-// If you want to specify an array which contains only an empty string, write
+// NOTE: A default value of an empty string array option in a struct tag is [],
+// like `opt:"name=[]"`, it doesn't represent an array which contains only one
+// empty string but an empty array.
+// If you want to specify an array which contains only one empty string, write
 // nothing after "=" mark, like `opt:"name="`.
 func ParseFor(osArgs []string, options any) (Cmd, []OptCfg, error) {
 	optCfgs, err := MakeOptCfgsFor(options)

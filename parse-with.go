@@ -100,7 +100,7 @@ func (e OptionIsNotArray) GetOpt() string {
 
 const anyOption = "*"
 
-// OptCfg is the structure that represents an option configuration.
+// OptCfg is the struct that represents an option configuration.
 // An option configuration consists of fields: Name, Aliases, HasArg,
 // IsArray, Defaults, OnParsed, Desc, and ArgHelp.
 //
