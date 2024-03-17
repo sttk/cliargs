@@ -107,25 +107,25 @@ func (e IllegalOptionType) Error() string {
 // ParseFor is the function to parse command line arguments and set their
 // values to the option store which is the second argument of this function.
 // This function divides command line arguments to command arguments and
-// options, then stores the options to the option store, and returns the
-// command arguments with the generated option configuratins.
+// options, then sets the options to the option store, and returns the
+// command arguments with the generated option configurations.
 //
 // The configurations of options are determined by types and struct tags of
 // fields of the option store.
 // If the type is bool, the option takes no argument.
 // If the type is integer, floating point number or string, the option can
-// takes one  option argument, therefore it can appear once in command line
+// takes single option argument, therefore it can appear once in command line
 // arguments.
 // If the type is an array, the option can takes multiple option arguments,
 // therefore it can appear multiple times in command line arguments.
 //
-// A struct tag can specify an option name, aliases, and a default value.
-// It has a special format, like `opt:foo-bar,f=123`.
+// A struct tag can be specified an option names and default value(s).
+// It has a special format like `opt:foo-bar,f=123`.
 // This opt: is the struct tag key for the option configuration.
-// The string following this key and rounded by double quotes is the content
-// of the option configuration.
-// The first part of the option configuration is an option name and aliases,
-// which are separated by commas, and ends with "=" mark or end of string.
+// The string following this key and rounded by double quotes is the content of
+// the option configuration.
+// The first part of the option configuration is an option names, which are
+// separated by commas, and ends with "=" mark or end of string.
 // If the option name is empty or no struct tag, the option's name becomes same
 // with the field name of the option store.
 //
@@ -137,8 +137,8 @@ func (e IllegalOptionType) Error() string {
 // If the type of the option is an array, the string after "=" mark have to be
 // rounded by square brackets and separate the elements with commas, like
 // [elem1,elem2,elem3].
-// The element separator can be used other than a comma by put the separator
-// before the open square bracket, like :[elem1:elem2:elem3].
+// The element separator can be used other than a comma by putting the
+// separator before the open square bracket, like :[elem1:elem2:elem3].
 // It's useful when some array elements include commas.
 //
 // NOTE: A default value of an empty string array option in a struct tag is [],
@@ -173,13 +173,12 @@ func MakeOptCfgsFor(options any) ([]OptCfg, error) {
 	n := t.NumField()
 
 	optCfgs := make([]OptCfg, n)
-	var err error
 
 	for i := 0; i < n; i++ {
 		optCfgs[i] = newOptCfg(t.Field(i))
 
-		var setter func([]string) error
-		setter, err = newValueSetter(optCfgs[i].Name, t.Field(i).Name, v.Field(i))
+		setter, err := newValueSetter(
+			optCfgs[i].Names[0], t.Field(i).Name, v.Field(i))
 		if err != nil {
 			return nil, err
 		}
@@ -190,18 +189,14 @@ func MakeOptCfgsFor(options any) ([]OptCfg, error) {
 }
 
 func newOptCfg(fld reflect.StructField) OptCfg {
+	storeKey := fld.Name
+
 	opt := fld.Tag.Get("optcfg")
 	arr := strings.SplitN(opt, "=", 2)
-	names := strings.Split(arr[0], ",")
 
-	var name string
-	var aliases []string
+	names := strings.Split(arr[0], ",")
 	if len(names) == 0 || len(names[0]) == 0 {
-		name = fld.Name
-		aliases = nil
-	} else {
-		name = names[0]
-		aliases = names[1:]
+		names = []string{storeKey}
 	}
 
 	isArray := false
@@ -246,13 +241,13 @@ func newOptCfg(fld reflect.StructField) OptCfg {
 	desc := fld.Tag.Get("optdesc")
 
 	return OptCfg{
-		Name:     name,
-		Aliases:  aliases,
-		HasArg:   hasArg,
-		IsArray:  isArray,
-		Defaults: defaults,
-		Desc:     desc,
-		ArgHelp:  optArg,
+		StoreKey:  storeKey,
+		Names:     names,
+		HasArg:    hasArg,
+		IsArray:   isArray,
+		Defaults:  defaults,
+		Desc:      desc,
+		ArgInHelp: optArg,
 	}
 }
 

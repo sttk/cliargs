@@ -10,7 +10,7 @@ import (
 func ExampleInvalidOption() {
 	optCfgs := []cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:     "foo",
+			Names:    []string{"foo"},
 			Defaults: []string{"123"},
 			HasArg:   false,
 		},

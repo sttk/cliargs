@@ -360,8 +360,8 @@ func TestAddOpts_oneOpts_withNoWrapping(t *testing.T) {
 	help := cliargs.NewHelp()
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name: "foo-bar",
-			Desc: "This is a description of option.",
+			Names: []string{"foo-bar"},
+			Desc:  "This is a description of option.",
 		},
 	})
 	iter := help.Iter()
@@ -379,9 +379,8 @@ func TestAddOpts_oneOpts_withWrapping(t *testing.T) {
 	help := cliargs.NewHelp()
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:    "foo-bar",
-			Aliases: []string{"f", "foo", "b", "bar"},
-			Desc:    "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678",
+			Names: []string{"foo-bar", "f", "foo", "b", "bar"},
+			Desc:  "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678",
 		},
 	})
 	iter := help.Iter()
@@ -403,11 +402,10 @@ func TestAddOpts_oneOpts_withMarginsByNewHelpArg(t *testing.T) {
 	help := cliargs.NewHelp(5, 3)
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:    "foo-bar",
-			Aliases: []string{"f"},
-			HasArg:  true,
-			Desc:    "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 h12345678",
-			ArgHelp: "<text>",
+			Names:     []string{"foo-bar", "f"},
+			HasArg:    true,
+			Desc:      "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 h12345678",
+			ArgInHelp: "<text>",
 		},
 	})
 	iter := help.Iter()
@@ -429,11 +427,10 @@ func TestAddOpts_oneOpts_withMarginsByAddOptsArg(t *testing.T) {
 	help := cliargs.NewHelp()
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:    "foo-bar",
-			Aliases: []string{"f"},
-			HasArg:  true,
-			Desc:    "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 h12345678",
-			ArgHelp: "<text>",
+			Names:     []string{"foo-bar", "f"},
+			HasArg:    true,
+			Desc:      "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 h12345678",
+			ArgInHelp: "<text>",
 		},
 	}, 0, 5, 3)
 	iter := help.Iter()
@@ -455,11 +452,10 @@ func TestAddOpts_oneOpts_withMarginsByNewHelpArgAndAddOptsArg(t *testing.T) {
 	help := cliargs.NewHelp(2, 2)
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:    "foo-bar",
-			Aliases: []string{"f"},
-			HasArg:  true,
-			Desc:    "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 h12345678",
-			ArgHelp: "<text>",
+			Names:     []string{"foo-bar", "f"},
+			HasArg:    true,
+			Desc:      "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 h12345678",
+			ArgInHelp: "<text>",
 		},
 	}, 0, 3, 1)
 	iter := help.Iter()
@@ -481,11 +477,10 @@ func TestAddOpts_oneOpts_withIndentLongerThanTitle(t *testing.T) {
 	help := cliargs.NewHelp()
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:    "foo-bar",
-			Aliases: []string{"f"},
-			HasArg:  true,
-			Desc:    "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 h12345678",
-			ArgHelp: "<text>",
+			Names:     []string{"foo-bar", "f"},
+			HasArg:    true,
+			Desc:      "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 h12345678",
+			ArgInHelp: "<text>",
 		},
 	}, 25)
 	iter := help.Iter()
@@ -507,11 +502,10 @@ func TestAddOpts_oneOpts_withIndentShorterThanTitle(t *testing.T) {
 	help := cliargs.NewHelp()
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:    "foo-bar",
-			Aliases: []string{"f"},
-			HasArg:  true,
-			Desc:    "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 h12345678",
-			ArgHelp: "<text>",
+			Names:     []string{"foo-bar", "f"},
+			HasArg:    true,
+			Desc:      "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 h12345678",
+			ArgInHelp: "<text>",
 		},
 	}, 10)
 	iter := help.Iter()
@@ -537,16 +531,14 @@ func TestAddOpts_multipleOpts(t *testing.T) {
 	help := cliargs.NewHelp()
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:    "foo-bar",
-			Aliases: []string{"f"},
-			HasArg:  true,
-			Desc:    "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 h12345678",
-			ArgHelp: "<text>",
+			Names:     []string{"foo-bar", "f"},
+			HasArg:    true,
+			Desc:      "a12345678 b12345678 c12345678 d12345678 e12345678 f12345678 g12345678 h12345678",
+			ArgInHelp: "<text>",
 		},
 		cliargs.OptCfg{
-			Name:    "baz",
-			Aliases: []string{"b"},
-			Desc:    "i12345678 j12345678 k12345678 l12345678 m12345678 n12345678 o12345678 p12345678",
+			Names: []string{"baz", "b"},
+			Desc:  "i12345678 j12345678 k12345678 l12345678 m12345678 n12345678 o12345678 p12345678",
 		},
 	})
 	iter := help.Iter()
@@ -576,12 +568,12 @@ func TestAddOpts_hasAnyOption(t *testing.T) {
 	help := cliargs.NewHelp()
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name: "foo-bar",
-			Desc: "a12345678 b12345678",
+			Names: []string{"foo-bar"},
+			Desc:  "a12345678 b12345678",
 		},
 		cliargs.OptCfg{
-			Name: "*",
-			Desc: "c12345678 d12345678",
+			StoreKey: "*",
+			Desc:     "c12345678 d12345678",
 		},
 	})
 	iter := help.Iter()
@@ -599,12 +591,12 @@ func TestAddOpts_hasAnyOption_withIndent(t *testing.T) {
 	help := cliargs.NewHelp()
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name: "*",
-			Desc: "c12345678 d12345678",
+			Names: []string{"*"},
+			Desc:  "c12345678 d12345678",
 		},
 		cliargs.OptCfg{
-			Name: "foo-bar",
-			Desc: "a12345678 b12345678",
+			Names: []string{"foo-bar"},
+			Desc:  "a12345678 b12345678",
 		},
 	}, 5)
 	iter := help.Iter()
@@ -663,20 +655,20 @@ func TestAddOpts_ifLineWidthLessThanSunOfMargins(t *testing.T) {
 	help := cliargs.NewHelp(10, 30)
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name: "foo-bar",
-			Desc: "This is a description of option.",
+			Names: []string{"foo-bar"},
+			Desc:  "This is a description of option.",
 		},
 	}, 10, 10, 20)
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name: "baz",
-			Desc: "This is a description of option.",
+			Names: []string{"baz"},
+			Desc:  "This is a description of option.",
 		},
 	}, 10, 10)
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name: "qux",
-			Desc: "This is a description of option.",
+			Names: []string{"qux"},
+			Desc:  "This is a description of option.",
 		},
 	}, 10, 10, 21)
 	iter := help.Iter()
@@ -716,76 +708,76 @@ func TestPrint_curl(t *testing.T) {
 
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:    "d",
-			Aliases: []string{"data"},
-			Desc:    "HTTP POST data",
-			HasArg:  true,
-			ArgHelp: "<data>",
+			StoreKey:  "Data",
+			Names:     []string{"d", "data"},
+			Desc:      "HTTP POST data",
+			HasArg:    true,
+			ArgInHelp: "<data>",
 		},
 		cliargs.OptCfg{
-			Name:    "f",
-			Aliases: []string{"fail"},
-			Desc:    "Fail fast with no output on HTTP errors",
+			StoreKey: "Fail",
+			Names:    []string{"f", "fail"},
+			Desc:     "Fail fast with no output on HTTP errors",
 		},
 		cliargs.OptCfg{
-			Name:    "h",
-			Aliases: []string{"help"},
-			Desc:    "Get help for commands",
-			HasArg:  true,
-			ArgHelp: "<category>",
+			StoreKey:  "Help",
+			Names:     []string{"h", "help"},
+			Desc:      "Get help for commands",
+			HasArg:    true,
+			ArgInHelp: "<category>",
 		},
 		cliargs.OptCfg{
-			Name:    "i",
-			Aliases: []string{"include"},
-			Desc:    "Include protocol response headers in the output",
+			StoreKey: "Include",
+			Names:    []string{"i", "include"},
+			Desc:     "Include protocol response headers in the output",
 		},
 		cliargs.OptCfg{
-			Name:    "o",
-			Aliases: []string{"output"},
-			Desc:    "Write to file instead of stdout",
-			HasArg:  true,
-			ArgHelp: "<file>",
+			StoreKey:  "Output",
+			Names:     []string{"o", "output"},
+			Desc:      "Write to file instead of stdout",
+			HasArg:    true,
+			ArgInHelp: "<file>",
 		},
 		cliargs.OptCfg{
-			Name:    "O",
-			Aliases: []string{"remote-name"},
-			Desc:    "Write output to a file named as the remote file",
+			StoreKey: "RemoteName",
+			Names:    []string{"O", "remote-name"},
+			Desc:     "Write output to a file named as the remote file",
 		},
 		cliargs.OptCfg{
-			Name:    "s",
-			Aliases: []string{"silent"},
-			Desc:    "Silent mode",
+			StoreKey: "Silent",
+			Names:    []string{"s", "silent"},
+			Desc:     "Silent mode",
 		},
 		cliargs.OptCfg{
-			Name:    "T",
-			Aliases: []string{"upload-file"},
-			Desc:    "Transfer local FILE to destination",
-			HasArg:  true,
-			ArgHelp: "<file>",
+			StoreKey:  "UploadFile",
+			Names:     []string{"T", "upload-file"},
+			Desc:      "Transfer local FILE to destination",
+			HasArg:    true,
+			ArgInHelp: "<file>",
 		},
 		cliargs.OptCfg{
-			Name:    "u",
-			Aliases: []string{"user"},
-			Desc:    "Server user and password",
-			HasArg:  true,
-			ArgHelp: "<user:password>",
+			StoreKey:  "User",
+			Names:     []string{"u", "user"},
+			Desc:      "Server user and password",
+			HasArg:    true,
+			ArgInHelp: "<user:password>",
 		},
 		cliargs.OptCfg{
-			Name:    "A",
-			Aliases: []string{"user-agent"},
-			Desc:    "Send User-Agent <name> to server",
-			HasArg:  true,
-			ArgHelp: "<name>",
+			StoreKey:  "UserAgent",
+			Names:     []string{"A", "user-agent"},
+			Desc:      "Send User-Agent <name> to server",
+			HasArg:    true,
+			ArgInHelp: "<name>",
 		},
 		cliargs.OptCfg{
-			Name:    "v",
-			Aliases: []string{"verbose"},
-			Desc:    "Make the operation more talkative",
+			StoreKey: "Verbose",
+			Names:    []string{"v", "verbose"},
+			Desc:     "Make the operation more talkative",
 		},
 		cliargs.OptCfg{
-			Name:    "V",
-			Aliases: []string{"version"},
-			Desc:    "Show version number and quit",
+			StoreKey: "Version",
+			Names:    []string{"V", "version"},
+			Desc:     "Show version number and quit",
 		},
 	}, 0, 1)
 
