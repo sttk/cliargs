@@ -38,27 +38,31 @@ This library supports Go 1.18 or later.
 % gvm-fav
 Now using version go1.18.10
 go version go1.18.10 darwin/amd64
-ok  	github.com/sttk/cliargs	0.178s	coverage: 98.0% of statements
+ok  	github.com/sttk/cliargs	0.306s	coverage: 100.0% of statements
 
 Now using version go1.19.13
 go version go1.19.13 darwin/amd64
-ok  	github.com/sttk/cliargs	0.119s	coverage: 98.0% of statements
+ok  	github.com/sttk/cliargs	0.222s	coverage: 100.0% of statements
 
-Now using version go1.20.8
-go version go1.20.8 darwin/amd64
-ok  	github.com/sttk/cliargs	0.155s	coverage: 98.0% of statements
+Now using version go1.20.14
+go version go1.20.14 darwin/amd64
+ok  	github.com/sttk/cliargs	0.222s	coverage: 100.0% of statements
 
-Now using version go1.21.1
-go version go1.21.1 darwin/amd64
-ok  	github.com/sttk/cliargs	0.128s	coverage: 98.0% of statements
+Now using version go1.21.7
+go version go1.21.7 darwin/amd64
+ok  	github.com/sttk/cliargs	0.227s	coverage: 100.0% of statements
 
-Back to go1.21.1
-Now using version go1.21.1
+Now using version go1.22
+go version go1.22.0 darwin/amd64
+ok  	github.com/sttk/cliargs	0.296s	coverage: 100.0% of statements
+
+Back to go1.22
+Now using version go1.22
 ```
 
 ## License
 
-Copyright (C) 2023 Takayuki Sato
+Copyright (C) 2023-2024 Takayuki Sato
 
 This program is free software under MIT License.<br>
 See the file LICENSE in this distribution for more details.
