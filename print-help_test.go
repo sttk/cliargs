@@ -564,7 +564,7 @@ func TestAddOpts_multipleOpts(t *testing.T) {
 	assert.False(t, more)
 }
 
-func TestAddOpts_hasAnyOption(t *testing.T) {
+func TestAddOpts_StoreKeyIsAnyOption(t *testing.T) {
 	help := cliargs.NewHelp()
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
@@ -587,7 +587,57 @@ func TestAddOpts_hasAnyOption(t *testing.T) {
 	assert.False(t, more)
 }
 
-func TestAddOpts_hasAnyOption_withIndent(t *testing.T) {
+func TestAddOpts_FirstElementInNamesIsAnyOption(t *testing.T) {
+	help := cliargs.NewHelp()
+	help.AddOpts([]cliargs.OptCfg{
+		cliargs.OptCfg{
+			Names: []string{"foo-bar"},
+			Desc:  "a12345678 b12345678",
+		},
+		cliargs.OptCfg{
+			Names: []string{"*"},
+			Desc:  "c12345678 d12345678",
+		},
+	})
+	iter := help.Iter()
+
+	line, more := iter.Next()
+	assert.Equal(t, line, "--foo-bar  a12345678 b12345678")
+	assert.False(t, more)
+
+	line, more = iter.Next()
+	assert.Equal(t, line, "")
+	assert.False(t, more)
+}
+
+func TestAddOpts_StoreKeyIsAnyOption_withIndent(t *testing.T) {
+	help := cliargs.NewHelp()
+	help.AddOpts([]cliargs.OptCfg{
+		cliargs.OptCfg{
+			StoreKey: "*",
+			Desc:     "c12345678 d12345678",
+		},
+		cliargs.OptCfg{
+			Names: []string{"foo-bar"},
+			Desc:  "a12345678 b12345678",
+		},
+	}, 5)
+	iter := help.Iter()
+
+	line, more := iter.Next()
+	assert.Equal(t, line, "--foo-bar")
+	assert.True(t, more)
+
+	line, more = iter.Next()
+	assert.Equal(t, line, "     a12345678 b12345678")
+	assert.False(t, more)
+
+	line, more = iter.Next()
+	assert.Equal(t, line, "")
+	assert.False(t, more)
+}
+
+func TestAddOpts_FirstElementInNamesIsAnyOption_withIndent(t *testing.T) {
 	help := cliargs.NewHelp()
 	help.AddOpts([]cliargs.OptCfg{
 		cliargs.OptCfg{
