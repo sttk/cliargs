@@ -49,29 +49,40 @@ This function takes an array of option configurations: []OptCfg as the second
 argument, and divides command line arguments to options and command arguments
 with this configurations.
 
-An option configuration has fields: Name, Aliases, HasArg, IsArray, Defaults,
-Desc, and ArgHelp.
-Name field is an option name and it is used as an argument of the functions:
-Cmd#HasOpt, Cmd#OptArg, and Cmd#OptArgs.
-Aliases field is an array of option aliases.
+An option configuration has fields: StoreKey, Names, HasArg, IsArray, Defaults,
+Desc, and ArgInHelp.
+
+StoreKey field is specified the key name to store the option value st the
+option map.
+If this field is not specified, the first element of Names field is set
+instead.
+
+Names field is a string array and specified the option names, that are both
+long options and short options.
+The order of elements in this field is used in a help text.
+If you want to prioritize the output of short option name first in the help
+text, like `-f, --foo-bar`, but use the long option name as the key in the
+option map, write StoreKey and Names fields as follows:
+`OptCfg {StoreKey: "foo-bar", Names: []string{"f", "foo-bar"}}`.
+
 HasArg field indicates the option requires one or more values.
 IsArray field indicates the option can have multiple values.
 Defaults field is an array of string which is used as default one or more
 values if the option is not specified.
 Desc field is a description of the option for help text.
-ArgHelp field is a text which is output after option name and aliases as an
+ArgInHelp field is a text which is output after option name and aliases as an
 option value in help text.
 
 	// osArgs := []string{"app", "--foo-bar", "hoge", "--baz", "1", "-z=2", "-x" "fuga"}
 
 	optCfgs := []cliargs.OptCfg{
 	    cliargs.OptCfg{
-	        Name:"foo-bar",
-	        Desc:"This is description of foo-bar.",
+	        StoreKey: "FooBar",
+	        Names: []string{"foo-bar"},
+	        Desc: "This is description of foo-bar.",
 	    },
 	    cliargs.OptCfg{
-	        Name:"baz",
-	        Aliases:[]string{"z"},
+	        Names: []string{"baz", "z"},
 	        HasArg:true,
 	        IsArray: true,
 	        Defaults: [9,8,7],
@@ -79,7 +90,7 @@ option value in help text.
 	        ArgHelp:"<text>",
 	    },
 	    cliargs.OptCfg{
-	        Name:"*",
+	        Names: []string{"*"},
 	        Desc: "(Any options are accepted)",
 	    },
 	}
@@ -87,13 +98,13 @@ option value in help text.
 	cmd, err := cliargs.ParseWith(optCfgs)
 	cmd.Name                // app
 	cmd.Args()              // [hoge fuga]
-	cmd.HasOpt("foo-bar")   // true
+	cmd.HasOpt("FooBar")    // true
 	cmd.HasOpt("baz")       // true
 	cmd.HasOpt("x")         // true, due to "*" config
-	cmd.OptArg("foo-bar")   // true
+	cmd.OptArg("FooBar")    // true
 	cmd.OptArg("baz")       // 1
 	cmd.OptArg("x")         // true
-	cmd.OptArgs("foo-bar")  // []
+	cmd.OptArgs("FooBar")   // []
 	cmd.OptArgs("baz")      // [1 2]
 	cmd.OptArgs("x")        // []
 
@@ -121,7 +132,7 @@ This function creates a Cmd instance and also an array of OptCfg which is
 transformed from these struct tags and is used to parse command line arguments.
 
 The struct tags used in a option store struct are optcfg, optdesc, and optarg.
-optcfg is what to specify option configurations other than Desc and AtgHelp.
+optcfg is what to specify option configurations other than Desc and AtgInHelp.
 The format of optcfg is as follows:
 
 	`optcfg:"name"`                 // only name
@@ -146,15 +157,15 @@ And optarg is what to specify a text for an option argument value in help text.
 	cmd, optCfgs, err := cliargs.ParseFor(osArgs, &options)
 	cmd.Name               // app
 	cmd.Args()             // [hoge fuga]
-	cmd.HasOpt("foo-bar")  // true
-	cmd.HasOpt("baz")      // true
-	cmd.HasOpt("x")        // true
-	cmd.OptArg("foo-bar")  // true
-	cmd.OptArg("baz")      // 1
-	cmd.OptArg("x")        // true
-	cmd.OptArgs("foo-bar") // []
-	cmd.OptArgs("baz")     // [1 2]
-	cmd.OptArgs("x")       // []
+	cmd.HasOpt("FooBar")   // true
+	cmd.HasOpt("Baz")      // true
+	cmd.HasOpt("Qux")      // true
+	cmd.OptArg("FooBar")   // true
+	cmd.OptArg("Baz")      // 1
+	cmd.OptArg("Qux")      // true
+	cmd.OptArgs("FooBar")  // []
+	cmd.OptArgs("Baz")     // [1 2]
+	cmd.OptArgs("Qux")     // []
 
 	options.FooBar   // true
 	options.Baz      // [1 2]
@@ -162,31 +173,31 @@ And optarg is what to specify a text for an option argument value in help text.
 
 	optCfgs    // []OptCfg{
 	           //   OptCfg{
-	           //     Name: "foo-bar",
-	           //     Aliases: []string{},
+	           //     StoreKey: "FooBar",
+	           //     Names: []string{"foo-bar"},
 	           //     Desc: "This is description of foo-bar.",
 	           //     HasArg: false,
 	           //     IsArray: false,
 	           //     Defaults: []string(nil),
-	           //     ArgHelp: "",
+	           //     ArgInHelp: "",
 	           //   },
 	           //   OptCfg{
-	           //     Name: "baz",
-	           //     Aliases: []string{"z"},
+	           //     StoreKey: "Baz",
+	           //     Aliases: []string{"baz", "z"},
 	           //     Desc: "This is description of baz.",
 	           //     HasArg: true,
 	           //     IsArray: true,
 	           //     Defaults: []string{"9","8","7"},
-	           //     ArgHelp: "<num>",
+	           //     ArgInHelp: "<num>",
 	           //   },
 	           //   OptCfg{
-	           //     Name: "qux",
-	           //     Aliases: []string{"x"},
+	           //     StoreKey: "Qux",
+	           //     Aliases: []string{"qux", "x"},
 	           //     Desc: "This is description of qux.",
 	           //     HasArg: false,
 	           //     IsArray: false,
 	           //     Defaults: []string(nil),
-	           //     ArgHelp: "",
+	           //     ArgInHelp: "",
 	           //   },
 	           // }
 

@@ -36,17 +36,17 @@ func TestParseWith_zeroCfgAndOneCommandArg(t *testing.T) {
 	assert.Equal(t, cmd.Args(), []string{"foo-bar"})
 }
 
-func testParseWith_zeroCfgAndOneLongOpt(t *testing.T) {
+func TestParseWith_zeroCfgAndOneLongOpt(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{}
 
 	osArgs := []string{"path/to/app", "--foo-bar"}
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "UnconfiguredOption")
+	assert.Equal(t, err.Error(), "UnconfiguredOption{Name:foo-bar}")
 	switch e := err.(type) {
 	case cliargs.UnconfiguredOption:
-		assert.Equal(t, e.Option, "foo-bar")
+		assert.Equal(t, e.Name, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -74,10 +74,10 @@ func TestParseWith_zeroCfgAndOneShortOpt(t *testing.T) {
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "UnconfiguredOption{Option:f}")
+	assert.Equal(t, err.Error(), "UnconfiguredOption{Name:f}")
 	switch e := err.(type) {
 	case cliargs.UnconfiguredOption:
-		assert.Equal(t, e.Option, "f")
+		assert.Equal(t, e.Name, "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -100,7 +100,7 @@ func TestParseWith_zeroCfgAndOneShortOpt(t *testing.T) {
 
 func TestParseWith_oneCfgAndZeroOpt(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar"},
+		cliargs.OptCfg{Names: []string{"foo-bar"}},
 	}
 
 	osArgs := []string{"app"}
@@ -119,7 +119,7 @@ func TestParseWith_oneCfgAndZeroOpt(t *testing.T) {
 
 func TestParseWith_oneCfgAndOneCmdArg(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar"},
+		cliargs.OptCfg{Names: []string{"foo-bar"}},
 	}
 
 	osArgs := []string{"path/to/app", "foo-bar"}
@@ -138,7 +138,7 @@ func TestParseWith_oneCfgAndOneCmdArg(t *testing.T) {
 
 func TestParseWith_oneCfgAndOneLongOpt(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar"},
+		cliargs.OptCfg{Names: []string{"foo-bar"}},
 	}
 
 	osArgs := []string{"path/to/app", "--foo-bar"}
@@ -157,7 +157,7 @@ func TestParseWith_oneCfgAndOneLongOpt(t *testing.T) {
 
 func TestParseWith_oneCfgAndOneShortOpt(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "f"},
+		cliargs.OptCfg{Names: []string{"f"}},
 	}
 
 	osArgs := []string{"app", "-f"}
@@ -176,17 +176,17 @@ func TestParseWith_oneCfgAndOneShortOpt(t *testing.T) {
 
 func TestParseWith_oneCfgAndOneDifferentLongOpt(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar"},
+		cliargs.OptCfg{Names: []string{"foo-bar"}},
 	}
 
 	osArgs := []string{"app", "--boo-far"}
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "UnconfiguredOption{Option:boo-far}")
+	assert.Equal(t, err.Error(), "UnconfiguredOption{Name:boo-far}")
 	switch e := err.(type) {
 	case cliargs.UnconfiguredOption:
-		assert.Equal(t, e.Option, "boo-far")
+		assert.Equal(t, e.Name, "boo-far")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -209,17 +209,17 @@ func TestParseWith_oneCfgAndOneDifferentLongOpt(t *testing.T) {
 
 func TestParseWith_oneCfgAndOneDifferentShortOpt(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "f"},
+		cliargs.OptCfg{Names: []string{"f"}},
 	}
 
 	osArgs := []string{"app", "-b"}
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "UnconfiguredOption{Option:b}")
+	assert.Equal(t, err.Error(), "UnconfiguredOption{Name:b}")
 	switch e := err.(type) {
 	case cliargs.UnconfiguredOption:
-		assert.Equal(t, e.Option, "b")
+		assert.Equal(t, e.Name, "b")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -242,8 +242,8 @@ func TestParseWith_oneCfgAndOneDifferentShortOpt(t *testing.T) {
 
 func TestParseWith_anyOptCfgAndOneDifferentLongOpt(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar"},
-		cliargs.OptCfg{Name: "*"},
+		cliargs.OptCfg{Names: []string{"foo-bar"}},
+		cliargs.OptCfg{Names: []string{"*"}},
 	}
 
 	osArgs := []string{"app", "--boo-far"}
@@ -266,8 +266,8 @@ func TestParseWith_anyOptCfgAndOneDifferentLongOpt(t *testing.T) {
 
 func TestParseWith_anyOptCfgAndOneDifferentShortOpt(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "f"},
-		cliargs.OptCfg{Name: "*"},
+		cliargs.OptCfg{Names: []string{"f"}},
+		cliargs.OptCfg{Names: []string{"*"}},
 	}
 
 	osArgs := []string{"app", "-b"}
@@ -290,7 +290,7 @@ func TestParseWith_anyOptCfgAndOneDifferentShortOpt(t *testing.T) {
 
 func TestParseWith_oneCfgHasArgAndOneLongOptHasArg(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar", HasArg: true},
+		cliargs.OptCfg{Names: []string{"foo-bar"}, HasArg: true},
 	}
 
 	osArgs := []string{"app", "--foo-bar", "ABC"}
@@ -348,7 +348,7 @@ func TestParseWith_oneCfgHasArgAndOneLongOptHasArg(t *testing.T) {
 
 func TestParseWith_oneCfgHasArgAndOneShortOptHasArg(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "f", HasArg: true},
+		cliargs.OptCfg{Names: []string{"f"}, HasArg: true},
 	}
 
 	osArgs := []string{"app", "-f", "ABC"}
@@ -406,17 +406,18 @@ func TestParseWith_oneCfgHasArgAndOneShortOptHasArg(t *testing.T) {
 
 func TestParseWith_oneCfgHasArgButOneLongOptHasNoArg(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar", HasArg: true},
+		cliargs.OptCfg{Names: []string{"foo-bar"}, HasArg: true},
 	}
 
 	osArgs := []string{"app", "--foo-bar"}
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionNeedsArg{Option:foo-bar}")
+	assert.Equal(t, err.Error(), "OptionNeedsArg{Name:foo-bar,StoreKey:foo-bar}")
 	switch e := err.(type) {
 	case cliargs.OptionNeedsArg:
-		assert.Equal(t, e.Option, "foo-bar")
+		assert.Equal(t, e.Name, "foo-bar")
+		assert.Equal(t, e.StoreKey, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -439,17 +440,18 @@ func TestParseWith_oneCfgHasArgButOneLongOptHasNoArg(t *testing.T) {
 
 func TestParseWith_oneCfgHasArgAndOneShortOptHasNoArg(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "f", HasArg: true},
+		cliargs.OptCfg{Names: []string{"f"}, HasArg: true},
 	}
 
 	osArgs := []string{"app", "-f"}
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionNeedsArg{Option:f}")
+	assert.Equal(t, err.Error(), "OptionNeedsArg{Name:f,StoreKey:f}")
 	switch e := err.(type) {
 	case cliargs.OptionNeedsArg:
-		assert.Equal(t, e.Option, "f")
+		assert.Equal(t, e.Name, "f")
+		assert.Equal(t, e.StoreKey, "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -472,7 +474,7 @@ func TestParseWith_oneCfgHasArgAndOneShortOptHasNoArg(t *testing.T) {
 
 func TestParseWith_oneCfgHasNoArgAndOneLongOptHasArg(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar"},
+		cliargs.OptCfg{Names: []string{"foo-bar"}},
 	}
 
 	osArgs := []string{"app", "--foo-bar", "ABC"}
@@ -492,10 +494,11 @@ func TestParseWith_oneCfgHasNoArgAndOneLongOptHasArg(t *testing.T) {
 
 	cmd, err = cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionTakesNoArg{Option:foo-bar}")
+	assert.Equal(t, err.Error(), "OptionTakesNoArg{Name:foo-bar,StoreKey:foo-bar}")
 	switch e := err.(type) {
 	case cliargs.OptionTakesNoArg:
-		assert.Equal(t, e.Option, "foo-bar")
+		assert.Equal(t, e.Name, "foo-bar")
+		assert.Equal(t, e.StoreKey, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -532,10 +535,11 @@ func TestParseWith_oneCfgHasNoArgAndOneLongOptHasArg(t *testing.T) {
 
 	cmd, err = cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionTakesNoArg{Option:foo-bar}")
+	assert.Equal(t, err.Error(), "OptionTakesNoArg{Name:foo-bar,StoreKey:foo-bar}")
 	switch e := err.(type) {
 	case cliargs.OptionTakesNoArg:
-		assert.Equal(t, e.Option, "foo-bar")
+		assert.Equal(t, e.Name, "foo-bar")
+		assert.Equal(t, e.StoreKey, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -558,7 +562,7 @@ func TestParseWith_oneCfgHasNoArgAndOneLongOptHasArg(t *testing.T) {
 
 func TestParseWith_oneCfgHasNoArgAndOneShortOptHasArg(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "f"},
+		cliargs.OptCfg{Names: []string{"f"}},
 	}
 
 	osArgs := []string{"app", "-f", "ABC"}
@@ -578,10 +582,11 @@ func TestParseWith_oneCfgHasNoArgAndOneShortOptHasArg(t *testing.T) {
 
 	cmd, err = cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionTakesNoArg{Option:f}")
+	assert.Equal(t, err.Error(), "OptionTakesNoArg{Name:f,StoreKey:f}")
 	switch e := err.(type) {
 	case cliargs.OptionTakesNoArg:
-		assert.Equal(t, e.Option, "f")
+		assert.Equal(t, e.Name, "f")
+		assert.Equal(t, e.StoreKey, "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -618,10 +623,11 @@ func TestParseWith_oneCfgHasNoArgAndOneShortOptHasArg(t *testing.T) {
 
 	cmd, err = cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionTakesNoArg{Option:f}")
+	assert.Equal(t, err.Error(), "OptionTakesNoArg{Name:f,StoreKey:f}")
 	switch e := err.(type) {
 	case cliargs.OptionTakesNoArg:
-		assert.Equal(t, e.Option, "f")
+		assert.Equal(t, e.Name, "f")
+		assert.Equal(t, e.StoreKey, "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -644,17 +650,17 @@ func TestParseWith_oneCfgHasNoArgAndOneShortOptHasArg(t *testing.T) {
 
 func TestParseWith_oneCfgHasNoArgButIsArray(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar", HasArg: false, IsArray: true},
+		cliargs.OptCfg{Names: []string{"foo-bar"}, HasArg: false, IsArray: true},
 	}
 
 	osArgs := []string{"app", "--foo-bar", "ABC"}
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "ConfigIsArrayButHasNoArg{Option:foo-bar}")
+	assert.Equal(t, err.Error(), "ConfigIsArrayButHasNoArg{StoreKey:foo-bar}")
 	switch e := err.(type) {
 	case cliargs.ConfigIsArrayButHasNoArg:
-		assert.Equal(t, e.Option, "foo-bar")
+		assert.Equal(t, e.StoreKey, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -677,8 +683,8 @@ func TestParseWith_oneCfgHasNoArgButIsArray(t *testing.T) {
 
 func TestParseWith_oneCfgIsArrayAndOptHasOneArg(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar", HasArg: true, IsArray: true},
-		cliargs.OptCfg{Name: "f", HasArg: true, IsArray: true},
+		cliargs.OptCfg{Names: []string{"foo-bar"}, HasArg: true, IsArray: true},
+		cliargs.OptCfg{Names: []string{"f"}, HasArg: true, IsArray: true},
 	}
 
 	osArgs := []string{"app", "--foo-bar", "ABC"}
@@ -737,9 +743,8 @@ func TestParseWith_oneCfgIsArrayAndOptHasOneArg(t *testing.T) {
 func TestParseWith_oneCfgHasAliasesAndArgMatchesName(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:    "foo-bar",
-			Aliases: []string{"f", "b"},
-			HasArg:  true,
+			Names:  []string{"foo-bar", "f", "b"},
+			HasArg: true,
 		},
 	}
 
@@ -770,47 +775,10 @@ func TestParseWith_oneCfgHasAliasesAndArgMatchesName(t *testing.T) {
 	assert.Equal(t, cmd.Args(), []string{})
 }
 
-func TestParseWith_oneCfgHasAliasesAndArgMatchesAliases(t *testing.T) {
+func TestParseWith_hasOptsOfBothNameAndAliase(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:    "foo-bar",
-			Aliases: []string{"f"},
-			HasArg:  true,
-		},
-	}
-
-	osArgs := []string{"app", "-f", "ABC"}
-
-	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
-	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "app")
-	assert.True(t, cmd.HasOpt("foo-bar"))
-	assert.Equal(t, cmd.OptArg("foo-bar"), "ABC")
-	assert.Equal(t, cmd.OptArgs("foo-bar"), []string{"ABC"})
-	assert.False(t, cmd.HasOpt("f"))
-	assert.Equal(t, cmd.OptArg("f"), "")
-	assert.Equal(t, cmd.OptArgs("f"), []string(nil))
-	assert.Equal(t, cmd.Args(), []string{})
-
-	osArgs = []string{"app", "-f=ABC"}
-
-	cmd, err = cliargs.ParseWith(osArgs, optCfgs)
-	assert.Nil(t, err)
-	assert.Equal(t, cmd.Name, "app")
-	assert.True(t, cmd.HasOpt("foo-bar"))
-	assert.Equal(t, cmd.OptArg("foo-bar"), "ABC")
-	assert.Equal(t, cmd.OptArgs("foo-bar"), []string{"ABC"})
-	assert.False(t, cmd.HasOpt("f"))
-	assert.Equal(t, cmd.OptArg("f"), "")
-	assert.Equal(t, cmd.OptArgs("f"), []string(nil))
-	assert.Equal(t, cmd.Args(), []string{})
-}
-
-func TestParseWith_combineOptsByNameAndAliases(t *testing.T) {
-	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{
-			Name:    "foo-bar",
-			Aliases: []string{"f"},
+			Names:   []string{"foo-bar", "f"},
 			HasArg:  true,
 			IsArray: true,
 		},
@@ -846,8 +814,7 @@ func TestParseWith_combineOptsByNameAndAliases(t *testing.T) {
 func TestParseWith_oneCfgIsNotArrayButOptsAreMultiple(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
 		cliargs.OptCfg{
-			Name:    "foo-bar",
-			Aliases: []string{"f"},
+			Names:   []string{"foo-bar", "f"},
 			HasArg:  true,
 			IsArray: false,
 		},
@@ -857,10 +824,11 @@ func TestParseWith_oneCfgIsNotArrayButOptsAreMultiple(t *testing.T) {
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionIsNotArray{Option:foo-bar}")
+	assert.Equal(t, err.Error(), "OptionIsNotArray{Name:foo-bar,StoreKey:foo-bar}")
 	switch e := err.(type) {
 	case cliargs.OptionIsNotArray:
-		assert.Equal(t, e.Option, "foo-bar")
+		assert.Equal(t, e.Name, "foo-bar")
+		assert.Equal(t, e.StoreKey, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -879,13 +847,41 @@ func TestParseWith_oneCfgIsNotArrayButOptsAreMultiple(t *testing.T) {
 	assert.Equal(t, cmd.OptArg("f"), "")
 	assert.Equal(t, cmd.OptArgs("f"), []string(nil))
 	assert.Equal(t, cmd.Args(), []string{})
+
+	osArgs = []string{"app", "-f=1", "ABC", "--foo-bar", "2"}
+
+	cmd, err = cliargs.ParseWith(osArgs, optCfgs)
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "OptionIsNotArray{Name:foo-bar,StoreKey:foo-bar}")
+	switch e := err.(type) {
+	case cliargs.OptionIsNotArray:
+		assert.Equal(t, e.Name, "foo-bar")
+		assert.Equal(t, e.StoreKey, "foo-bar")
+	default:
+		assert.Fail(t, err.Error())
+	}
+	switch e := err.(type) {
+	case cliargs.InvalidOption:
+		assert.Equal(t, e.GetOpt(), "foo-bar")
+	default:
+		assert.Fail(t, err.Error())
+	}
+
+	assert.Equal(t, cmd.Name, "app")
+	assert.True(t, cmd.HasOpt("foo-bar"))
+	assert.Equal(t, cmd.OptArg("foo-bar"), "1")
+	assert.Equal(t, cmd.OptArgs("foo-bar"), []string{"1"})
+	assert.False(t, cmd.HasOpt("f"))
+	assert.Equal(t, cmd.OptArg("f"), "")
+	assert.Equal(t, cmd.OptArgs("f"), []string(nil))
+	assert.Equal(t, cmd.Args(), []string{"ABC"})
 }
 
 func TestParseWith_specifyDefault(t *testing.T) {
 	osArgs := []string{"app"}
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "bar", HasArg: true, Defaults: []string{"A"}},
-		cliargs.OptCfg{Name: "baz", HasArg: true, IsArray: true, Defaults: []string{"A"}},
+		cliargs.OptCfg{Names: []string{"bar"}, HasArg: true, Defaults: []string{"A"}},
+		cliargs.OptCfg{Names: []string{"baz"}, HasArg: true, IsArray: true, Defaults: []string{"A"}},
 	}
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
@@ -904,17 +900,17 @@ func TestParseWith_specifyDefault(t *testing.T) {
 
 func TestParseWith_oneCfgHasNoArgButHasDefault(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar", HasArg: false, Defaults: []string{"A"}},
+		cliargs.OptCfg{Names: []string{"foo-bar"}, HasArg: false, Defaults: []string{"A"}},
 	}
 
 	osArgs := []string{"app"}
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "ConfigHasDefaultsButHasNoArg{Option:foo-bar}")
+	assert.Equal(t, err.Error(), "ConfigHasDefaultsButHasNoArg{StoreKey:foo-bar}")
 	switch e := err.(type) {
 	case cliargs.ConfigHasDefaultsButHasNoArg:
-		assert.Equal(t, e.Option, "foo-bar")
+		assert.Equal(t, e.StoreKey, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -939,15 +935,14 @@ func TestParseWith_multipleArgs(t *testing.T) {
 	osArgs := []string{"app", "--foo-bar", "qux", "--baz", "1", "-z=2", "-X", "quux"}
 
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo-bar"},
+		cliargs.OptCfg{Names: []string{"foo-bar"}},
 		cliargs.OptCfg{
-			Name:    "baz",
-			Aliases: []string{"z"},
+			Names:   []string{"baz", "z"},
 			HasArg:  true,
 			IsArray: true,
 		},
-		cliargs.OptCfg{Name: "corge", HasArg: true, Defaults: []string{"99"}},
-		cliargs.OptCfg{Name: "*"},
+		cliargs.OptCfg{Names: []string{"corge"}, HasArg: true, Defaults: []string{"99"}},
+		cliargs.OptCfg{Names: []string{"*"}},
 	}
 
 	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
@@ -966,7 +961,7 @@ func TestParseWith_multipleArgs(t *testing.T) {
 
 func TestParseWith_parseAllArgsEvenIfError(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "foo", Aliases: []string{"f"}},
+		cliargs.OptCfg{Names: []string{"foo", "f"}},
 	}
 
 	osArgs := []string{"app", "-ef", "bar"}
@@ -981,7 +976,7 @@ func TestParseWith_parseAllArgsEvenIfError(t *testing.T) {
 
 	switch e := err.(type) {
 	case cliargs.UnconfiguredOption:
-		assert.Equal(t, e.Option, "e")
+		assert.Equal(t, e.Name, "e")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -995,8 +990,8 @@ func TestParseWith_parseAllArgsEvenIfError(t *testing.T) {
 
 func TestParseWith_parseAllArgsEvenIfShortOptionValueIsError(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "e"},
-		cliargs.OptCfg{Name: "foo", Aliases: []string{"f"}},
+		cliargs.OptCfg{Names: []string{"e"}},
+		cliargs.OptCfg{Names: []string{"foo", "f"}},
 	}
 
 	osArgs := []string{"app", "-ef=123", "bar"}
@@ -1011,13 +1006,14 @@ func TestParseWith_parseAllArgsEvenIfShortOptionValueIsError(t *testing.T) {
 
 	switch e := err.(type) {
 	case cliargs.OptionTakesNoArg:
-		assert.Equal(t, e.Option, "foo")
+		assert.Equal(t, e.Name, "f")
+		assert.Equal(t, e.StoreKey, "foo")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
 	case cliargs.InvalidOption:
-		assert.Equal(t, e.GetOpt(), "foo")
+		assert.Equal(t, e.GetOpt(), "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1025,8 +1021,8 @@ func TestParseWith_parseAllArgsEvenIfShortOptionValueIsError(t *testing.T) {
 
 func TestParseWith_parseAllArgsEvenIfLongOptionValueIsError(t *testing.T) {
 	optCfgs := []cliargs.OptCfg{
-		cliargs.OptCfg{Name: "e"},
-		cliargs.OptCfg{Name: "foo", Aliases: []string{"f"}},
+		cliargs.OptCfg{Names: []string{"e"}},
+		cliargs.OptCfg{Names: []string{"foo", "f"}},
 	}
 
 	osArgs := []string{"app", "--foo=123", "-e", "bar"}
@@ -1041,7 +1037,8 @@ func TestParseWith_parseAllArgsEvenIfLongOptionValueIsError(t *testing.T) {
 
 	switch e := err.(type) {
 	case cliargs.OptionTakesNoArg:
-		assert.Equal(t, e.Option, "foo")
+		assert.Equal(t, e.Name, "foo")
+		assert.Equal(t, e.StoreKey, "foo")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1051,4 +1048,141 @@ func TestParseWith_parseAllArgsEvenIfLongOptionValueIsError(t *testing.T) {
 	default:
 		assert.Fail(t, err.Error())
 	}
+}
+
+func TestParseWith_ignoreCfgifNamesIsEmpty(t *testing.T) {
+	optCfgs := []cliargs.OptCfg{
+		cliargs.OptCfg{Names: []string{}},
+		cliargs.OptCfg{
+			Names: []string{"foo"},
+		},
+	}
+
+	osArgs := []string{"app", "--foo", "bar"}
+
+	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
+	assert.Equal(t, cmd.Name, "app")
+	assert.Nil(t, err)
+
+	assert.True(t, cmd.HasOpt("foo"))
+	assert.Equal(t, cmd.Args(), []string{"bar"})
+}
+
+func TestParseWith_optionNameIsDuplicated(t *testing.T) {
+	optCfgs := []cliargs.OptCfg{
+		cliargs.OptCfg{Names: []string{"foo", "f"}},
+		cliargs.OptCfg{Names: []string{"bar", "f"}},
+	}
+
+	osArgs := []string{"app", "--foo", "--bar"}
+
+	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
+	assert.Equal(t, cmd.Name, "app")
+
+	assert.Equal(t, err.Error(), "OptionNameIsDuplicated{Name:f,StoreKey:bar}")
+	switch e := err.(type) {
+	case cliargs.OptionNameIsDuplicated:
+		assert.Equal(t, e.Name, "f")
+		assert.Equal(t, e.StoreKey, "bar")
+	default:
+		assert.Fail(t, err.Error())
+	}
+	switch e := err.(type) {
+	case cliargs.InvalidOption:
+		assert.Equal(t, e.GetOpt(), "f")
+	default:
+		assert.Fail(t, err.Error())
+	}
+}
+
+func TestParseWith_useStoreKey(t *testing.T) {
+	optCfgs := []cliargs.OptCfg{
+		cliargs.OptCfg{
+			StoreKey: "FooBar",
+			Names:    []string{"f", "foo"},
+		},
+	}
+
+	osArgs := []string{"app", "--foo", "bar"}
+
+	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
+	assert.Equal(t, cmd.Name, "app")
+	assert.Nil(t, err)
+
+	assert.True(t, cmd.HasOpt("FooBar"))
+	assert.False(t, cmd.HasOpt("foo"))
+	assert.False(t, cmd.HasOpt("f"))
+	assert.Equal(t, cmd.Args(), []string{"bar"})
+}
+
+func TestParseWith_StoreKeyIsDuplicated(t *testing.T) {
+	optCfgs := []cliargs.OptCfg{
+		cliargs.OptCfg{
+			StoreKey: "FooBar",
+			Names:    []string{"f", "foo"},
+		},
+		cliargs.OptCfg{
+			StoreKey: "FooBar",
+			Names:    []string{"b", "bar"},
+		},
+	}
+
+	osArgs := []string{"app", "--foo", "bar"}
+
+	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, err.Error(), "StoreKeyIsDuplicated{StoreKey:FooBar}")
+	switch e := err.(type) {
+	case cliargs.StoreKeyIsDuplicated:
+		assert.Equal(t, e.StoreKey, "FooBar")
+	default:
+		assert.Fail(t, err.Error())
+	}
+	switch e := err.(type) {
+	case cliargs.InvalidOption:
+		assert.Equal(t, e.GetOpt(), "FooBar")
+	default:
+		assert.Fail(t, err.Error())
+	}
+}
+
+func TestParseWith_acceptAllOptionsIfStoreKeyIsAterisk(t *testing.T) {
+	optCfgs := []cliargs.OptCfg{
+		cliargs.OptCfg{StoreKey: "*"},
+	}
+
+	osArgs := []string{"app", "--foo", "--bar", "baz"}
+
+	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
+	assert.Equal(t, cmd.Name, "app")
+	assert.Nil(t, err)
+
+	assert.True(t, cmd.HasOpt("foo"))
+	assert.True(t, cmd.HasOpt("bar"))
+	assert.Equal(t, cmd.Args(), []string{"baz"})
+}
+
+func TestParseWith_acceptUnconfiguredOptionEvenIfItMatchesStoreKey(t *testing.T) {
+	optCfgs := []cliargs.OptCfg{
+		cliargs.OptCfg{
+			StoreKey: "Bar",
+			Names:    []string{"foo", "f"},
+			HasArg:   true,
+			IsArray:  true,
+		},
+		cliargs.OptCfg{
+			StoreKey: "*",
+		},
+	}
+
+	osArgs := []string{"app", "--foo", "1", "-f=2", "--Bar=3"}
+
+	cmd, err := cliargs.ParseWith(osArgs, optCfgs)
+	assert.Equal(t, cmd.Name, "app")
+	assert.Nil(t, err)
+
+	assert.True(t, cmd.HasOpt("Bar"))
+	assert.Equal(t, cmd.OptArg("Bar"), "1")
+	assert.Equal(t, cmd.OptArgs("Bar"), []string{"1", "2", "3"})
+	assert.Equal(t, cmd.Args(), []string{})
 }

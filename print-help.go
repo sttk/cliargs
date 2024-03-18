@@ -187,9 +187,16 @@ func (help *Help) AddOpts(optCfgs []OptCfg, wrapOpts ...int) {
 	if b.indent > 0 {
 		i := 0
 		for _, cfg := range optCfgs {
-			if cfg.Name == anyOption {
+			storeKey := cfg.StoreKey
+			if len(storeKey) == 0 {
+				if len(cfg.Names) > 0 && cfg.Names[0] == anyOption {
+					storeKey = cfg.Names[0]
+				}
+			}
+			if storeKey == anyOption {
 				continue
 			}
+
 			texts[i] = makeOptTitle(cfg)
 			width := linebreak.TextWidth(texts[i])
 			if width+2 > b.indent {
@@ -207,9 +214,16 @@ func (help *Help) AddOpts(optCfgs []OptCfg, wrapOpts ...int) {
 
 		i := 0
 		for _, cfg := range optCfgs {
-			if cfg.Name == anyOption {
+			storeKey := cfg.StoreKey
+			if len(storeKey) == 0 {
+				if len(cfg.Names) > 0 && cfg.Names[0] == anyOption {
+					storeKey = cfg.Names[0]
+				}
+			}
+			if storeKey == anyOption {
 				continue
 			}
+
 			texts[i] = makeOptTitle(cfg)
 			widths[i] = linebreak.TextWidth(texts[i])
 			if indent < widths[i] {
@@ -224,9 +238,16 @@ func (help *Help) AddOpts(optCfgs []OptCfg, wrapOpts ...int) {
 
 		i = 0
 		for _, cfg := range optCfgs {
-			if cfg.Name == anyOption {
+			storeKey := cfg.StoreKey
+			if len(storeKey) == 0 {
+				if len(cfg.Names) > 0 && cfg.Names[0] == anyOption {
+					storeKey = cfg.Names[0]
+				}
+			}
+			if storeKey == anyOption {
 				continue
 			}
+
 			texts[i] += strings.Repeat(" ", indent-widths[i]) + cfg.Desc
 			i++
 		}
@@ -237,30 +258,22 @@ func (help *Help) AddOpts(optCfgs []OptCfg, wrapOpts ...int) {
 }
 
 func makeOptTitle(cfg OptCfg) string {
-	title := cfg.Name
-	switch len(title) {
-	case 0:
-	case 1:
-		title = "-" + title
-	default:
-		title = "--" + title
-	}
-
-	for _, alias := range cfg.Aliases {
-		switch len(alias) {
+	title := ""
+	for _, name := range cfg.Names {
+		switch len(name) {
 		case 0:
 		case 1:
-			title += ", -" + alias
+			title += ", -" + name
 		default:
-			title += ", --" + alias
+			title += ", --" + name
 		}
 	}
 
-	if cfg.HasArg && len(cfg.ArgHelp) > 0 {
-		title += " " + cfg.ArgHelp
+	if cfg.HasArg && len(cfg.ArgInHelp) > 0 {
+		title += " " + cfg.ArgInHelp
 	}
 
-	return title
+	return title[2:]
 }
 
 // Print is a method which prints help texts to standard output.

@@ -9,188 +9,246 @@ import (
 	"path"
 )
 
+// StoreKeyIsDuplicated is the error which indicates that a store key in an
+// option configuration is duplicated another among all option configurations.
+type StoreKeyIsDuplicated struct{ StoreKey string }
+
+// Error is the method to retrieve the message of this error.
+func (e StoreKeyIsDuplicated) Error() string {
+	return fmt.Sprintf("StoreKeyIsDuplicated{StoreKey:%s}", e.StoreKey)
+}
+
+// GetOpt is the method to retrieve the store key that caused this error.
+func (e StoreKeyIsDuplicated) GetOpt() string {
+	return e.StoreKey
+}
+
 // ConfigIsArrayButHasNoArg is the error which indicates that an option
 // configuration contradicts that the option must be an array
 // (.IsArray = true) but must have no option argument (.HasArg = false).
-type ConfigIsArrayButHasNoArg struct{ Option string }
+type ConfigIsArrayButHasNoArg struct{ StoreKey string }
 
 // Error is the method to retrieve the message of this error.
 func (e ConfigIsArrayButHasNoArg) Error() string {
-	return fmt.Sprintf("ConfigIsArrayButHasNoArg{Option:%s}", e.Option)
+	return fmt.Sprintf("ConfigIsArrayButHasNoArg{StoreKey:%s}", e.StoreKey)
 }
 
-// GetOpt is the method to retrieve the option that caused this error.
+// GetOpt is the method to retrieve the store key that caused this error.
 func (e ConfigIsArrayButHasNoArg) GetOpt() string {
-	return e.Option
+	return e.StoreKey
 }
 
 // ConfigHasDefaultsButHasNoArg is the error which indicates that an option
 // configuration contradicts that the option has default value
 // (.Defaults != nil) but must have no option argument (.HasArg = false).
-type ConfigHasDefaultsButHasNoArg struct{ Option string }
+type ConfigHasDefaultsButHasNoArg struct{ StoreKey string }
 
 // Error is the method to retrieve the message of this error.
 func (e ConfigHasDefaultsButHasNoArg) Error() string {
-	return fmt.Sprintf("ConfigHasDefaultsButHasNoArg{Option:%s}", e.Option)
+	return fmt.Sprintf("ConfigHasDefaultsButHasNoArg{StoreKey:%s}", e.StoreKey)
 }
 
-// GetOpt is the method to retrieve the option that caused this error.
+// GetOpt is the method to retrieve the store key that caused this error.
 func (e ConfigHasDefaultsButHasNoArg) GetOpt() string {
-	return e.Option
+	return e.StoreKey
+}
+
+// OptionNameIsDuplicated is the error which indicates that an option name
+// in Names field is duplicated another among all option configurations.
+type OptionNameIsDuplicated struct{ Name, StoreKey string }
+
+// Error is the method to retrieve the message of this error.
+func (e OptionNameIsDuplicated) Error() string {
+	return fmt.Sprintf("OptionNameIsDuplicated{Name:%s,StoreKey:%s}",
+		e.Name, e.StoreKey)
+}
+
+// GetOpt is the method to retrieve the store key that caused this error.
+func (e OptionNameIsDuplicated) GetOpt() string {
+	return e.Name
 }
 
 // UnconfiguredOption is the error which indicates that there is no
 // configuration about the input option.
-type UnconfiguredOption struct{ Option string }
+type UnconfiguredOption struct{ Name string }
 
 // Error is the method to retrieve the message of this error.
 func (e UnconfiguredOption) Error() string {
-	return fmt.Sprintf("UnconfiguredOption{Option:%s}", e.Option)
+	return fmt.Sprintf("UnconfiguredOption{Name:%s}", e.Name)
 }
 
-// GetOpt is the method to retrieve the option that caused this error.
+// GetOpt is the method to retrieve the store key that caused this error.
 func (e UnconfiguredOption) GetOpt() string {
-	return e.Option
+	return e.Name
 }
 
 // OptionNeedsArg is the error which indicates that an option is input with
 // no option argument though its option configuration requires option
 // argument (.HasArg = true).
-type OptionNeedsArg struct{ Option string }
+type OptionNeedsArg struct{ Name, StoreKey string }
 
 // Error is the method to retrieve the message of this error.
 func (e OptionNeedsArg) Error() string {
-	return fmt.Sprintf("OptionNeedsArg{Option:%s}", e.Option)
+	return fmt.Sprintf("OptionNeedsArg{Name:%s,StoreKey:%s}",
+		e.Name, e.StoreKey)
 }
 
-// GetOpt is the method to retrieve the option that caused this error.
+// GetOpt is the method to retrieve the store key that caused this error.
 func (e OptionNeedsArg) GetOpt() string {
-	return e.Option
+	return e.Name
 }
 
 // OptionTakesNoArg is the error which indicates that an option is input with
 // an option argument though its option configuration does not accept option
 // arguments (.HasArg = false).
-type OptionTakesNoArg struct{ Option string }
+type OptionTakesNoArg struct{ Name, StoreKey string }
 
 // Error is the method to retrieve the message of this error.
 func (e OptionTakesNoArg) Error() string {
-	return fmt.Sprintf("OptionTakesNoArg{Option:%s}", e.Option)
+	return fmt.Sprintf("OptionTakesNoArg{Name:%s,StoreKey:%s}",
+		e.Name, e.StoreKey)
 }
 
-// GetOpt is the method to retrieve the option that caused this error.
+// GetOpt is the method to retrieve the store key that caused this error.
 func (e OptionTakesNoArg) GetOpt() string {
-	return e.Option
+	return e.Name
 }
 
 // OptionIsNotArray is the error which indicates that an option is input with
 // an option argument multiple times though its option configuration specifies
 // the option is not an array (.IsArray = false).
-type OptionIsNotArray struct{ Option string }
+type OptionIsNotArray struct{ Name, StoreKey string }
 
 // Error is the method to retrieve the message of this error.
 func (e OptionIsNotArray) Error() string {
-	return fmt.Sprintf("OptionIsNotArray{Option:%s}", e.Option)
+	return fmt.Sprintf("OptionIsNotArray{Name:%s,StoreKey:%s}",
+		e.Name, e.StoreKey)
 }
 
-// GetOpt is the method to retrieve the option that caused this error.
+// GetOpt is the method to retrieve the store key that caused this error.
 func (e OptionIsNotArray) GetOpt() string {
-	return e.Option
+	return e.Name
 }
 
 const anyOption = "*"
 
 // OptCfg is the struct that represents an option configuration.
-// An option configuration consists of fields: Name, Aliases, HasArg,
-// IsArray, Defaults, OnParsed, Desc, and ArgHelp.
+// An option configuration consists of fields: StoreKey, Names, HasArg,
+// IsArray, Defaults, Desc, and ArgInHelp.
 //
-// Name is the option name and Aliases are the another names.
-// Options given by those names in command line arguments are all registered to
-// Args with the Name.
+// The StoreKey field is the key to store a option value(s) in the option map.
+// If this key is not specified or empty, the first element of Names field is
+// used instead.
 //
-// HasArg and IsArray are flags which allows the option to take option
+// The Names field is the array for specifing the option name and the aliases.
+// The order of the names in this array are used in a help text.
+//
+// HasArg and IsArray are flags which allow the option to take option
 // arguments.
 // If both HasArg and IsArray are true, the option can take one or multiple
 // option arguments.
-// If HasArg is true and IsArray is false, the option can take only one
-// option arguments.
+// If HasArg is true and IsArray is false, the option can take only one option
+// arguments.
 // If both HasArg and IsArray are false, the option can take no option
 // argument.
 //
-// Defaults is the field to specify the default value for when the option is
+// Defaults is the field to specified the default value for when the option is
 // not given in command line arguments.
 //
-// OnParsed is the field for the event handler which is called when the option
-// has been parsed.
-// This handler receives a string array which is the option argument(s) as its
-// argument.
-// If this field is nil, nothing is done after parsing.
+// OnParsed is the field for a function which is called when the option has
+// been parsed.
 //
 // Desc is the field to set the description of the option.
 //
-// ArgHelp is a display at a argument position of this option in a help text.
-// This string is for a display like: -o, --option <value>.
+// ArgInHelp is a display of the argument of this option in a help text.
+// The example of the display is like: -o, --option <value>.
 type OptCfg struct {
-	Name     string
-	Aliases  []string
-	HasArg   bool
-	IsArray  bool
-	Defaults []string
-	OnParsed *func([]string) error
-	Desc     string
-	ArgHelp  string
+	StoreKey  string
+	Names     []string
+	HasArg    bool
+	IsArray   bool
+	Defaults  []string
+	OnParsed  *func([]string) error
+	Desc      string
+	ArgInHelp string
 }
 
 // ParseWith is the function which parses command line arguments with option
 // configurations.
 // This function divides command line arguments to command arguments and
-// options, and an option consists of a name and option arguments.
+// options. And an option consists of a name and an option argument.
 // Options are divided to long format options and short format options.
 // About long/short format options, since they are same with Parse function,
-// see the comment of the function.
+// see the comment of that function.
 //
 // This function allows only options declared in option configurations.
-// A option configuration has fields: Name, Aliases, HasArg, IsArray, Defaults,
-// Desc and ArgHelp.
-// When an option matches Name or includes in Aliases in an option
-// configuration, the option is registered into Cmd with the Name.
+// An option configuration has fields: StoreKey, Names, HasArg, IsArray,
+// Defaults, Desc and ArgInHelp.
+// When an option matches one of the Names in an option configuration, the
+// option is registered into Cmd with StoreKey.
 // If both HasArg and IsArray are true, the option can have one or multiple
-// option arguments, and if HasArg is true and IsArray is false, the option
+// option argumentsr, and if HasArg is true and IsArray is false, the option
 // can have only one option argument, otherwise the option cannot have option
-// argument.
-// If Defaults is specified and the option is not given in command line
-// arguments, the value of Defaults is set to the option argument.
+// arguments.
+// If Defaults field is specified and no option value is given in command line
+// arguments, the value of Defaults is set as the option arguments.
 //
-// If options not declared in option configurations are given in command line
-// arguments, this function basically returns UnconfiguredOption error.
-// If you want to allow other options, add an option configuration of which
-// Name is "*" (but HasArg and IsArray of this configuration is ignored).
+// If options not declared in option configurationsi are given in command line
+// arguments, this function basically returns UnconfiguradOption error.
+// However, if you want to allow other options, add an option configuration of
+// which StoreKey or the first element of Names is "*".
 func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 	var cmdName string
 	if len(osArgs) > 0 {
 		cmdName = path.Base(osArgs[0])
 	}
 
-	hasAnyOpt := false
+	var opts = make(map[string][]string)
+	var err error = nil
+
 	cfgMap := make(map[string]int)
+	hasAnyOpt := false
+
 	for i, cfg := range optCfgs {
-		if !cfg.HasArg {
-			if cfg.IsArray {
-				err := ConfigIsArrayButHasNoArg{Option: cfg.Name}
-				return Cmd{Name: cmdName, args: empty}, err
-			}
-			if cfg.Defaults != nil {
-				err := ConfigHasDefaultsButHasNoArg{Option: cfg.Name}
-				return Cmd{Name: cmdName, args: empty}, err
-			}
+		storeKey := cfg.StoreKey
+		if len(storeKey) == 0 && len(cfg.Names) > 0 {
+			storeKey = cfg.Names[0]
 		}
-		if cfg.Name == anyOption {
+
+		if len(storeKey) == 0 {
+			continue
+		}
+
+		if storeKey == anyOption {
 			hasAnyOpt = true
 			continue
 		}
-		cfgMap[cfg.Name] = i
-		for _, a := range cfg.Aliases {
-			cfgMap[a] = i
+
+		_, exists := opts[storeKey]
+		if exists {
+			err = StoreKeyIsDuplicated{StoreKey: storeKey}
+			return Cmd{Name: cmdName, args: empty}, err
+		}
+		opts[storeKey] = nil
+
+		if !cfg.HasArg {
+			if cfg.IsArray {
+				err = ConfigIsArrayButHasNoArg{StoreKey: storeKey}
+				return Cmd{Name: cmdName, args: empty}, err
+			}
+			if cfg.Defaults != nil {
+				err = ConfigHasDefaultsButHasNoArg{StoreKey: storeKey}
+				return Cmd{Name: cmdName, args: empty}, err
+			}
+		}
+
+		for _, nm := range cfg.Names {
+			_, exists := cfgMap[nm]
+			if exists {
+				err = OptionNameIsDuplicated{Name: nm, StoreKey: storeKey}
+				return Cmd{Name: cmdName, args: empty}, err
+			}
+			cfgMap[nm] = i
 		}
 	}
 
@@ -202,8 +260,8 @@ func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 		return false
 	}
 
-	var args = make([]string, 0)
-	var opts = make(map[string][]string)
+	args := make([]string, 0)
+	opts = make(map[string][]string)
 
 	var collectArgs = func(a ...string) {
 		args = append(args, a...)
@@ -212,7 +270,7 @@ func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 		i, exists := cfgMap[name]
 		if !exists {
 			if !hasAnyOpt {
-				return UnconfiguredOption{Option: name}
+				return UnconfiguredOption{Name: name}
 			}
 
 			arr := opts[name]
@@ -224,17 +282,23 @@ func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 		}
 
 		cfg := optCfgs[i]
+
+		storeKey := cfg.StoreKey
+		if len(storeKey) == 0 {
+			storeKey = cfg.Names[0]
+		}
+
 		if !cfg.HasArg {
 			if len(a) > 0 {
-				return OptionTakesNoArg{Option: cfg.Name}
+				return OptionTakesNoArg{Name: name, StoreKey: storeKey}
 			}
 		} else {
 			if len(a) == 0 {
-				return OptionNeedsArg{Option: cfg.Name}
+				return OptionNeedsArg{Name: name, StoreKey: storeKey}
 			}
 		}
 
-		arr := opts[cfg.Name]
+		arr := opts[storeKey]
 		if arr == nil {
 			arr = empty
 		}
@@ -242,11 +306,11 @@ func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 
 		if !cfg.IsArray {
 			if len(arr) > 1 {
-				return OptionIsNotArray{Option: cfg.Name}
+				return OptionIsNotArray{Name: name, StoreKey: storeKey}
 			}
 		}
 
-		opts[cfg.Name] = arr
+		opts[storeKey] = arr
 		return nil
 	}
 
@@ -255,14 +319,24 @@ func ParseWith(osArgs []string, optCfgs []OptCfg) (Cmd, error) {
 		osArgs1 = osArgs[1:]
 	}
 
-	err := parseArgs(osArgs1, collectArgs, collectOpts, takeArgs)
+	err = parseArgs(osArgs1, collectArgs, collectOpts, takeArgs)
 
 	for _, cfg := range optCfgs {
-		arr, exists := opts[cfg.Name]
+		if len(cfg.Names) == 0 {
+			continue
+		}
+
+		storeKey := cfg.StoreKey
+		if len(storeKey) == 0 {
+			storeKey = cfg.Names[0]
+		}
+
+		arr, exists := opts[storeKey]
 		if !exists && cfg.Defaults != nil {
 			arr = cfg.Defaults
-			opts[cfg.Name] = arr
+			opts[storeKey] = arr
 		}
+
 		if cfg.OnParsed != nil {
 			e := (*cfg.OnParsed)(arr)
 			if e != nil && err == nil {
