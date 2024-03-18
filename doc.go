@@ -52,15 +52,16 @@ with this configurations.
 An option configuration has fields: StoreKey, Names, HasArg, IsArray, Defaults,
 Desc, and ArgInHelp.
 
-StoreKey field is specified the key name of the option in the option map.
+StoreKey field is specified the key name to store the option value st the
+option map.
 If this field is not specified, the first element of Names field is set
 instead.
 
 Names field is a string array and specified the option names, that are both
 long options and short options.
-The order of element in this field is used in a help text.
+The order of elements in this field is used in a help text.
 If you want to prioritize the output of short option name first in the help
-text, like `-f, --foo-bar`, but store the long option name as the key in the
+text, like `-f, --foo-bar`, but use the long option name as the key in the
 option map, write StoreKey and Names fields as follows:
 `OptCfg {StoreKey: "foo-bar", Names: []string{"f", "foo-bar"}}`.
 
