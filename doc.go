@@ -52,9 +52,17 @@ with this configurations.
 An option configuration has fields: StoreKey, Names, HasArg, IsArray, Defaults,
 Desc, and ArgInHelp.
 
-Name field is an option name and it is used as an argument of the functions:
-Cmd#HasOpt, Cmd#OptArg, and Cmd#OptArgs.
-Aliases field is an array of option aliases.
+StoreKey field is specified the key name of the option in the option map.
+If this field is not specified, the first element of Names field is set
+instead.
+
+Names field is a string array and specified the option names, that are both
+long options and short options.
+The order of element in this field is used in a help text.
+If you want to prioritize the output of short option name first in the help
+text, like `-f, --foo-bar`, but store the long option name as the key in the
+option map, write StoreKey and Names fields as follows:
+`OptCfg {StoreKey: "foo-bar", Names: []string{"f", "foo-bar"}}`.
 
 HasArg field indicates the option requires one or more values.
 IsArray field indicates the option can have multiple values.
