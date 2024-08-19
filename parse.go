@@ -5,33 +5,11 @@
 package cliargs
 
 import (
-	"fmt"
-	"os"
-	"path"
 	"strings"
 	"unicode"
+
+	"github.com/sttk/cliargs/errors"
 )
-
-// InvalidOption is the error interface which provides method declarations
-// to retrieve an option that caused this error and an error message.
-type InvalidOption interface {
-	GetOpt() string
-	Error() string
-}
-
-// OptionHasInvalidChar is the error which indicates that an invalid character
-// is found in the option.
-type OptionHasInvalidChar struct{ Option string }
-
-// Error is the method to retrieve the message of this error.
-func (e OptionHasInvalidChar) Error() string {
-	return fmt.Sprintf("OptionHasInvalidChar{Option:%s}", e.Option)
-}
-
-// GetOpt is the method to retrieve the option that caused this error.
-func (e OptionHasInvalidChar) GetOpt() string {
-	return e.Option
-}
 
 var (
 	empty            = make([]string, 0)
@@ -51,112 +29,79 @@ var (
 	}
 )
 
-// Cmd is the structure which contains a command name, command arguments, and
-// option arguments that are parsed from command line arguments without
-// configurations.
-// And this provides methods to check if they are specified and to obtain them.
-type Cmd struct {
-	Name string
-	args []string
-	opts map[string][]string
-}
-
-// HasOpt is the method which checks if the option is specified in command line
+// Parse is the function to parse command line arguments without configurations.
+// This function divides command line arguments to command arguments, which are not associated with
+// any options, and options, of which each has a name and option arguments.
+// If an option appears multiple times in command line arguments, the option has multiple option
 // arguments.
-func (cmd Cmd) HasOpt(name string) bool {
-	_, exists := cmd.opts[name]
-	return exists
-}
-
-// OptArg is the method to get the first option argument of the specified named
-// option.
-func (cmd Cmd) OptArg(name string) string {
-	arr := cmd.opts[name]
-	// If no entry, map returns a nil slice.
-	// If a value of a found entry is an empty slice.
-	// Both returned values are zero length in common.
-	if len(arr) == 0 {
-		return ""
-	} else {
-		return arr[0]
-	}
-}
-
-// OptArgs is the method to get the option arguments which are all specified
-// with name in command line arguments.
-func (cmd Cmd) OptArgs(name string) []string {
-	return cmd.opts[name]
-}
-
-// Args is the method to get command arguments which are specified in command
-// line arguments and are not associated with any options.
-func (cmd Cmd) Args() []string {
-	return cmd.args
-}
-
-// Parse is the function to parse command line arguments without
-// configurations.
-// This function divides command line arguments to command arguments, which
-// are not associated with any options, and options, of which each has a name
-// and option arguments.
-// If an option appears multiple times in command line arguments, the option
-// has multiple option arguments.
 // Options are divided to long format options and short format options.
 //
-// A long format option starts with "--" and follows multiple characters which
-// consists of alphabets, numbers, and '-'.
+// A long format option starts with "--" and follows multiple characters which consists of
+// alphabets, numbers, and '-'.
 // (A character immediately after the heading "--" allows only an alphabet.)
 // A long format option can be followed by "=" and its option argument.
 //
-// A short format option starts with "-" and follows single character which is
-// an alphabet.
+// A short format option starts with "-" and follows single character which is an alphabet.
 // Multiple short options can be combined into one argument.
 // (For example -a -b -c can be combined into -abc.)
 // Moreover, a short option can be followed by "=" and its option argument.
-// In case of combined short options, only the last short option can take an
-// option argument.
+// In case of combined short options, only the last short option can take an option argument.
 // (For example, -abc=3 is equal to -a -b -c=3.)
-func Parse() (Cmd, error) {
-	var args = make([]string, 0)
-	var opts = make(map[string][]string)
-
-	var collectArgs = func(a ...string) {
-		args = append(args, a...)
+func (cmd *Cmd) Parse() error {
+	var collectArgs = func(a string) {
+		cmd.Args = append(cmd.Args, a)
 	}
 	var collectOpts = func(name string, a ...string) error {
-		arr, exists := opts[name]
+		arr, exists := cmd.opts[name]
 		if !exists {
 			arr = empty
 		}
-		opts[name] = append(arr, a...)
+		cmd.opts[name] = append(arr, a...)
 		return nil
 	}
 
-	var cmdName string
-	if len(os.Args) > 0 {
-		cmdName = path.Base(os.Args[0])
-	}
-
-	var osArgs1 []string
-	if len(os.Args) > 1 {
-		osArgs1 = os.Args[1:]
-	}
-
-	err := parseArgs(osArgs1, collectArgs, collectOpts, _false)
-
-	return Cmd{Name: cmdName, args: args, opts: opts}, err
+	_, err := parseArgs(cmd._args, collectArgs, collectOpts, takeOptArgs, false)
+	return err
 }
 
-func _false(_ string) bool {
+// ParseUntilSubCmd is the method that parses command line arguments without configurations but
+// stops parsing when encountering first command argument.
+//
+// This method creates and returns a new Cmd instance that holds the command line arguments
+// starting from the first command argument.
+//
+// This method parses command line arguments in the same way as the Cmd#parse method, except that
+// it only parses the command line arguments before the first command argument.
+func (cmd *Cmd) ParseUntilSubCmd() (Cmd, error) {
+	var collectArgs = func(_arg string) {}
+
+	var collectOpts = func(name string, a ...string) error {
+		arr, exists := cmd.opts[name]
+		if !exists {
+			arr = empty
+		}
+		cmd.opts[name] = append(arr, a...)
+		return nil
+	}
+
+	idx, err := parseArgs(cmd._args, collectArgs, collectOpts, takeOptArgs, true)
+	if idx < 0 {
+		return Cmd{}, err
+	}
+	return cmd.subCmd(idx), err
+}
+
+func takeOptArgs(_opt string) bool {
 	return false
 }
 
 func parseArgs(
 	osArgs []string,
-	collectArgs func(...string),
+	collectArgs func(string),
 	collectOpts func(string, ...string) error,
-	takeArgs func(string) bool,
-) error {
+	takeOptArgs func(string) bool,
+	untilFirstArg bool,
+) (int, error) {
 
 	isNonOpt := false
 	prevOptTakingArgs := ""
@@ -165,18 +110,20 @@ func parseArgs(
 L0:
 	for iArg, arg := range osArgs {
 		if isNonOpt {
+			if untilFirstArg {
+				return iArg, firstErr
+			}
 			collectArgs(arg)
 
 		} else if len(prevOptTakingArgs) > 0 {
 			err := collectOpts(prevOptTakingArgs, arg)
+			prevOptTakingArgs = ""
 			if err != nil {
 				if firstErr == nil {
 					firstErr = err
 				}
 				continue L0
 			}
-			prevOptTakingArgs = ""
-
 		} else if strings.HasPrefix(arg, "--") {
 			if len(arg) == 2 {
 				isNonOpt = true
@@ -188,7 +135,8 @@ L0:
 			for _, r := range arg {
 				if i > 0 {
 					if r == '=' {
-						err := collectOpts(arg[0:i], arg[i+1:])
+						rr := []rune(arg)
+						err := collectOpts(string(rr[0:i]), string(rr[i+1:]))
 						if err != nil {
 							if firstErr == nil {
 								firstErr = err
@@ -199,14 +147,14 @@ L0:
 					}
 					if !unicode.Is(rangeOfAlNumMarks, r) {
 						if firstErr == nil {
-							firstErr = OptionHasInvalidChar{Option: arg}
+							firstErr = errors.OptionHasInvalidChar{Option: arg}
 						}
 						continue L0
 					}
 				} else {
 					if !unicode.Is(rangeOfAlphabets, r) {
 						if firstErr == nil {
-							firstErr = OptionHasInvalidChar{Option: arg}
+							firstErr = errors.OptionHasInvalidChar{Option: arg}
 						}
 						continue L0
 					}
@@ -215,7 +163,7 @@ L0:
 			}
 
 			if i == len(arg) {
-				if takeArgs(arg) && iArg < len(osArgs)-1 {
+				if takeOptArgs(arg) && iArg < len(osArgs)-1 {
 					prevOptTakingArgs = arg
 					continue L0
 				}
@@ -230,6 +178,9 @@ L0:
 
 		} else if strings.HasPrefix(arg, "-") {
 			if len(arg) == 1 {
+				if untilFirstArg {
+					return iArg, firstErr
+				}
 				collectArgs(arg)
 				continue L0
 			}
@@ -241,7 +192,8 @@ L0:
 				if i > 0 {
 					if r == '=' {
 						if len(name) > 0 {
-							err := collectOpts(name, arg[i+1:])
+							rr := []rune(arg)
+							err := collectOpts(name, string(rr[i+1:]))
 							if err != nil {
 								if firstErr == nil {
 									firstErr = err
@@ -261,7 +213,7 @@ L0:
 				}
 				if !unicode.Is(rangeOfAlphabets, r) {
 					if firstErr == nil {
-						firstErr = OptionHasInvalidChar{Option: string(r)}
+						firstErr = errors.OptionHasInvalidChar{Option: string(r)}
 					}
 					name = ""
 				} else {
@@ -271,7 +223,7 @@ L0:
 			}
 
 			if i == len(arg) && len(name) > 0 {
-				if takeArgs(name) && iArg < len(osArgs)-1 {
+				if takeOptArgs(name) && iArg < len(osArgs)-1 {
 					prevOptTakingArgs = name
 				} else {
 					err := collectOpts(name)
@@ -285,9 +237,12 @@ L0:
 			}
 
 		} else {
+			if untilFirstArg {
+				return iArg, firstErr
+			}
 			collectArgs(arg)
 		}
 	}
 
-	return firstErr
+	return -1, firstErr
 }
