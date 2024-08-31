@@ -5,110 +5,21 @@
 package cliargs
 
 import (
-	"fmt"
-	"path"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/sttk/cliargs/errors"
 )
 
-// OptionStoreIsNotChangeable is the error which indicates that the second
-// argument of ParseFor function, which is set options produced by parsing
-// command line arguments, is not a pointer.
-type OptionStoreIsNotChangeable struct{}
-
-// Error is the method to retrieve the message of this error.
-func (e OptionStoreIsNotChangeable) Error() string {
-	return "OptionStoreIsNotChangeable{}"
-}
-
-// FailToParseInt is the error reaason which indicates that an option
-// argument in command line arguments should be an integer but is invalid.
-type FailToParseInt struct {
-	Option  string
-	Field   string
-	Input   string
-	BitSize int
-	cause   error
-}
-
-// Error is the method to retrieve the message of this error.
-func (e FailToParseInt) Error() string {
-	return fmt.Sprintf("FailToParseInt{"+
-		"Option:%s,Field:%s,Input:%s,BitSize:%d,cause:%s}",
-		e.Option, e.Field, e.Input, e.BitSize, e.cause.Error())
-}
-
-// Unwrap is the method to retrieve an error that caused this error.
-func (e FailToParseInt) Unwrap() error {
-	return e.cause
-}
-
-// FailToParseUint is the error which indicates that an option argument in
-// command line arguments should be an unsigned integer but is invalid.
-type FailToParseUint struct {
-	Option  string
-	Field   string
-	Input   string
-	BitSize int
-	cause   error
-}
-
-// Error is the method to retrieve the message of this error.
-func (e FailToParseUint) Error() string {
-	return fmt.Sprintf("FailToParseUint{"+
-		"Option:%s,Field:%s,Input:%s,BitSize:%d,cause:%s}",
-		e.Option, e.Field, e.Input, e.BitSize, e.cause.Error())
-}
-
-// Unwrap is the method to retrieve an error that caused this error.
-func (e FailToParseUint) Unwrap() error {
-	return e.cause
-}
-
-// FailToParseFloat is the error which indicates that an option argument in
-// command line arguments should be a floating point number but is invalid.
-type FailToParseFloat struct {
-	Option  string
-	Field   string
-	Input   string
-	BitSize int
-	cause   error
-}
-
-// Error is the method to retrieve the message of this error.
-func (e FailToParseFloat) Error() string {
-	return fmt.Sprintf("FailToParseFloat{"+
-		"Option:%s,Field:%s,Input:%s,BitSize:%d,cause:%s}",
-		e.Option, e.Field, e.Input, e.BitSize, e.cause.Error())
-}
-
-// Unwrap is the method to retrieve an error that caused this error.
-func (e FailToParseFloat) Unwrap() error {
-	return e.cause
-}
-
-// IllegalOptionType is the error which indicates that a type of a field of the
-// option store is neither a boolean, a number, a string, nor an array of
-// numbers or strings.
-type IllegalOptionType struct {
-	Option string
-	Field  string
-	Type   reflect.Type
-}
-
-// Error is the method to retrieve the message of this error.
-func (e IllegalOptionType) Error() string {
-	return fmt.Sprintf("IllegalOptionType{"+
-		"Option:%s,Field:%s,Type:%s}",
-		e.Option, e.Field, e.Type.String())
-}
-
-// ParseFor is the function to parse command line arguments and set their
-// values to the option store which is the second argument of this function.
-// This function divides command line arguments to command arguments and
-// options, then sets the options to the option store, and returns the
-// command arguments with the generated option configurations.
+// ParseFor is the method to parse command line arguments and set their values to the option store
+// which is passed as an argument.
+//
+// This method divides command line arguments to command arguments and options, then sets the
+// options to the option store.
+//
+// Within this method, a slice of OptCfg is made from the fields of the option store.
+// This OptCfg array is set to the public field `OptCfgs` of this Cmd instance.
 //
 // The configurations of options are determined by types and struct tags of
 // fields of the option store.
@@ -146,26 +57,38 @@ func (e IllegalOptionType) Error() string {
 // empty string but an empty array.
 // If you want to specify an array which contains only one empty string, write
 // nothing after "=" mark, like `opt:"name="`.
-func ParseFor(osArgs []string, options any) (Cmd, []OptCfg, error) {
-	optCfgs, err := MakeOptCfgsFor(options)
+func (cmd *Cmd) ParseFor(optStore any) error {
+	cfgs, err := MakeOptCfgsFor(optStore)
 	if err != nil {
-		var cmdName string
-		if len(osArgs) > 0 {
-			cmdName = path.Base(osArgs[0])
-		}
-		return Cmd{Name: cmdName, args: empty}, optCfgs, err
+		cmd.OptCfgs = cfgs
+		return err
 	}
-
-	cmd, err := ParseWith(osArgs, optCfgs)
-	return cmd, optCfgs, err
+	return cmd.ParseWith(cfgs)
 }
 
-// MakeOptCfgsFor is a function to make a OptCfg array from fields of the
-// option store which is the argument of this function.
+// ParseUntilSubCmdFor is the method to parse command line arguments until the first command
+// argument and set their option values to the option store which is passed as an argument.
+//
+// This method creates and returns a new Cmd instance that holds the command line arguments
+// starting from the first command argument.
+//
+// This method parses command line arguments in the same way as the Cmd#parse_for method,
+// except that it only parses the command line arguments before the first command argument.
+func (cmd *Cmd) ParseUntilSubCmdFor(optStore any) (Cmd, error) {
+	cfgs, err := MakeOptCfgsFor(optStore)
+	if err != nil {
+		cmd.OptCfgs = cfgs
+		return Cmd{}, err
+	}
+	return cmd.ParseUntilSubCmdWith(cfgs)
+}
+
+// MakeOptCfgsFor is a function to make a OptCfg array from fields of the option store which is
+// the argument of this function.
 func MakeOptCfgsFor(options any) ([]OptCfg, error) {
 	v := reflect.ValueOf(options)
 	if v.Kind() != reflect.Ptr {
-		return nil, OptionStoreIsNotChangeable{}
+		return nil, errors.OptionStoreIsNotChangeable{}
 	}
 	v = v.Elem()
 
@@ -177,12 +100,11 @@ func MakeOptCfgsFor(options any) ([]OptCfg, error) {
 	for i := 0; i < n; i++ {
 		optCfgs[i] = newOptCfg(t.Field(i))
 
-		setter, err := newValueSetter(
-			optCfgs[i].Names[0], t.Field(i).Name, v.Field(i))
+		setter, err := newValueSetter(optCfgs[i].Names[0], t.Field(i).Name, v.Field(i))
 		if err != nil {
 			return nil, err
 		}
-		optCfgs[i].OnParsed = &setter
+		optCfgs[i].onParsed = &setter
 	}
 
 	return optCfgs, nil
@@ -314,28 +236,27 @@ func newValueSetter(
 		case reflect.String:
 			return newStringArraySetter(optName, fldName, fld)
 		default:
-			return newIllegalOptionTypeErr(optName, fldName, t)
+			return newBadFieldTypeError(optName, fldName, t)
 		}
 	case reflect.String:
 		return newStringSetter(optName, fldName, fld)
 	default:
-		return newIllegalOptionTypeErr(optName, fldName, t)
+		return newBadFieldTypeError(optName, fldName, t)
 	}
 }
 
-func newIllegalOptionTypeErr(
+func newBadFieldTypeError(
 	optName string, fldName string, t reflect.Type,
 ) (func([]string) error, error) {
-	return nil, IllegalOptionType{Option: optName, Field: fldName, Type: t}
+	e := errors.BadFieldType{Option: optName, Field: fldName, Type: t}
+	return nil, e
 }
 
 func newBoolSetter(
 	optName string, fldName string, fld reflect.Value,
 ) (func([]string) error, error) {
 	fn := func(s []string) error {
-		if s != nil {
-			fld.SetBool(true)
-		}
+		fld.SetBool(true)
 		return nil
 	}
 	return fn, nil
@@ -350,8 +271,8 @@ func newIntSetter(
 		}
 		n, e := strconv.ParseInt(s[0], 0, bitSize)
 		if e != nil {
-			return FailToParseInt{Option: optName, Field: fldName, Input: s[0],
-				BitSize: bitSize, cause: e}
+			return errors.OptionArgIsInvalid{
+				Option: optName, StoreKey: fldName, OptArg: s[0], TypeKind: fld.Type().Kind(), Cause: e}
 		}
 		fld.SetInt(n)
 		return nil
@@ -368,8 +289,8 @@ func newUintSetter(
 		}
 		n, e := strconv.ParseUint(s[0], 0, bitSize)
 		if e != nil {
-			return FailToParseUint{Option: optName, Field: fldName, Input: s[0],
-				BitSize: bitSize, cause: e}
+			return errors.OptionArgIsInvalid{
+				Option: optName, StoreKey: fldName, OptArg: s[0], TypeKind: fld.Type().Kind(), Cause: e}
 		}
 		fld.SetUint(n)
 		return nil
@@ -386,8 +307,8 @@ func newFloatSetter(
 		}
 		n, e := strconv.ParseFloat(s[0], bitSize)
 		if e != nil {
-			return FailToParseFloat{Option: optName, Field: fldName, Input: s[0],
-				BitSize: bitSize, cause: e}
+			return errors.OptionArgIsInvalid{
+				Option: optName, StoreKey: fldName, OptArg: s[0], TypeKind: fld.Type().Kind(), Cause: e}
 		}
 		fld.SetFloat(n)
 		return nil
@@ -426,8 +347,8 @@ func newIntArraySetter(
 		for i := 0; i < n; i++ {
 			v, e := strconv.ParseInt(s[i], 0, bitSize)
 			if e != nil {
-				return FailToParseInt{Option: optName, Field: fldName, Input: s[i],
-					BitSize: bitSize, cause: e}
+				return errors.OptionArgIsInvalid{
+					Option: optName, StoreKey: fldName, OptArg: s[i], TypeKind: t.Kind(), Cause: e}
 			}
 			a[i] = reflect.ValueOf(v).Convert(t)
 		}
@@ -455,8 +376,8 @@ func newUintArraySetter(
 		for i := 0; i < n; i++ {
 			v, e := strconv.ParseUint(s[i], 0, bitSize)
 			if e != nil {
-				return FailToParseUint{Option: optName, Field: fldName, Input: s[i],
-					BitSize: bitSize, cause: e}
+				return errors.OptionArgIsInvalid{
+					Option: optName, StoreKey: fldName, OptArg: s[i], TypeKind: t.Kind(), Cause: e}
 			}
 			a[i] = reflect.ValueOf(v).Convert(t)
 		}
@@ -484,8 +405,8 @@ func newFloatArraySetter(
 		for i := 0; i < n; i++ {
 			v, e := strconv.ParseFloat(s[i], bitSize)
 			if e != nil {
-				return FailToParseFloat{Option: optName, Field: fldName, Input: s[i],
-					BitSize: bitSize, cause: e}
+				return errors.OptionArgIsInvalid{
+					Option: optName, StoreKey: fldName, OptArg: s[i], TypeKind: t.Kind(), Cause: e}
 			}
 			a[i] = reflect.ValueOf(v).Convert(t)
 		}
