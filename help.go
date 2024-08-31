@@ -440,11 +440,11 @@ type blockIter struct {
 	indent   string
 	margin   string
 	lineIter linebreak.LineIter
+	isEnded  bool
 }
 
-// Next is a method which returns a line of a help text and a status which indicates this HelpIter
-// has more texts or not.
-// If there are more lines, the returned IterStatus value is true, otherwise the value is false.
+// Next is a method that returns a line of a help text and a flag which indicates the line is not
+// end.
 func (iter *HelpIter) Next() (string, bool) {
 	for {
 		line, exists := iter.blockIter.next()
