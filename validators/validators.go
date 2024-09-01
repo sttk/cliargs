@@ -1,3 +1,9 @@
+// Copyright (C) 2023-2024 Takayuki Sato. All Rights Reserved.
+// This program is free software under MIT License.
+// See the file LICENSE in this distribution for more details.
+
+// Package validators contains valiators that checks the number format of the string specified as
+// an option argument in command line arguments.
 package validators
 
 import (
