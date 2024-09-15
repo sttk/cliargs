@@ -235,7 +235,6 @@ like `optcfg:"name="`.
 	//              This is description of baz.
 	//  --qux       This is description of qux.
 
-
 ## Parse command line arguments including sub command
 
 This module provides methods Cmd#parseUntilSubCmd, Cmd#parseUntilSubCmdWith, and

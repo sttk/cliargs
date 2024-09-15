@@ -11,27 +11,32 @@ import (
 const anyOption = "*"
 
 // ParseWith is the method which parses command line arguments with option configurations.
-// This function divides command line arguments to command arguments and options.
+// This method divides command line arguments to command arguments and options.
+//
 // And an option consists of a name and an option argument.
 // Options are separated to long format options and short format options.
-// About long/short format options, since they are same with Parse function, see the comment of
-// that function.
+// About long/short format options, since they are same with Parse method, see the comment of
+// that method.
 //
-// This function allows only options declared in option configurations.
-// An option configuration has fields: StoreKey, Names, HasArg, IsArray, Defaults, Desc and
-// ArgInHelp.
-// When an option matches one of the Names in an option configuration, the option is registered
+// This method allows only options declared in option configurations, basically.
+// An option configuration has fields: StoreKey, Names, HasArg, IsArray, Defaults, Desc,
+// ArgInHelp, and Validator.
+//
+// When an option matches one of the Names in the option configurations, the option is registered
 // into Cmd with StoreKey.
-// If both HasArg and IsArray are true, the option can have one or multiple option argumentsr, and
+// If both HasArg and IsArray are true, the option can have one or multiple option arguments, and
 // if HasArg is true and IsArray is false, the option can have only one option argument, otherwise
 // the option cannot have option arguments.
 // If Defaults field is specified and no option value is given in command line arguments, the value
 // of Defaults is set as the option arguments.
 //
-// If options not declared in option configurationsi are given in command line arguments, this
-// function basically returns UnconfiguradOption error.
+// If options not declared in option configurations are given in command line arguments, this
+// method basically returns UnconfiguradOption error.
 // However, if you want to allow other options, add an option configuration of which StoreKey or
 // the first element of Names is "*".
+//
+// The option configurations used to parsing are set into this Cmd instance, and it can be
+// retrieved from its field: Cmd#OptCfgs.
 func (cmd *Cmd) ParseWith(optCfgs []OptCfg) error {
 	_, err := cmd.parseArgsWith(optCfgs, false)
 	cmd.OptCfgs = optCfgs
@@ -46,6 +51,9 @@ func (cmd *Cmd) ParseWith(optCfgs []OptCfg) error {
 //
 // This method parses command line arguments in the same way as the Cmd#parse_with method,
 // except that it only parses the command line arguments before the first command argument.
+//
+// The option configurations used to parsing are set into this Cmd instance, and it can be
+// retrieved from its field: Cmd#OptCfgs.
 func (cmd *Cmd) ParseUntilSubCmdWith(optCfgs []OptCfg) (Cmd, error) {
 	idx, err := cmd.parseArgsWith(optCfgs, true)
 	cmd.OptCfgs = optCfgs
