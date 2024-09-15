@@ -328,9 +328,9 @@ func TestParse_illegalLongOptIfIncludingInvalidChar(t *testing.T) {
 	err := cmd.Parse()
 
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionHasInvalidChar{Option:abc%def}")
+	assert.Equal(t, err.Error(), "OptionContainsInvalidChar{Option:abc%def}")
 	switch e := err.(type) {
-	case errors.OptionHasInvalidChar:
+	case errors.OptionContainsInvalidChar:
 		assert.Equal(t, e.Option, "abc%def")
 	default:
 		assert.Fail(t, err.Error())
@@ -369,9 +369,9 @@ func TestParse_illegalLongOptIfFirstCharIsNumber(t *testing.T) {
 	err := cmd.Parse()
 
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionHasInvalidChar{Option:1abc}")
+	assert.Equal(t, err.Error(), "OptionContainsInvalidChar{Option:1abc}")
 	switch e := err.(type) {
-	case errors.OptionHasInvalidChar:
+	case errors.OptionContainsInvalidChar:
 		assert.Equal(t, e.Option, "1abc")
 	default:
 		assert.Fail(t, err.Error())
@@ -410,9 +410,9 @@ func TestParse_illegalLongOptIfFirstCharIsHyphen(t *testing.T) {
 	err := cmd.Parse()
 
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionHasInvalidChar{Option:-aaa=123}")
+	assert.Equal(t, err.Error(), "OptionContainsInvalidChar{Option:-aaa=123}")
 	switch e := err.(type) {
-	case errors.OptionHasInvalidChar:
+	case errors.OptionContainsInvalidChar:
 		assert.Equal(t, e.Option, "-aaa=123")
 	default:
 		assert.Fail(t, err.Error())
@@ -453,9 +453,9 @@ func TestParse_IllegalCharInShortOpt(t *testing.T) {
 	err := cmd.Parse()
 
 	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "OptionHasInvalidChar{Option:@}")
+	assert.Equal(t, err.Error(), "OptionContainsInvalidChar{Option:@}")
 	switch e := err.(type) {
-	case errors.OptionHasInvalidChar:
+	case errors.OptionContainsInvalidChar:
 		assert.Equal(t, e.Option, "@")
 	default:
 		assert.Fail(t, err.Error())
@@ -587,7 +587,7 @@ func TestParse_parseAllArgsEvenIfError(t *testing.T) {
 	err := cmd.Parse()
 
 	switch e := err.(type) {
-	case errors.OptionHasInvalidChar:
+	case errors.OptionContainsInvalidChar:
 		assert.Equal(t, e.Option, "1")
 	default:
 		assert.Fail(t, err.Error())

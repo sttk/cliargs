@@ -147,14 +147,14 @@ L0:
 					}
 					if !unicode.Is(rangeOfAlNumMarks, r) {
 						if firstErr == nil {
-							firstErr = errors.OptionHasInvalidChar{Option: arg}
+							firstErr = errors.OptionContainsInvalidChar{Option: arg}
 						}
 						continue L0
 					}
 				} else {
 					if !unicode.Is(rangeOfAlphabets, r) {
 						if firstErr == nil {
-							firstErr = errors.OptionHasInvalidChar{Option: arg}
+							firstErr = errors.OptionContainsInvalidChar{Option: arg}
 						}
 						continue L0
 					}
@@ -213,7 +213,7 @@ L0:
 				}
 				if !unicode.Is(rangeOfAlphabets, r) {
 					if firstErr == nil {
-						firstErr = errors.OptionHasInvalidChar{Option: string(r)}
+						firstErr = errors.OptionContainsInvalidChar{Option: string(r)}
 					}
 					name = ""
 				} else {
