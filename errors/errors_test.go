@@ -9,11 +9,11 @@ import (
 	"github.com/sttk/cliargs/errors"
 )
 
-func TestErrors_OptionHasInvalidChar(t *testing.T) {
-	e := errors.OptionHasInvalidChar{Option: "foo"}
+func TestErrors_OptionContainsInvalidChar(t *testing.T) {
+	e := errors.OptionContainsInvalidChar{Option: "foo"}
 	assert.Equal(t, e.Option, "foo")
 	assert.Equal(t, e.GetOption(), "foo")
-	assert.Equal(t, e.Error(), "OptionHasInvalidChar{Option:foo}")
+	assert.Equal(t, e.Error(), "OptionContainsInvalidChar{Option:foo}")
 
 	var ee errors.InvalidOption = e
 	assert.Equal(t, ee.GetOption(), "foo")

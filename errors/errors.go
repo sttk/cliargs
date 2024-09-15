@@ -18,19 +18,19 @@ type InvalidOption interface {
 	Error() string
 }
 
-// OptionHasInvalidChar is the error which indicates that an invalid character
+// OptionContainsInvalidChar is the error which indicates that an invalid character
 // is found in the option.
-type OptionHasInvalidChar struct {
+type OptionContainsInvalidChar struct {
 	Option string
 }
 
 // Error is the method to retrieve the message of this error.
-func (e OptionHasInvalidChar) Error() string {
-	return fmt.Sprintf("OptionHasInvalidChar{Option:%s}", e.Option)
+func (e OptionContainsInvalidChar) Error() string {
+	return fmt.Sprintf("OptionContainsInvalidChar{Option:%s}", e.Option)
 }
 
 // GetOption is the method to retrieve the name of the option that caused this error.
-func (e OptionHasInvalidChar) GetOption() string {
+func (e OptionContainsInvalidChar) GetOption() string {
 	return e.Option
 }
 
