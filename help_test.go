@@ -570,7 +570,7 @@ func TestHelp_AddOpts_withWrapping(t *testing.T) {
 	assert.False(t, exists)
 }
 
-func TestHelp_withMargins_andAddOpts(t *testing.T) {
+func TestHelp_NewHelpWithMargins_and_AddOpts(t *testing.T) {
 	termCols := linebreak.TermCols()
 
 	help := cliargs.NewHelpWithMargins(4, 2)
@@ -602,7 +602,7 @@ func TestHelp_withMargins_andAddOpts(t *testing.T) {
 	assert.False(t, exists)
 }
 
-func TestHelp_addOptsWithMargins(t *testing.T) {
+func TestHelp_AddOptsWithMargins(t *testing.T) {
 	termCols := linebreak.TermCols()
 
 	help := cliargs.NewHelp()
@@ -634,7 +634,7 @@ func TestHelp_addOptsWithMargins(t *testing.T) {
 	assert.False(t, exists)
 }
 
-func TestHelp_addOptsWithMargins_bothOfNewMethod_andAddTextWithMargins(t *testing.T) {
+func TestHelp_AddOptsWithMargins_bothOfNewMethod_andAddTextWithMargins(t *testing.T) {
 	termCols := linebreak.TermCols()
 
 	help := cliargs.NewHelpWithMargins(4, 2)
@@ -666,7 +666,7 @@ func TestHelp_addOptsWithMargins_bothOfNewMethod_andAddTextWithMargins(t *testin
 	assert.False(t, exists)
 }
 
-func TestHelp_addOpsWithIndent_ifIndentIsLongerThanTitle(t *testing.T) {
+func TestHelp_AddOptsWithIndent_ifIndentIsLongerThanTitle(t *testing.T) {
 	termCols := linebreak.TermCols()
 
 	help := cliargs.NewHelp()
@@ -697,7 +697,7 @@ func TestHelp_addOpsWithIndent_ifIndentIsLongerThanTitle(t *testing.T) {
 	assert.False(t, exists)
 }
 
-func TestHelp_addOpsWithIndent_ifIndentIsShorterThanTitle(t *testing.T) {
+func TestHelp_AddOptsWithIndent_ifIndentIsShorterThanTitle(t *testing.T) {
 	termCols := linebreak.TermCols()
 
 	help := cliargs.NewHelp()
@@ -728,7 +728,7 @@ func TestHelp_addOpsWithIndent_ifIndentIsShorterThanTitle(t *testing.T) {
 	assert.Equal(t, line, "")
 }
 
-func TestHelp_addOpsWithIndentAndMargins(t *testing.T) {
+func TestHelp_AddOptsWithIndentAndMargins(t *testing.T) {
 	termCols := linebreak.TermCols()
 
 	help := cliargs.NewHelp()
@@ -759,7 +759,7 @@ func TestHelp_addOpsWithIndentAndMargins(t *testing.T) {
 	assert.Equal(t, line, "")
 }
 
-func TestHelp_addOpts_ifOptsAreMultiple(t *testing.T) {
+func TestHelp_AddOpts_ifOptsAreMultiple(t *testing.T) {
 	termCols := linebreak.TermCols()
 
 	help := cliargs.NewHelp()
@@ -808,7 +808,7 @@ func TestHelp_addOpts_ifOptsAreMultiple(t *testing.T) {
 	assert.Equal(t, line, "")
 }
 
-func TestHelp_addOpts_ifNamesAreEmptyAndStoreKeyIsSpecified(t *testing.T) {
+func TestHelp_AddOpts_ifNamesAreEmptyAndStoreKeyIsSpecified(t *testing.T) {
 	help := cliargs.NewHelp()
 
 	help.AddOpts([]cliargs.OptCfg{
@@ -833,7 +833,7 @@ func TestHelp_addOpts_ifNamesAreEmptyAndStoreKeyIsSpecified(t *testing.T) {
 	assert.Equal(t, line, "")
 }
 
-func TestHelp_addOpts_ifStoreKeyIsAnyOption(t *testing.T) {
+func TestHelp_AddOpts_ifStoreKeyIsAnyOption(t *testing.T) {
 	help := cliargs.NewHelp()
 
 	help.AddOpts([]cliargs.OptCfg{
@@ -858,7 +858,7 @@ func TestHelp_addOpts_ifStoreKeyIsAnyOption(t *testing.T) {
 	assert.Equal(t, line, "")
 }
 
-func TestHelp_addOpts_ifFirstElementOfNamesIsAnyOption(t *testing.T) {
+func TestHelp_AddOpts_ifFirstElementOfNamesIsAnyOption(t *testing.T) {
 	help := cliargs.NewHelp()
 
 	help.AddOpts([]cliargs.OptCfg{
@@ -883,7 +883,7 @@ func TestHelp_addOpts_ifFirstElementOfNamesIsAnyOption(t *testing.T) {
 	assert.Equal(t, line, "")
 }
 
-func TestHelp_addTextWithIndent_ifIndentIsLongerThanLineWidth(t *testing.T) {
+func TestHelp_AddOptsWithIndent_ifIndentIsLongerThanLineWidth(t *testing.T) {
 	termCols := linebreak.TermCols()
 
 	help := cliargs.NewHelp()
@@ -910,7 +910,7 @@ func TestHelp_addTextWithIndent_ifIndentIsLongerThanLineWidth(t *testing.T) {
 	assert.Equal(t, line, "")
 }
 
-func TestHelp_addText_withMargins_ifSumOfMarginsAreEqualToLineWidth(t *testing.T) {
+func TestHelp_AddOptsWithMargins_ifSumOfMarginsAreEqualToLineWidth(t *testing.T) {
 	termCols := linebreak.TermCols()
 
 	help := cliargs.NewHelp()
@@ -937,7 +937,7 @@ func TestHelp_addText_withMargins_ifSumOfMarginsAreEqualToLineWidth(t *testing.T
 	assert.Equal(t, line, "")
 }
 
-func TestHelp_addOpts_ifNamesContainsEmptyStrings(t *testing.T) {
+func TestHelp_AddOpts_ifNamesContainsEmptyStrings(t *testing.T) {
 	help := cliargs.NewHelp()
 
 	help.AddOpts([]cliargs.OptCfg{
