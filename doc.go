@@ -38,7 +38,7 @@ All command line arguments after `--` are command arguments, even they starts wi
 	cmd.OptArgs("y")        // []
 	cmd.OptArgs("z")        // [2 3]
 
-## Parses with configurations
+# Parses with configurations
 
 The Cmd struct has the method ParseWith which parses command line arguments with configurations.
 
@@ -120,7 +120,7 @@ In addition,the help printing for an array of OptCfg is generated with Help.
 	//   --foo-bar, -f     This is description of foo-bar.
 	//   --baz, -z <text>  This is description of baz.
 
-## Parse for a OptStore struct
+# Parse for a OptStore struct
 
 The Cmd struct has the method ParseFor which parses command line arguments and set their option
 values to the option store which is passed as an argument.
@@ -235,7 +235,7 @@ like `optcfg:"name="`.
 	//              This is description of baz.
 	//  --qux       This is description of qux.
 
-## Parse command line arguments including sub command
+# Parse command line arguments including sub command
 
 This module provides methods Cmd#parseUntilSubCmd, Cmd#parseUntilSubCmdWith, and
 Cmd#parseUntilSubCmdFor for parsing command line arguments including sub commands.
