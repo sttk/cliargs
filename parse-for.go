@@ -100,7 +100,14 @@ func MakeOptCfgsFor(options any) ([]OptCfg, error) {
 	for i := 0; i < n; i++ {
 		optCfgs[i] = newOptCfg(t.Field(i))
 
-		setter, err := newValueSetter(optCfgs[i].Names[0], t.Field(i).Name, v.Field(i))
+		var optName string
+		if len(optCfgs[i].Names) > 0 {
+			optName = optCfgs[i].Names[0]
+		} else {
+			optName = optCfgs[i].StoreKey
+		}
+
+		setter, err := newValueSetter(optName, t.Field(i).Name, v.Field(i))
 		if err != nil {
 			return nil, err
 		}
@@ -118,7 +125,7 @@ func newOptCfg(fld reflect.StructField) OptCfg {
 
 	names := strings.Split(arr[0], ",")
 	if len(names) == 0 || len(names[0]) == 0 {
-		names = []string{storeKey}
+		names = []string{}
 	}
 
 	isArray := false

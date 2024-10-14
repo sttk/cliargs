@@ -279,7 +279,7 @@ func ExampleMakeOptCfgsFor() {
 	// optCfgs[1].ArgInHelp = <number>
 	//
 	// optCfgs[2].StoreKey = Qux
-	// optCfgs[2].Names = [Qux]
+	// optCfgs[2].Names = []
 	// optCfgs[2].HasArg = true
 	// optCfgs[2].IsArray = false
 	// optCfgs[2].Defaults = [XXX]
@@ -295,7 +295,7 @@ func ExampleMakeOptCfgsFor() {
 	// optCfgs[3].ArgInHelp = <array elem>
 	//
 	// optCfgs[4].StoreKey = Corge
-	// optCfgs[4].Names = [Corge]
+	// optCfgs[4].Names = []
 	// optCfgs[4].HasArg = true
 	// optCfgs[4].IsArray = true
 	// optCfgs[4].Defaults = []
