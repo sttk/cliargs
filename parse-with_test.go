@@ -1819,3 +1819,87 @@ func TestParseUntilSubCmdWith_oneCfgUsingValidatorAndSubCmd(t *testing.T) {
 	assert.Equal(t, subCmd.Name, "def")
 	assert.Equal(t, subCmd.Args, []string{"ghi"})
 }
+
+func TestParseUntilSubCmd_parseWithEndOptMark(t *testing.T) {
+	defer reset()
+
+	optCfgs0 := []cliargs.OptCfg{
+		cliargs.OptCfg{
+			Names: []string{"foo"},
+		},
+	}
+	optCfgs1 := []cliargs.OptCfg{
+		cliargs.OptCfg{
+			Names: []string{"bar"},
+		},
+	}
+
+	os.Args = []string{"/path/to/app", "--foo", "sub", "--", "bar", "-@"}
+
+	cmd := cliargs.NewCmd()
+	subCmd, err := cmd.ParseUntilSubCmdWith(optCfgs0)
+
+	assert.Nil(t, err)
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args, []string{})
+	assert.Equal(t, cmd.HasOpt("foo"), true)
+	assert.Equal(t, cmd.OptArg("foo"), "")
+	assert.Equal(t, cmd.OptArgs("foo"), []string(nil))
+	assert.Equal(t, cmd.HasOpt("bar"), false)
+	assert.Equal(t, cmd.OptArg("bar"), "")
+	assert.Equal(t, cmd.OptArgs("bar"), []string(nil))
+
+	err = subCmd.ParseWith(optCfgs1)
+
+	assert.Nil(t, err)
+	assert.Equal(t, subCmd.Name, "sub")
+	assert.Equal(t, subCmd.Args, []string{"bar", "-@"})
+	assert.Equal(t, subCmd.HasOpt("foo"), false)
+	assert.Equal(t, subCmd.OptArg("foo"), "")
+	assert.Equal(t, subCmd.OptArgs("foo"), []string(nil))
+	assert.Equal(t, subCmd.HasOpt("bar"), false)
+	assert.Equal(t, subCmd.OptArg("bar"), "")
+	assert.Equal(t, subCmd.OptArgs("bar"), []string(nil))
+}
+
+func TestParseUntilSubCmd_parseAfterEndOptMark(t *testing.T) {
+	defer reset()
+
+	optCfgs0 := []cliargs.OptCfg{
+		cliargs.OptCfg{
+			Names: []string{"foo"},
+		},
+	}
+	optCfgs1 := []cliargs.OptCfg{
+		cliargs.OptCfg{
+			Names: []string{"bar"},
+		},
+	}
+
+	os.Args = []string{"/path/to/app", "--", "--foo", "sub", "bar", "-@"}
+
+	cmd := cliargs.NewCmd()
+	subCmd, err := cmd.ParseUntilSubCmdWith(optCfgs0)
+
+	assert.Nil(t, err)
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args, []string{})
+	assert.Equal(t, cmd.HasOpt("foo"), false)
+	assert.Equal(t, cmd.OptArg("foo"), "")
+	assert.Equal(t, cmd.OptArgs("foo"), []string(nil))
+	assert.Equal(t, cmd.HasOpt("bar"), false)
+	assert.Equal(t, cmd.OptArg("bar"), "")
+	assert.Equal(t, cmd.OptArgs("bar"), []string(nil))
+
+	err = subCmd.ParseWith(optCfgs1)
+
+	assert.Nil(t, err)
+	assert.Equal(t, subCmd.Name, "--foo")
+	assert.Equal(t, subCmd.Args, []string{"sub", "bar", "-@"})
+	assert.Equal(t, subCmd.HasOpt("foo"), false)
+	assert.Equal(t, subCmd.OptArg("foo"), "")
+	assert.Equal(t, subCmd.OptArgs("foo"), []string(nil))
+	assert.Equal(t, subCmd.HasOpt("bar"), false)
+	assert.Equal(t, subCmd.OptArg("bar"), "")
+	assert.Equal(t, subCmd.OptArgs("bar"), []string(nil))
+}

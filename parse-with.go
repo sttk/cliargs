@@ -38,7 +38,7 @@ const anyOption = "*"
 // The option configurations used to parsing are set into this Cmd instance, and it can be
 // retrieved from its field: Cmd#OptCfgs.
 func (cmd *Cmd) ParseWith(optCfgs []OptCfg) error {
-	_, err := cmd.parseArgsWith(optCfgs, false)
+	_, _, err := cmd.parseArgsWith(optCfgs, false)
 	cmd.OptCfgs = optCfgs
 	return err
 }
@@ -55,18 +55,18 @@ func (cmd *Cmd) ParseWith(optCfgs []OptCfg) error {
 // The option configurations used to parsing are set into this Cmd instance, and it can be
 // retrieved from its field: Cmd#OptCfgs.
 func (cmd *Cmd) ParseUntilSubCmdWith(optCfgs []OptCfg) (Cmd, error) {
-	idx, err := cmd.parseArgsWith(optCfgs, true)
+	idx, isAfterEndOpt, err := cmd.parseArgsWith(optCfgs, true)
 	cmd.OptCfgs = optCfgs
 	if idx < 0 {
 		return Cmd{}, err
 	}
-	return cmd.subCmd(idx), err
+	return cmd.subCmd(idx, isAfterEndOpt), err
 }
 
 func (cmd *Cmd) parseArgsWith(
 	optCfgs []OptCfg,
 	untilFirstArg bool,
-) (int, error) {
+) (int, bool, error) {
 
 	const ANY_OPT = "*"
 	hasAnyOpt := false
@@ -109,18 +109,18 @@ func (cmd *Cmd) parseArgsWith(
 		_, exists := optMap[storeKey]
 		if exists {
 			e := errors.StoreKeyIsDuplicated{StoreKey: storeKey, Name: firstName}
-			return -1, e
+			return -1, cmd.isAfterEndOpt, e
 		}
 		optMap[storeKey] = EMPTY_STRUCT
 
 		if !cfg.HasArg {
 			if cfg.IsArray {
 				e := errors.ConfigIsArrayButHasNoArg{StoreKey: storeKey, Name: firstName}
-				return -1, e
+				return -1, cmd.isAfterEndOpt, e
 			}
 			if cfg.Defaults != nil {
 				e := errors.ConfigHasDefaultsButHasNoArg{StoreKey: storeKey, Name: firstName}
-				return -1, e
+				return -1, cmd.isAfterEndOpt, e
 			}
 		}
 
@@ -131,7 +131,7 @@ func (cmd *Cmd) parseArgsWith(
 				_, exists := cfgMap[nm]
 				if exists {
 					e := errors.OptionNameIsDuplicated{StoreKey: storeKey, Name: nm}
-					return -1, e
+					return -1, cmd.isAfterEndOpt, e
 				}
 				cfgMap[nm] = i
 			}
@@ -231,12 +231,13 @@ func (cmd *Cmd) parseArgsWith(
 		}
 	}
 
-	idx, err := parseArgs(
+	idx, isAfterEndOpt, err := parseArgs(
 		cmd._args,
 		collectArgs,
 		collectOpts,
 		takeOptArgs,
 		untilFirstArg,
+		cmd.isAfterEndOpt,
 	)
 
 	for _, cfg := range optCfgs {
@@ -273,5 +274,5 @@ func (cmd *Cmd) parseArgsWith(
 		}
 	}
 
-	return idx, err
+	return idx, isAfterEndOpt, err
 }

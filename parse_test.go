@@ -807,10 +807,62 @@ func TestParseUntilSubCmd_subCmdIssingleHyphen(t *testing.T) {
 	assert.Equal(t, subCmd.OptArgs("bar"), []string{"123"})
 }
 
-func TestParseUntilSubCmd_nonOpt(t *testing.T) {
+func TestParseUntilSubCmd_withEndOptMark(t *testing.T) {
 	defer reset()
 
-	os.Args = []string{"/path/to/app", "--foo", "--", "--bar", "--baz=123"}
+	os.Args = []string{"/path/to/app", "--foo", "sub", "--", "--bar", "--baz=123", "-@"}
+
+	cmd := cliargs.NewCmd()
+	subCmd, err := cmd.ParseUntilSubCmd()
+
+	assert.Equal(t, err, nil)
+	assert.Equal(t, cmd.Name, "app")
+	assert.Equal(t, cmd.Args, []string{})
+
+	assert.True(t, cmd.HasOpt("foo"))
+	assert.Equal(t, cmd.OptArg("foo"), "")
+	assert.Equal(t, cmd.OptArgs("foo"), []string{})
+	assert.False(t, cmd.HasOpt("bar"))
+	assert.Equal(t, cmd.OptArg("bar"), "")
+	assert.Equal(t, cmd.OptArgs("bar"), []string(nil))
+	assert.False(t, cmd.HasOpt("baz"))
+	assert.Equal(t, cmd.OptArg("baz"), "")
+	assert.Equal(t, cmd.OptArgs("baz"), []string(nil))
+
+	assert.Equal(t, subCmd.Name, "sub")
+	assert.Equal(t, subCmd.Args, []string{})
+
+	assert.False(t, subCmd.HasOpt("foo"))
+	assert.Equal(t, subCmd.OptArg("foo"), "")
+	assert.Equal(t, subCmd.OptArgs("foo"), []string(nil))
+	assert.False(t, subCmd.HasOpt("bar"))
+	assert.Equal(t, subCmd.OptArg("bar"), "")
+	assert.Equal(t, subCmd.OptArgs("bar"), []string(nil))
+	assert.False(t, subCmd.HasOpt("baz"))
+	assert.Equal(t, subCmd.OptArg("baz"), "")
+	assert.Equal(t, subCmd.OptArgs("baz"), []string(nil))
+
+	err = subCmd.Parse()
+
+	assert.Equal(t, err, nil)
+	assert.Equal(t, subCmd.Name, "sub")
+	assert.Equal(t, subCmd.Args, []string{"--bar", "--baz=123", "-@"})
+
+	assert.False(t, subCmd.HasOpt("foo"))
+	assert.Equal(t, subCmd.OptArg("foo"), "")
+	assert.Equal(t, subCmd.OptArgs("foo"), []string(nil))
+	assert.False(t, subCmd.HasOpt("bar"))
+	assert.Equal(t, subCmd.OptArg("bar"), "")
+	assert.Equal(t, subCmd.OptArgs("bar"), []string(nil))
+	assert.False(t, subCmd.HasOpt("baz"))
+	assert.Equal(t, subCmd.OptArg("baz"), "")
+	assert.Equal(t, subCmd.OptArgs("baz"), []string(nil))
+}
+
+func TestParseUntilSubCmd_afterEndOptMark(t *testing.T) {
+	defer reset()
+
+	os.Args = []string{"/path/to/app", "--foo", "--", "--bar", "--baz=123", "-@"}
 
 	cmd := cliargs.NewCmd()
 	subCmd, err := cmd.ParseUntilSubCmd()
@@ -846,7 +898,7 @@ func TestParseUntilSubCmd_nonOpt(t *testing.T) {
 
 	assert.Equal(t, err, nil)
 	assert.Equal(t, subCmd.Name, "--bar")
-	assert.Equal(t, subCmd.Args, []string{})
+	assert.Equal(t, subCmd.Args, []string{"--baz=123", "-@"})
 
 	assert.False(t, subCmd.HasOpt("foo"))
 	assert.Equal(t, subCmd.OptArg("foo"), "")
@@ -854,7 +906,7 @@ func TestParseUntilSubCmd_nonOpt(t *testing.T) {
 	assert.False(t, subCmd.HasOpt("bar"))
 	assert.Equal(t, subCmd.OptArg("bar"), "")
 	assert.Equal(t, subCmd.OptArgs("bar"), []string(nil))
-	assert.True(t, subCmd.HasOpt("baz"))
-	assert.Equal(t, subCmd.OptArg("baz"), "123")
-	assert.Equal(t, subCmd.OptArgs("baz"), []string{"123"})
+	assert.False(t, subCmd.HasOpt("baz"))
+	assert.Equal(t, subCmd.OptArg("baz"), "")
+	assert.Equal(t, subCmd.OptArgs("baz"), []string(nil))
 }
