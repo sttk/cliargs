@@ -69,7 +69,7 @@ func TestCmd_subCmd(t *testing.T) {
 	cmd := NewCmd()
 	cmd._args = []string{"--foo", "-b", "qux", "--corge"}
 
-	subCmd := cmd.subCmd(2)
+	subCmd := cmd.subCmd(2, false)
 	assert.Equal(t, subCmd.Name, "qux")
 	assert.Equal(t, subCmd._args, []string{"--corge"})
 }
@@ -78,7 +78,7 @@ func TestCmd_subCmd_withNoArg(t *testing.T) {
 	cmd := NewCmd()
 	cmd._args = []string{"--foo", "-b", "qux"}
 
-	subCmd := cmd.subCmd(2)
+	subCmd := cmd.subCmd(2, false)
 	assert.Equal(t, subCmd.Name, "qux")
 	assert.Equal(t, subCmd._args, []string(nil))
 }
@@ -87,7 +87,7 @@ func TestCmd_subCmd_empty(t *testing.T) {
 	cmd := NewCmd()
 	cmd._args = []string{"--foo", "-b"}
 
-	subCmd := cmd.subCmd(2)
+	subCmd := cmd.subCmd(2, false)
 	assert.Equal(t, subCmd.Name, "")
 	assert.Equal(t, subCmd._args, []string(nil))
 }

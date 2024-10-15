@@ -19,7 +19,8 @@ type Cmd struct {
 	Args    []string
 	OptCfgs []OptCfg
 
-	opts map[string][]string
+	opts          map[string][]string
+	isAfterEndOpt bool
 
 	_args []string
 }
@@ -40,7 +41,7 @@ func NewCmd() Cmd {
 	return Cmd{Name: name, Args: []string{}, opts: make(map[string][]string), _args: args}
 }
 
-func (cmd Cmd) subCmd(fromIndex int) Cmd {
+func (cmd Cmd) subCmd(fromIndex int, isAfterEndOpt bool) Cmd {
 	var name string
 	if len(cmd._args) > fromIndex {
 		name = cmd._args[fromIndex]
@@ -51,7 +52,13 @@ func (cmd Cmd) subCmd(fromIndex int) Cmd {
 		args = cmd._args[fromIndex+1:]
 	}
 
-	return Cmd{Name: name, Args: []string{}, opts: make(map[string][]string), _args: args}
+	return Cmd{
+		Name:          name,
+		Args:          []string{},
+		opts:          make(map[string][]string),
+		isAfterEndOpt: isAfterEndOpt,
+		_args:         args,
+	}
 }
 
 // HasOpt is the method that checks whether an option with the specified name exists.

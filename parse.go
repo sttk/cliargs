@@ -60,7 +60,7 @@ func (cmd *Cmd) Parse() error {
 		return nil
 	}
 
-	_, err := parseArgs(cmd._args, collectArgs, collectOpts, takeOptArgs, false)
+	_, _, err := parseArgs(cmd._args, collectArgs, collectOpts, takeOptArgs, false, cmd.isAfterEndOpt)
 	return err
 }
 
@@ -84,11 +84,12 @@ func (cmd *Cmd) ParseUntilSubCmd() (Cmd, error) {
 		return nil
 	}
 
-	idx, err := parseArgs(cmd._args, collectArgs, collectOpts, takeOptArgs, true)
+	idx, isAfterEndOpt, err := parseArgs(
+		cmd._args, collectArgs, collectOpts, takeOptArgs, true, cmd.isAfterEndOpt)
 	if idx < 0 {
 		return Cmd{}, err
 	}
-	return cmd.subCmd(idx), err
+	return cmd.subCmd(idx, isAfterEndOpt), err
 }
 
 func takeOptArgs(_opt string) bool {
@@ -101,17 +102,17 @@ func parseArgs(
 	collectOpts func(string, ...string) error,
 	takeOptArgs func(string) bool,
 	untilFirstArg bool,
-) (int, error) {
+	isAfterEndOpt bool,
+) (int, bool, error) {
 
-	isNonOpt := false
 	prevOptTakingArgs := ""
 	var firstErr error = nil
 
 L0:
 	for iArg, arg := range osArgs {
-		if isNonOpt {
+		if isAfterEndOpt {
 			if untilFirstArg {
-				return iArg, firstErr
+				return iArg, isAfterEndOpt, firstErr
 			}
 			collectArgs(arg)
 
@@ -126,7 +127,7 @@ L0:
 			}
 		} else if strings.HasPrefix(arg, "--") {
 			if len(arg) == 2 {
-				isNonOpt = true
+				isAfterEndOpt = true
 				continue L0
 			}
 
@@ -179,7 +180,7 @@ L0:
 		} else if strings.HasPrefix(arg, "-") {
 			if len(arg) == 1 {
 				if untilFirstArg {
-					return iArg, firstErr
+					return iArg, isAfterEndOpt, firstErr
 				}
 				collectArgs(arg)
 				continue L0
@@ -238,11 +239,11 @@ L0:
 
 		} else {
 			if untilFirstArg {
-				return iArg, firstErr
+				return iArg, isAfterEndOpt, firstErr
 			}
 			collectArgs(arg)
 		}
 	}
 
-	return -1, firstErr
+	return -1, isAfterEndOpt, firstErr
 }
