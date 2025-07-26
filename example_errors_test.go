@@ -1,15 +1,15 @@
-package errors_test
+package cliargs_test
 
 import (
-	goerrors "errors"
+	"errors"
 	"fmt"
 	"reflect"
 
-	"github.com/sttk/cliargs/errors"
+	"github.com/sttk/cliargs"
 )
 
 func ExampleBadFieldType_Error() {
-	e := errors.BadFieldType{
+	e := cliargs.BadFieldType{
 		Option: "foo-bar",
 		Field:  "FooBar",
 		Type:   reflect.TypeOf(int(0)),
@@ -21,7 +21,7 @@ func ExampleBadFieldType_Error() {
 }
 
 func ExampleConfigHasDefaultsButHasNoArg_Error() {
-	e := errors.ConfigHasDefaultsButHasNoArg{
+	e := cliargs.ConfigHasDefaultsButHasNoArg{
 		StoreKey: "FooBar",
 		Name:     "foo-bar",
 	}
@@ -32,11 +32,11 @@ func ExampleConfigHasDefaultsButHasNoArg_Error() {
 }
 
 func ExampleConfigHasDefaultsButHasNoArg_GetOption() {
-	e := errors.ConfigHasDefaultsButHasNoArg{
+	e := cliargs.ConfigHasDefaultsButHasNoArg{
 		StoreKey: "FooBar",
 		Name:     "foo-bar",
 	}
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 
 	fmt.Printf("%s\n", e.GetOption())
 	fmt.Printf("%s\n", ee.GetOption())
@@ -46,7 +46,7 @@ func ExampleConfigHasDefaultsButHasNoArg_GetOption() {
 }
 
 func ExampleConfigIsArrayButHasNoArg_Error() {
-	e := errors.ConfigIsArrayButHasNoArg{
+	e := cliargs.ConfigIsArrayButHasNoArg{
 		StoreKey: "FooBar",
 		Name:     "foo-bar",
 	}
@@ -57,11 +57,11 @@ func ExampleConfigIsArrayButHasNoArg_Error() {
 }
 
 func ExampleConfigIsArrayButHasNoArg_GetOption() {
-	e := errors.ConfigIsArrayButHasNoArg{
+	e := cliargs.ConfigIsArrayButHasNoArg{
 		StoreKey: "FooBar",
 		Name:     "foo-bar",
 	}
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 
 	fmt.Printf("%s\n", e.GetOption())
 	fmt.Printf("%s\n", ee.GetOption())
@@ -71,7 +71,7 @@ func ExampleConfigIsArrayButHasNoArg_GetOption() {
 }
 
 func ExampleOptionArgIsInvalid_Error() {
-	e := errors.OptionArgIsInvalid{
+	e := cliargs.OptionArgIsInvalid{
 		StoreKey: "FooBar",
 		Option:   "foo-bar",
 		OptArg:   "123",
@@ -85,14 +85,14 @@ func ExampleOptionArgIsInvalid_Error() {
 }
 
 func ExampleOptionArgIsInvalid_GetOption() {
-	e := errors.OptionArgIsInvalid{
+	e := cliargs.OptionArgIsInvalid{
 		StoreKey: "FooBar",
 		Option:   "foo-bar",
 		OptArg:   "123",
 		TypeKind: reflect.Int,
 		Cause:    fmt.Errorf("Bad number format"),
 	}
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 
 	fmt.Printf("%s\n", e.GetOption())
 	fmt.Printf("%s\n", ee.GetOption())
@@ -102,11 +102,9 @@ func ExampleOptionArgIsInvalid_GetOption() {
 }
 
 func ExampleOptionArgIsInvalid_Unwrap() {
-	// import ( goerrors "errors" )
-
 	e0 := fmt.Errorf("Bad number format")
 
-	e := errors.OptionArgIsInvalid{
+	e := cliargs.OptionArgIsInvalid{
 		StoreKey: "FooBar",
 		Option:   "foo-bar",
 		OptArg:   "123",
@@ -114,13 +112,13 @@ func ExampleOptionArgIsInvalid_Unwrap() {
 		Cause:    e0,
 	}
 
-	fmt.Printf("%t\n", goerrors.Is(e, e0))
+	fmt.Printf("%t\n", errors.Is(e, e0))
 	// Output:
 	// true
 }
 
 func ExampleOptionIsNotArray_Error() {
-	e := errors.OptionIsNotArray{
+	e := cliargs.OptionIsNotArray{
 		Option:   "foo-bar",
 		StoreKey: "FooBar",
 	}
@@ -131,11 +129,11 @@ func ExampleOptionIsNotArray_Error() {
 }
 
 func ExampleOptionIsNotArray_GetOption() {
-	e := errors.OptionIsNotArray{
+	e := cliargs.OptionIsNotArray{
 		Option:   "foo-bar",
 		StoreKey: "FooBar",
 	}
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 
 	fmt.Printf("%s\n", e.GetOption())
 	fmt.Printf("%s\n", ee.GetOption())
@@ -145,7 +143,7 @@ func ExampleOptionIsNotArray_GetOption() {
 }
 
 func ExampleOptionNameIsDuplicated_Error() {
-	e := errors.OptionNameIsDuplicated{
+	e := cliargs.OptionNameIsDuplicated{
 		StoreKey: "FooBar",
 		Name:     "foo-bar",
 	}
@@ -156,12 +154,12 @@ func ExampleOptionNameIsDuplicated_Error() {
 }
 
 func ExampleOptionNameIsDuplicated_GetOption() {
-	e := errors.OptionNameIsDuplicated{
+	e := cliargs.OptionNameIsDuplicated{
 		StoreKey: "FooBar",
 		Name:     "foo-bar",
 	}
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 
 	fmt.Printf("%s\n", e.GetOption())
 	fmt.Printf("%s\n", ee.GetOption())
@@ -171,7 +169,7 @@ func ExampleOptionNameIsDuplicated_GetOption() {
 }
 
 func ExampleOptionNeedsArg_Error() {
-	e := errors.OptionNeedsArg{
+	e := cliargs.OptionNeedsArg{
 		StoreKey: "FooBar",
 		Option:   "foo-bar",
 	}
@@ -182,12 +180,12 @@ func ExampleOptionNeedsArg_Error() {
 }
 
 func ExampleOptionNeedsArg_GetOption() {
-	e := errors.OptionNeedsArg{
+	e := cliargs.OptionNeedsArg{
 		Option:   "foo-bar",
 		StoreKey: "FooBar",
 	}
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 
 	fmt.Printf("%s\n", e.GetOption())
 	fmt.Printf("%s\n", ee.GetOption())
@@ -197,7 +195,7 @@ func ExampleOptionNeedsArg_GetOption() {
 }
 
 func ExampleOptionStoreIsNotChangeable_Error() {
-	e := errors.OptionStoreIsNotChangeable{}
+	e := cliargs.OptionStoreIsNotChangeable{}
 
 	fmt.Printf("%s\n", e.Error())
 	// Output:
@@ -205,7 +203,7 @@ func ExampleOptionStoreIsNotChangeable_Error() {
 }
 
 func ExampleOptionTakesNoArg_Error() {
-	e := errors.OptionTakesNoArg{
+	e := cliargs.OptionTakesNoArg{
 		Option:   "foo-bar",
 		StoreKey: "FooBar",
 	}
@@ -216,12 +214,12 @@ func ExampleOptionTakesNoArg_Error() {
 }
 
 func ExampleOptionTakesNoArg_GetOption() {
-	e := errors.OptionTakesNoArg{
+	e := cliargs.OptionTakesNoArg{
 		Option:   "foo-bar",
 		StoreKey: "FooBar",
 	}
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 
 	fmt.Printf("%s\n", e.GetOption())
 	fmt.Printf("%s\n", ee.GetOption())
@@ -231,7 +229,7 @@ func ExampleOptionTakesNoArg_GetOption() {
 }
 
 func ExampleStoreKeyIsDuplicated_Error() {
-	e := errors.StoreKeyIsDuplicated{
+	e := cliargs.StoreKeyIsDuplicated{
 		StoreKey: "FooBar",
 		Name:     "foo-bar",
 	}
@@ -242,12 +240,12 @@ func ExampleStoreKeyIsDuplicated_Error() {
 }
 
 func ExampleStoreKeyIsDuplicated_GetOption() {
-	e := errors.StoreKeyIsDuplicated{
+	e := cliargs.StoreKeyIsDuplicated{
 		StoreKey: "FooBar",
 		Name:     "foo-bar",
 	}
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 
 	fmt.Printf("%s\n", e.GetOption())
 	fmt.Printf("%s\n", ee.GetOption())
@@ -257,7 +255,7 @@ func ExampleStoreKeyIsDuplicated_GetOption() {
 }
 
 func ExampleUnconfiguredOption_Error() {
-	e := errors.UnconfiguredOption{
+	e := cliargs.UnconfiguredOption{
 		Option: "foo-bar",
 	}
 
@@ -267,11 +265,11 @@ func ExampleUnconfiguredOption_Error() {
 }
 
 func ExampleUnconfiguredOption_GetOption() {
-	e := errors.UnconfiguredOption{
+	e := cliargs.UnconfiguredOption{
 		Option: "foo-bar",
 	}
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 
 	fmt.Printf("%s\n", e.GetOption())
 	fmt.Printf("%s\n", ee.GetOption())

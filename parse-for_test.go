@@ -8,7 +8,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/sttk/cliargs"
-	errs "github.com/sttk/cliargs/errors"
 )
 
 func TestParseFor_emptyOptionStoreAndNoArgs(t *testing.T) {
@@ -1447,11 +1446,11 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsInt(t *testing.T) {
 	)
 	assert.NotNil(t, errors.Unwrap(err))
 	switch err.(type) {
-	case errs.OptionArgIsInvalid:
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).StoreKey, "IntVar")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).Option, "int-var")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).OptArg, "")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).TypeKind, reflect.Int)
+	case cliargs.OptionArgIsInvalid:
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).StoreKey, "IntVar")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).Option, "int-var")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).OptArg, "")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).TypeKind, reflect.Int)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1480,11 +1479,11 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUint(t *testing.T) {
 	)
 	assert.NotNil(t, errors.Unwrap(err))
 	switch err.(type) {
-	case errs.OptionArgIsInvalid:
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).StoreKey, "UintVar")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).Option, "uint-var")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).OptArg, "")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).TypeKind, reflect.Uint)
+	case cliargs.OptionArgIsInvalid:
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).StoreKey, "UintVar")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).Option, "uint-var")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).OptArg, "")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).TypeKind, reflect.Uint)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1513,11 +1512,11 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloat(t *testing.T) {
 	)
 	assert.NotNil(t, errors.Unwrap(err))
 	switch err.(type) {
-	case errs.OptionArgIsInvalid:
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).StoreKey, "Float64Var")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).Option, "float-var")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).OptArg, "")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).TypeKind, reflect.Float64)
+	case cliargs.OptionArgIsInvalid:
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).StoreKey, "Float64Var")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).Option, "float-var")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).OptArg, "")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).TypeKind, reflect.Float64)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1566,11 +1565,11 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsIntArray(t *testing.T) {
 	)
 	assert.NotNil(t, errors.Unwrap(err))
 	switch err.(type) {
-	case errs.OptionArgIsInvalid:
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).StoreKey, "IntArr")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).Option, "int-arr")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).OptArg, "")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).TypeKind, reflect.Int)
+	case cliargs.OptionArgIsInvalid:
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).StoreKey, "IntArr")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).Option, "int-arr")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).OptArg, "")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).TypeKind, reflect.Int)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1599,11 +1598,11 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsUintArray(t *testing.T) {
 	)
 	assert.NotNil(t, errors.Unwrap(err))
 	switch err.(type) {
-	case errs.OptionArgIsInvalid:
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).StoreKey, "UintArr")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).Option, "uint-arr")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).OptArg, "")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).TypeKind, reflect.Uint)
+	case cliargs.OptionArgIsInvalid:
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).StoreKey, "UintArr")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).Option, "uint-arr")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).OptArg, "")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).TypeKind, reflect.Uint)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1632,11 +1631,11 @@ func TestParseFor_errorEmptyDefaultValueIfOptionIsFloatArray(t *testing.T) {
 	)
 	assert.NotNil(t, errors.Unwrap(err))
 	switch err.(type) {
-	case errs.OptionArgIsInvalid:
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).StoreKey, "Float64Arr")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).Option, "float-arr")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).OptArg, "")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).TypeKind, reflect.Float64)
+	case cliargs.OptionArgIsInvalid:
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).StoreKey, "Float64Arr")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).Option, "float-arr")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).OptArg, "")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).TypeKind, reflect.Float64)
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1701,10 +1700,10 @@ func TestParseFor_errorIfDefaultValueIsInvalidType(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "BadFieldType{Option:BoolArr,Field:BoolArr,Type:[]bool}")
 	switch err.(type) {
-	case errs.BadFieldType:
-		assert.Equal(t, err.(errs.BadFieldType).Option, "BoolArr")
-		assert.Equal(t, err.(errs.BadFieldType).Field, "BoolArr")
-		assert.Equal(t, err.(errs.BadFieldType).Type, reflect.TypeOf(options.BoolArr))
+	case cliargs.BadFieldType:
+		assert.Equal(t, err.(cliargs.BadFieldType).Option, "BoolArr")
+		assert.Equal(t, err.(cliargs.BadFieldType).Field, "BoolArr")
+		assert.Equal(t, err.(cliargs.BadFieldType).Type, reflect.TypeOf(options.BoolArr))
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1898,10 +1897,10 @@ func TestParseFor_optCfgHasUnsupportedType(t *testing.T) {
 		"Option:foo-bar,Field:FooBar,Type:cliargs_test.A}",
 	)
 	switch err.(type) {
-	case errs.BadFieldType:
-		assert.Equal(t, err.(errs.BadFieldType).Option, "foo-bar")
-		assert.Equal(t, err.(errs.BadFieldType).Field, "FooBar")
-		assert.Equal(t, err.(errs.BadFieldType).Type.(reflect.Type).Name(), "A")
+	case cliargs.BadFieldType:
+		assert.Equal(t, err.(cliargs.BadFieldType).Option, "foo-bar")
+		assert.Equal(t, err.(cliargs.BadFieldType).Field, "FooBar")
+		assert.Equal(t, err.(cliargs.BadFieldType).Type.(reflect.Type).Name(), "A")
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -1924,7 +1923,7 @@ func TestParseFor_argIsNotPointer(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionStoreIsNotChangeable{}")
 	switch err.(type) {
-	case errs.OptionStoreIsNotChangeable:
+	case cliargs.OptionStoreIsNotChangeable:
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -2013,10 +2012,10 @@ func TestParseUntilSubCmdFor_error0(t *testing.T) {
 	subCmd, err := cmd.ParseUntilSubCmdFor(&options)
 
 	switch err.(type) {
-	case errs.BadFieldType:
-		assert.Equal(t, err.(errs.BadFieldType).Option, "foo-bar")
-		assert.Equal(t, err.(errs.BadFieldType).Field, "FooBar")
-		assert.Equal(t, err.(errs.BadFieldType).Type, reflect.TypeOf(options.FooBar))
+	case cliargs.BadFieldType:
+		assert.Equal(t, err.(cliargs.BadFieldType).Option, "foo-bar")
+		assert.Equal(t, err.(cliargs.BadFieldType).Field, "FooBar")
+		assert.Equal(t, err.(cliargs.BadFieldType).Type, reflect.TypeOf(options.FooBar))
 	default:
 		assert.Fail(t, err.Error())
 	}
@@ -2045,12 +2044,12 @@ func TestParseUntilSubCmdFor_error1(t *testing.T) {
 	subCmd, err := cmd.ParseUntilSubCmdFor(&options)
 
 	switch err.(type) {
-	case errs.OptionArgIsInvalid:
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).StoreKey, "FooBar")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).Option, "foo-bar")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).OptArg, "baz")
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).TypeKind, reflect.Int)
-		assert.Equal(t, err.(errs.OptionArgIsInvalid).Cause.Error(), "strconv.ParseInt: parsing \"baz\": invalid syntax")
+	case cliargs.OptionArgIsInvalid:
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).StoreKey, "FooBar")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).Option, "foo-bar")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).OptArg, "baz")
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).TypeKind, reflect.Int)
+		assert.Equal(t, err.(cliargs.OptionArgIsInvalid).Cause.Error(), "strconv.ParseInt: parsing \"baz\": invalid syntax")
 	default:
 		assert.Fail(t, err.Error())
 	}

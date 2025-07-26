@@ -2,21 +2,17 @@
 // This program is free software under MIT License.
 // See the file LICENSE in this distribution for more details.
 
-// Package validators contains valiators that checks the number format of the string specified as
-// an option argument in command line arguments.
-package validators
+package cliargs
 
 import (
 	"reflect"
 	"strconv"
-
-	"github.com/sttk/cliargs/errors"
 )
 
 func validateInt(storeKey string, option string, optArg string) error {
 	_, e := strconv.ParseInt(optArg, 0, strconv.IntSize)
 	if e != nil {
-		return errors.OptionArgIsInvalid{
+		return OptionArgIsInvalid{
 			StoreKey: storeKey, Option: option, OptArg: optArg, TypeKind: reflect.Int, Cause: e}
 	}
 	return nil
@@ -25,7 +21,7 @@ func validateInt(storeKey string, option string, optArg string) error {
 func validateInt8(storeKey string, option string, optArg string) error {
 	_, e := strconv.ParseInt(optArg, 0, 8)
 	if e != nil {
-		return errors.OptionArgIsInvalid{
+		return OptionArgIsInvalid{
 			StoreKey: storeKey, Option: option, OptArg: optArg, TypeKind: reflect.Int8, Cause: e}
 	}
 	return nil
@@ -34,7 +30,7 @@ func validateInt8(storeKey string, option string, optArg string) error {
 func validateInt16(storeKey string, option string, optArg string) error {
 	_, e := strconv.ParseInt(optArg, 0, 16)
 	if e != nil {
-		return errors.OptionArgIsInvalid{
+		return OptionArgIsInvalid{
 			StoreKey: storeKey, Option: option, OptArg: optArg, TypeKind: reflect.Int16, Cause: e}
 	}
 	return nil
@@ -43,7 +39,7 @@ func validateInt16(storeKey string, option string, optArg string) error {
 func validateInt32(storeKey string, option string, optArg string) error {
 	_, e := strconv.ParseInt(optArg, 0, 32)
 	if e != nil {
-		return errors.OptionArgIsInvalid{
+		return OptionArgIsInvalid{
 			StoreKey: storeKey, Option: option, OptArg: optArg, TypeKind: reflect.Int32, Cause: e}
 	}
 	return nil
@@ -52,7 +48,7 @@ func validateInt32(storeKey string, option string, optArg string) error {
 func validateInt64(storeKey string, option string, optArg string) error {
 	_, e := strconv.ParseInt(optArg, 0, 64)
 	if e != nil {
-		return errors.OptionArgIsInvalid{
+		return OptionArgIsInvalid{
 			StoreKey: storeKey, Option: option, OptArg: optArg, TypeKind: reflect.Int64, Cause: e}
 	}
 	return nil
@@ -61,7 +57,7 @@ func validateInt64(storeKey string, option string, optArg string) error {
 func validateUint(storeKey string, option string, optArg string) error {
 	_, e := strconv.ParseUint(optArg, 0, strconv.IntSize)
 	if e != nil {
-		return errors.OptionArgIsInvalid{
+		return OptionArgIsInvalid{
 			StoreKey: storeKey, Option: option, OptArg: optArg, TypeKind: reflect.Uint, Cause: e}
 	}
 	return nil
@@ -70,7 +66,7 @@ func validateUint(storeKey string, option string, optArg string) error {
 func validateUint8(storeKey string, option string, optArg string) error {
 	_, e := strconv.ParseUint(optArg, 0, 8)
 	if e != nil {
-		return errors.OptionArgIsInvalid{
+		return OptionArgIsInvalid{
 			StoreKey: storeKey, Option: option, OptArg: optArg, TypeKind: reflect.Uint8, Cause: e}
 	}
 	return nil
@@ -79,7 +75,7 @@ func validateUint8(storeKey string, option string, optArg string) error {
 func validateUint16(storeKey string, option string, optArg string) error {
 	_, e := strconv.ParseUint(optArg, 0, 16)
 	if e != nil {
-		return errors.OptionArgIsInvalid{
+		return OptionArgIsInvalid{
 			StoreKey: storeKey, Option: option, OptArg: optArg, TypeKind: reflect.Uint16, Cause: e}
 	}
 	return nil
@@ -88,7 +84,7 @@ func validateUint16(storeKey string, option string, optArg string) error {
 func validateUint32(storeKey string, option string, optArg string) error {
 	_, e := strconv.ParseUint(optArg, 0, 32)
 	if e != nil {
-		return errors.OptionArgIsInvalid{
+		return OptionArgIsInvalid{
 			StoreKey: storeKey, Option: option, OptArg: optArg, TypeKind: reflect.Uint32, Cause: e}
 	}
 	return nil
@@ -97,7 +93,7 @@ func validateUint32(storeKey string, option string, optArg string) error {
 func validateUint64(storeKey string, option string, optArg string) error {
 	_, e := strconv.ParseUint(optArg, 0, 64)
 	if e != nil {
-		return errors.OptionArgIsInvalid{
+		return OptionArgIsInvalid{
 			StoreKey: storeKey, Option: option, OptArg: optArg, TypeKind: reflect.Uint64, Cause: e}
 	}
 	return nil
@@ -106,7 +102,7 @@ func validateUint64(storeKey string, option string, optArg string) error {
 func validateFloat32(storeKey string, option string, optArg string) error {
 	_, e := strconv.ParseFloat(optArg, 32)
 	if e != nil {
-		return errors.OptionArgIsInvalid{
+		return OptionArgIsInvalid{
 			StoreKey: storeKey, Option: option, OptArg: optArg, TypeKind: reflect.Float32, Cause: e}
 	}
 	return nil
@@ -115,7 +111,7 @@ func validateFloat32(storeKey string, option string, optArg string) error {
 func validateFloat64(storeKey string, option string, optArg string) error {
 	_, e := strconv.ParseFloat(optArg, 64)
 	if e != nil {
-		return errors.OptionArgIsInvalid{
+		return OptionArgIsInvalid{
 			StoreKey: storeKey, Option: option, OptArg: optArg, TypeKind: reflect.Float64, Cause: e}
 	}
 	return nil

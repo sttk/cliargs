@@ -7,8 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/sttk/cliargs"
-	"github.com/sttk/cliargs/errors"
-	"github.com/sttk/cliargs/validators"
 )
 
 func TestParseWith_zeroCfgAndZeroArg(t *testing.T) {
@@ -61,13 +59,13 @@ func TestParseWith_zeroCfgAndOneLongOpt(t *testing.T) {
 	assert.Equal(t, err.Error(), "UnconfiguredOption{Option:foo-bar}")
 
 	switch e := err.(type) {
-	case errors.UnconfiguredOption:
+	case cliargs.UnconfiguredOption:
 		assert.Equal(t, e.Option, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
@@ -97,13 +95,13 @@ func TestParseWith_zeroCfgAndOneShortOpt(t *testing.T) {
 	assert.Equal(t, err.Error(), "UnconfiguredOption{Option:f}")
 
 	switch e := err.(type) {
-	case errors.UnconfiguredOption:
+	case cliargs.UnconfiguredOption:
 		assert.Equal(t, e.Option, "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "f")
 	default:
 		assert.Fail(t, err.Error())
@@ -226,13 +224,13 @@ func TestParseWith_oneCfgAndOneDifferentLongOpt(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "UnconfiguredOption{Option:boo-far}")
 	switch e := err.(type) {
-	case errors.UnconfiguredOption:
+	case cliargs.UnconfiguredOption:
 		assert.Equal(t, e.Option, "boo-far")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "boo-far")
 	default:
 		assert.Fail(t, err.Error())
@@ -263,13 +261,13 @@ func TestParseWith_oneCfgAndOneDifferentShortOpt(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "UnconfiguredOption{Option:b}")
 	switch e := err.(type) {
-	case errors.UnconfiguredOption:
+	case cliargs.UnconfiguredOption:
 		assert.Equal(t, e.Option, "b")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "b")
 	default:
 		assert.Fail(t, err.Error())
@@ -492,14 +490,14 @@ func TestParseWith_oneCfgHasArgButOneLongOptHasNoArg(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionNeedsArg{Option:foo-bar,StoreKey:foo-bar}")
 	switch e := err.(type) {
-	case errors.OptionNeedsArg:
+	case cliargs.OptionNeedsArg:
 		assert.Equal(t, e.Option, "foo-bar")
 		assert.Equal(t, e.StoreKey, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
@@ -530,14 +528,14 @@ func TestParseWith_oneCfgHasArgAndOneShortOptHasNoArg(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionNeedsArg{Option:f,StoreKey:f}")
 	switch e := err.(type) {
-	case errors.OptionNeedsArg:
+	case cliargs.OptionNeedsArg:
 		assert.Equal(t, e.Option, "f")
 		assert.Equal(t, e.StoreKey, "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "f")
 	default:
 		assert.Fail(t, err.Error())
@@ -583,14 +581,14 @@ func TestParseWith_oneCfgHasNoArgAndOneLongOptHasArg(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionTakesNoArg{Option:foo-bar,StoreKey:foo-bar}")
 	switch e := err.(type) {
-	case errors.OptionTakesNoArg:
+	case cliargs.OptionTakesNoArg:
 		assert.Equal(t, e.Option, "foo-bar")
 		assert.Equal(t, e.StoreKey, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
@@ -628,14 +626,14 @@ func TestParseWith_oneCfgHasNoArgAndOneLongOptHasArg(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionTakesNoArg{Option:foo-bar,StoreKey:foo-bar}")
 	switch e := err.(type) {
-	case errors.OptionTakesNoArg:
+	case cliargs.OptionTakesNoArg:
 		assert.Equal(t, e.Option, "foo-bar")
 		assert.Equal(t, e.StoreKey, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
@@ -681,14 +679,14 @@ func TestParseWith_oneCfgHasNoArgAndOneShortOptHasArg(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionTakesNoArg{Option:f,StoreKey:f}")
 	switch e := err.(type) {
-	case errors.OptionTakesNoArg:
+	case cliargs.OptionTakesNoArg:
 		assert.Equal(t, e.Option, "f")
 		assert.Equal(t, e.StoreKey, "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "f")
 	default:
 		assert.Fail(t, err.Error())
@@ -726,14 +724,14 @@ func TestParseWith_oneCfgHasNoArgAndOneShortOptHasArg(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionTakesNoArg{Option:f,StoreKey:f}")
 	switch e := err.(type) {
-	case errors.OptionTakesNoArg:
+	case cliargs.OptionTakesNoArg:
 		assert.Equal(t, e.Option, "f")
 		assert.Equal(t, e.StoreKey, "f")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "f")
 	default:
 		assert.Fail(t, err.Error())
@@ -764,14 +762,14 @@ func TestParseWith_oneCfgHasNoArgButIsArray(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "ConfigIsArrayButHasNoArg{StoreKey:foo-bar,Name:foo-bar}")
 	switch e := err.(type) {
-	case errors.ConfigIsArrayButHasNoArg:
+	case cliargs.ConfigIsArrayButHasNoArg:
 		assert.Equal(t, e.StoreKey, "foo-bar")
 		assert.Equal(t, e.Name, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
@@ -958,14 +956,14 @@ func TestParseWith_oneCfgIsNotArrayButOptsAreMultiple(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionIsNotArray{Option:foo-bar,StoreKey:foo-bar}")
 	switch e := err.(type) {
-	case errors.OptionIsNotArray:
+	case cliargs.OptionIsNotArray:
 		assert.Equal(t, e.Option, "foo-bar")
 		assert.Equal(t, e.StoreKey, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
@@ -988,14 +986,14 @@ func TestParseWith_oneCfgIsNotArrayButOptsAreMultiple(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "OptionIsNotArray{Option:foo-bar,StoreKey:foo-bar}")
 	switch e := err.(type) {
-	case errors.OptionIsNotArray:
+	case cliargs.OptionIsNotArray:
 		assert.Equal(t, e.Option, "foo-bar")
 		assert.Equal(t, e.StoreKey, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
@@ -1053,14 +1051,14 @@ func TestParseWith_oneCfgHasNoArgButHasDefault(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "ConfigHasDefaultsButHasNoArg{StoreKey:foo-bar,Name:foo-bar}")
 	switch e := err.(type) {
-	case errors.ConfigHasDefaultsButHasNoArg:
+	case cliargs.ConfigHasDefaultsButHasNoArg:
 		assert.Equal(t, e.StoreKey, "foo-bar")
 		assert.Equal(t, e.Name, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
@@ -1127,13 +1125,13 @@ func TestParseWith_parseAllArgsEvenIfError(t *testing.T) {
 	assert.False(t, cmd.HasOpt("e"))
 
 	switch e := err.(type) {
-	case errors.UnconfiguredOption:
+	case cliargs.UnconfiguredOption:
 		assert.Equal(t, e.Option, "e")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "e")
 	default:
 		assert.Fail(t, err.Error())
@@ -1160,14 +1158,14 @@ func TestParseWith_parseAllArgsEvenIfShortOptionValueIsError(t *testing.T) {
 	assert.True(t, cmd.HasOpt("e"))
 
 	switch e := err.(type) {
-	case errors.OptionTakesNoArg:
+	case cliargs.OptionTakesNoArg:
 		assert.Equal(t, e.Option, "f")
 		assert.Equal(t, e.StoreKey, "foo")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "f")
 	default:
 		assert.Fail(t, err.Error())
@@ -1194,14 +1192,14 @@ func TestParseWith_parseAllArgsEvenIfLongOptionValueIsError(t *testing.T) {
 	assert.True(t, cmd.HasOpt("e"))
 
 	switch e := err.(type) {
-	case errors.OptionTakesNoArg:
+	case cliargs.OptionTakesNoArg:
 		assert.Equal(t, e.Option, "foo")
 		assert.Equal(t, e.StoreKey, "foo")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "foo")
 	default:
 		assert.Fail(t, err.Error())
@@ -1247,14 +1245,14 @@ func TestParseWith_optionNameIsDuplicated(t *testing.T) {
 
 	assert.Equal(t, err.Error(), "OptionNameIsDuplicated{StoreKey:bar,Name:f}")
 	switch e := err.(type) {
-	case errors.OptionNameIsDuplicated:
+	case cliargs.OptionNameIsDuplicated:
 		assert.Equal(t, e.Name, "f")
 		assert.Equal(t, e.StoreKey, "bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "f")
 	default:
 		assert.Fail(t, err.Error())
@@ -1309,14 +1307,14 @@ func TestParseWith_StoreKeyIsDuplicated(t *testing.T) {
 
 	assert.Equal(t, err.Error(), "StoreKeyIsDuplicated{StoreKey:FooBar,Name:b}")
 	switch e := err.(type) {
-	case errors.StoreKeyIsDuplicated:
+	case cliargs.StoreKeyIsDuplicated:
 		assert.Equal(t, e.StoreKey, "FooBar")
 		assert.Equal(t, e.Name, "b")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "b")
 	default:
 		assert.Fail(t, err.Error())
@@ -1375,7 +1373,7 @@ func TestParseWith_oneCfgUsingValidator(t *testing.T) {
 		cliargs.OptCfg{
 			StoreKey:  "foo",
 			HasArg:    true,
-			Validator: &validators.ValidateInt16,
+			Validator: &cliargs.ValidateInt16,
 		},
 	}
 
@@ -1403,7 +1401,7 @@ func TestParseWith_oneCfgUsingValidator_validationError(t *testing.T) {
 			StoreKey:  "Foo",
 			Names:     []string{"foo", "f"},
 			HasArg:    true,
-			Validator: &validators.ValidateInt8,
+			Validator: &cliargs.ValidateInt8,
 		},
 	}
 
@@ -1413,7 +1411,7 @@ func TestParseWith_oneCfgUsingValidator_validationError(t *testing.T) {
 	err := cmd.ParseWith(optCfgs)
 
 	switch e := err.(type) {
-	case errors.OptionArgIsInvalid:
+	case cliargs.OptionArgIsInvalid:
 		assert.Equal(t, e.StoreKey, "Foo")
 		assert.Equal(t, e.Option, "f")
 		assert.Equal(t, e.OptArg, "128")
@@ -1422,7 +1420,7 @@ func TestParseWith_oneCfgUsingValidator_validationError(t *testing.T) {
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "f")
 	default:
 		assert.Fail(t, err.Error())
@@ -1444,7 +1442,7 @@ func TestParseWith_oneCfgBeingArrayAndUsingValidator(t *testing.T) {
 			Names:     []string{"foo", "f"},
 			HasArg:    true,
 			IsArray:   true,
-			Validator: &validators.ValidateInt32,
+			Validator: &cliargs.ValidateInt32,
 		},
 	}
 
@@ -1470,7 +1468,7 @@ func TestParseWith_oneCfgBeingArrayAndUsingValidator_validationError(t *testing.
 			Names:     []string{"foo", "f"},
 			HasArg:    true,
 			IsArray:   true,
-			Validator: &validators.ValidateInt32,
+			Validator: &cliargs.ValidateInt32,
 		},
 	}
 
@@ -1480,7 +1478,7 @@ func TestParseWith_oneCfgBeingArrayAndUsingValidator_validationError(t *testing.
 	err := cmd.ParseWith(optCfgs)
 
 	switch e := err.(type) {
-	case errors.OptionArgIsInvalid:
+	case cliargs.OptionArgIsInvalid:
 		assert.Equal(t, e.StoreKey, "Foo")
 		assert.Equal(t, e.Option, "foo")
 		assert.Equal(t, e.OptArg, "ABC")
@@ -1489,7 +1487,7 @@ func TestParseWith_oneCfgBeingArrayAndUsingValidator_validationError(t *testing.
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "foo")
 	default:
 		assert.Fail(t, err.Error())
@@ -1574,13 +1572,13 @@ func TestParseUntilSubCmdWith_zeroCfg_oneOptWithNoArg(t *testing.T) {
 	assert.Equal(t, err.Error(), "UnconfiguredOption{Option:foo-bar}")
 
 	switch e := err.(type) {
-	case errors.UnconfiguredOption:
+	case cliargs.UnconfiguredOption:
 		assert.Equal(t, e.Option, "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
 	}
 	switch e := err.(type) {
-	case errors.InvalidOption:
+	case cliargs.InvalidOption:
 		assert.Equal(t, e.GetOption(), "foo-bar")
 	default:
 		assert.Fail(t, err.Error())
@@ -1791,7 +1789,7 @@ func TestParseUntilSubCmdWith_oneCfgUsingValidatorAndSubCmd(t *testing.T) {
 		cliargs.OptCfg{
 			StoreKey:  "foo",
 			HasArg:    true,
-			Validator: &validators.ValidateInt32,
+			Validator: &cliargs.ValidateInt32,
 		},
 	}
 

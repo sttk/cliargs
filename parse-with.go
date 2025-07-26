@@ -4,10 +4,6 @@
 
 package cliargs
 
-import (
-	"github.com/sttk/cliargs/errors"
-)
-
 const anyOption = "*"
 
 // ParseWith is the method which parses command line arguments with option configurations.
@@ -108,18 +104,18 @@ func (cmd *Cmd) parseArgsWith(
 
 		_, exists := optMap[storeKey]
 		if exists {
-			e := errors.StoreKeyIsDuplicated{StoreKey: storeKey, Name: firstName}
+			e := StoreKeyIsDuplicated{StoreKey: storeKey, Name: firstName}
 			return -1, cmd.isAfterEndOpt, e
 		}
 		optMap[storeKey] = EMPTY_STRUCT
 
 		if !cfg.HasArg {
 			if cfg.IsArray {
-				e := errors.ConfigIsArrayButHasNoArg{StoreKey: storeKey, Name: firstName}
+				e := ConfigIsArrayButHasNoArg{StoreKey: storeKey, Name: firstName}
 				return -1, cmd.isAfterEndOpt, e
 			}
 			if cfg.Defaults != nil {
-				e := errors.ConfigHasDefaultsButHasNoArg{StoreKey: storeKey, Name: firstName}
+				e := ConfigHasDefaultsButHasNoArg{StoreKey: storeKey, Name: firstName}
 				return -1, cmd.isAfterEndOpt, e
 			}
 		}
@@ -130,7 +126,7 @@ func (cmd *Cmd) parseArgsWith(
 			for _, nm := range cfg.Names {
 				_, exists := cfgMap[nm]
 				if exists {
-					e := errors.OptionNameIsDuplicated{StoreKey: storeKey, Name: nm}
+					e := OptionNameIsDuplicated{StoreKey: storeKey, Name: nm}
 					return -1, cmd.isAfterEndOpt, e
 				}
 				cfgMap[nm] = i
@@ -169,7 +165,7 @@ func (cmd *Cmd) parseArgsWith(
 
 			if len(a) > 0 {
 				if !cfg.HasArg {
-					return errors.OptionTakesNoArg{
+					return OptionTakesNoArg{
 						Option:   name,
 						StoreKey: storeKey,
 					}
@@ -178,7 +174,7 @@ func (cmd *Cmd) parseArgsWith(
 				arr, _ := cmd.opts[storeKey]
 				if len(arr) > 0 {
 					if !cfg.IsArray {
-						return errors.OptionIsNotArray{
+						return OptionIsNotArray{
 							StoreKey: storeKey,
 							Option:   name,
 						}
@@ -201,7 +197,7 @@ func (cmd *Cmd) parseArgsWith(
 				}
 			} else {
 				if cfg.HasArg {
-					return errors.OptionNeedsArg{
+					return OptionNeedsArg{
 						Option:   name,
 						StoreKey: storeKey,
 					}
@@ -216,7 +212,7 @@ func (cmd *Cmd) parseArgsWith(
 			return nil
 		} else {
 			if !hasAnyOpt {
-				return errors.UnconfiguredOption{
+				return UnconfiguredOption{
 					Option: name,
 				}
 			}

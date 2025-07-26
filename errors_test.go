@@ -1,4 +1,4 @@
-package errors_test
+package cliargs_test
 
 import (
 	"fmt"
@@ -6,112 +6,112 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/sttk/cliargs/errors"
+	"github.com/sttk/cliargs"
 )
 
 func TestErrors_OptionContainsInvalidChar(t *testing.T) {
-	e := errors.OptionContainsInvalidChar{Option: "foo"}
+	e := cliargs.OptionContainsInvalidChar{Option: "foo"}
 	assert.Equal(t, e.Option, "foo")
 	assert.Equal(t, e.GetOption(), "foo")
 	assert.Equal(t, e.Error(), "OptionContainsInvalidChar{Option:foo}")
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 	assert.Equal(t, ee.GetOption(), "foo")
 }
 
 func TestErrors_UnconfiguredOption(t *testing.T) {
-	e := errors.UnconfiguredOption{Option: "foo"}
+	e := cliargs.UnconfiguredOption{Option: "foo"}
 	assert.Equal(t, e.Option, "foo")
 	assert.Equal(t, e.GetOption(), "foo")
 	assert.Equal(t, e.Error(), "UnconfiguredOption{Option:foo}")
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 	assert.Equal(t, ee.GetOption(), "foo")
 }
 
 func TestErrors_OptionNeedsArg(t *testing.T) {
-	e := errors.OptionNeedsArg{Option: "foo", StoreKey: "Foo"}
+	e := cliargs.OptionNeedsArg{Option: "foo", StoreKey: "Foo"}
 	assert.Equal(t, e.Option, "foo")
 	assert.Equal(t, e.StoreKey, "Foo")
 	assert.Equal(t, e.GetOption(), "foo")
 	assert.Equal(t, e.Error(), "OptionNeedsArg{Option:foo,StoreKey:Foo}")
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 	assert.Equal(t, ee.GetOption(), "foo")
 }
 
 func TestErrors_OptionTakesNoArg(t *testing.T) {
-	e := errors.OptionTakesNoArg{Option: "foo", StoreKey: "Foo"}
+	e := cliargs.OptionTakesNoArg{Option: "foo", StoreKey: "Foo"}
 	assert.Equal(t, e.Option, "foo")
 	assert.Equal(t, e.StoreKey, "Foo")
 	assert.Equal(t, e.GetOption(), "foo")
 	assert.Equal(t, e.Error(), "OptionTakesNoArg{Option:foo,StoreKey:Foo}")
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 	assert.Equal(t, ee.GetOption(), "foo")
 }
 
 func TestErrors_OptionIsNotArray(t *testing.T) {
-	e := errors.OptionIsNotArray{Option: "foo", StoreKey: "Foo"}
+	e := cliargs.OptionIsNotArray{Option: "foo", StoreKey: "Foo"}
 	assert.Equal(t, e.Option, "foo")
 	assert.Equal(t, e.StoreKey, "Foo")
 	assert.Equal(t, e.GetOption(), "foo")
 	assert.Equal(t, e.Error(), "OptionIsNotArray{Option:foo,StoreKey:Foo}")
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 	assert.Equal(t, ee.GetOption(), "foo")
 }
 
 func TestErrors_StoreKeyIsDuplicated(t *testing.T) {
-	e := errors.StoreKeyIsDuplicated{StoreKey: "Foo", Name: "foo"}
+	e := cliargs.StoreKeyIsDuplicated{StoreKey: "Foo", Name: "foo"}
 
 	assert.Equal(t, e.Name, "foo")
 	assert.Equal(t, e.StoreKey, "Foo")
 	assert.Equal(t, e.GetOption(), "foo")
 	assert.Equal(t, e.Error(), "StoreKeyIsDuplicated{StoreKey:Foo,Name:foo}")
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 	assert.Equal(t, ee.GetOption(), "foo")
 }
 
 func TestErrors_ConfigIsArrayButHasNoArg(t *testing.T) {
-	e := errors.ConfigIsArrayButHasNoArg{StoreKey: "Foo", Name: "foo"}
+	e := cliargs.ConfigIsArrayButHasNoArg{StoreKey: "Foo", Name: "foo"}
 
 	assert.Equal(t, e.Name, "foo")
 	assert.Equal(t, e.StoreKey, "Foo")
 	assert.Equal(t, e.GetOption(), "foo")
 	assert.Equal(t, e.Error(), "ConfigIsArrayButHasNoArg{StoreKey:Foo,Name:foo}")
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 	assert.Equal(t, ee.GetOption(), "foo")
 }
 
 func TestErrors_ConfigHasDefaultsButHasNoArg(t *testing.T) {
-	e := errors.ConfigHasDefaultsButHasNoArg{StoreKey: "Foo", Name: "foo"}
+	e := cliargs.ConfigHasDefaultsButHasNoArg{StoreKey: "Foo", Name: "foo"}
 
 	assert.Equal(t, e.Name, "foo")
 	assert.Equal(t, e.StoreKey, "Foo")
 	assert.Equal(t, e.GetOption(), "foo")
 	assert.Equal(t, e.Error(), "ConfigHasDefaultsButHasNoArg{StoreKey:Foo,Name:foo}")
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 	assert.Equal(t, ee.GetOption(), "foo")
 }
 
 func TestErrors_OptionNameIsDuplicated(t *testing.T) {
-	e := errors.OptionNameIsDuplicated{StoreKey: "Foo", Name: "foo"}
+	e := cliargs.OptionNameIsDuplicated{StoreKey: "Foo", Name: "foo"}
 
 	assert.Equal(t, e.Name, "foo")
 	assert.Equal(t, e.StoreKey, "Foo")
 	assert.Equal(t, e.GetOption(), "foo")
 	assert.Equal(t, e.Error(), "OptionNameIsDuplicated{StoreKey:Foo,Name:foo}")
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 	assert.Equal(t, ee.GetOption(), "foo")
 }
 
 func TestErrors_OptionArgIsInvalid(t *testing.T) {
-	e := errors.OptionArgIsInvalid{
+	e := cliargs.OptionArgIsInvalid{
 		StoreKey: "Foo", Option: "foo", OptArg: "xx", TypeKind: reflect.Int,
 		Cause: fmt.Errorf("type error")}
 
@@ -122,16 +122,16 @@ func TestErrors_OptionArgIsInvalid(t *testing.T) {
 	assert.Equal(t, e.GetOption(), "foo")
 	assert.Equal(t, e.Error(), "OptionArgIsInvalid{StoreKey:Foo,Option:foo,OptArg:xx,TypeKind:int,Cause:type error}")
 
-	var ee errors.InvalidOption = e
+	var ee cliargs.InvalidOption = e
 	assert.Equal(t, ee.GetOption(), "foo")
 }
 
 func TestErrors_OptionStoreIsNotChangeable(t *testing.T) {
-	e := errors.OptionStoreIsNotChangeable{}
+	e := cliargs.OptionStoreIsNotChangeable{}
 	assert.Equal(t, e.Error(), "OptionStoreIsNotChangeable{}")
 }
 
 func TestErrors_BadFieldType(t *testing.T) {
-	e := errors.BadFieldType{Option: "foo", Field: "Foo", Type: reflect.TypeOf(0)}
+	e := cliargs.BadFieldType{Option: "foo", Field: "Foo", Type: reflect.TypeOf(0)}
 	assert.Equal(t, e.Error(), "BadFieldType{Option:foo,Field:Foo,Type:int}")
 }

@@ -7,8 +7,6 @@ package cliargs
 import (
 	"strings"
 	"unicode"
-
-	"github.com/sttk/cliargs/errors"
 )
 
 var (
@@ -148,14 +146,14 @@ L0:
 					}
 					if !unicode.Is(rangeOfAlNumMarks, r) {
 						if firstErr == nil {
-							firstErr = errors.OptionContainsInvalidChar{Option: arg}
+							firstErr = OptionContainsInvalidChar{Option: arg}
 						}
 						continue L0
 					}
 				} else {
 					if !unicode.Is(rangeOfAlphabets, r) {
 						if firstErr == nil {
-							firstErr = errors.OptionContainsInvalidChar{Option: arg}
+							firstErr = OptionContainsInvalidChar{Option: arg}
 						}
 						continue L0
 					}
@@ -214,7 +212,7 @@ L0:
 				}
 				if !unicode.Is(rangeOfAlphabets, r) {
 					if firstErr == nil {
-						firstErr = errors.OptionContainsInvalidChar{Option: string(r)}
+						firstErr = OptionContainsInvalidChar{Option: string(r)}
 					}
 					name = ""
 				} else {

@@ -2,9 +2,7 @@
 // This program is free software under MIT License.
 // See the file LICENSE in this distribution for more details.
 
-// Package errors contains the error structures that can occur during
-// command line argument parsing.
-package errors
+package cliargs
 
 import (
 	"fmt"

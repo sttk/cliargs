@@ -8,8 +8,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-
-	"github.com/sttk/cliargs/errors"
 )
 
 // ParseFor is the method to parse command line arguments and set their values to the option store
@@ -88,7 +86,7 @@ func (cmd *Cmd) ParseUntilSubCmdFor(optStore any) (Cmd, error) {
 func MakeOptCfgsFor(options any) ([]OptCfg, error) {
 	v := reflect.ValueOf(options)
 	if v.Kind() != reflect.Ptr {
-		return nil, errors.OptionStoreIsNotChangeable{}
+		return nil, OptionStoreIsNotChangeable{}
 	}
 	v = v.Elem()
 
@@ -255,7 +253,7 @@ func newValueSetter(
 func newBadFieldTypeError(
 	optName string, fldName string, t reflect.Type,
 ) (func([]string) error, error) {
-	e := errors.BadFieldType{Option: optName, Field: fldName, Type: t}
+	e := BadFieldType{Option: optName, Field: fldName, Type: t}
 	return nil, e
 }
 
@@ -278,7 +276,7 @@ func newIntSetter(
 		}
 		n, e := strconv.ParseInt(s[0], 0, bitSize)
 		if e != nil {
-			return errors.OptionArgIsInvalid{
+			return OptionArgIsInvalid{
 				Option: optName, StoreKey: fldName, OptArg: s[0], TypeKind: fld.Type().Kind(), Cause: e}
 		}
 		fld.SetInt(n)
@@ -296,7 +294,7 @@ func newUintSetter(
 		}
 		n, e := strconv.ParseUint(s[0], 0, bitSize)
 		if e != nil {
-			return errors.OptionArgIsInvalid{
+			return OptionArgIsInvalid{
 				Option: optName, StoreKey: fldName, OptArg: s[0], TypeKind: fld.Type().Kind(), Cause: e}
 		}
 		fld.SetUint(n)
@@ -314,7 +312,7 @@ func newFloatSetter(
 		}
 		n, e := strconv.ParseFloat(s[0], bitSize)
 		if e != nil {
-			return errors.OptionArgIsInvalid{
+			return OptionArgIsInvalid{
 				Option: optName, StoreKey: fldName, OptArg: s[0], TypeKind: fld.Type().Kind(), Cause: e}
 		}
 		fld.SetFloat(n)
@@ -354,7 +352,7 @@ func newIntArraySetter(
 		for i := 0; i < n; i++ {
 			v, e := strconv.ParseInt(s[i], 0, bitSize)
 			if e != nil {
-				return errors.OptionArgIsInvalid{
+				return OptionArgIsInvalid{
 					Option: optName, StoreKey: fldName, OptArg: s[i], TypeKind: t.Kind(), Cause: e}
 			}
 			a[i] = reflect.ValueOf(v).Convert(t)
@@ -383,7 +381,7 @@ func newUintArraySetter(
 		for i := 0; i < n; i++ {
 			v, e := strconv.ParseUint(s[i], 0, bitSize)
 			if e != nil {
-				return errors.OptionArgIsInvalid{
+				return OptionArgIsInvalid{
 					Option: optName, StoreKey: fldName, OptArg: s[i], TypeKind: t.Kind(), Cause: e}
 			}
 			a[i] = reflect.ValueOf(v).Convert(t)
@@ -412,7 +410,7 @@ func newFloatArraySetter(
 		for i := 0; i < n; i++ {
 			v, e := strconv.ParseFloat(s[i], bitSize)
 			if e != nil {
-				return errors.OptionArgIsInvalid{
+				return OptionArgIsInvalid{
 					Option: optName, StoreKey: fldName, OptArg: s[i], TypeKind: t.Kind(), Cause: e}
 			}
 			a[i] = reflect.ValueOf(v).Convert(t)
