@@ -37,42 +37,48 @@ This library supports Go 1.18 or later.
 % gvm-fav
 Now using version go1.18.10
 go version go1.18.10 darwin/amd64
-ok  	github.com/sttk/cliargs	0.907s	coverage: 97.6% of statements
-ok  	github.com/sttk/cliargs/errors	1.052s	coverage: 100.0% of statements
-ok  	github.com/sttk/cliargs/validators	0.553s	coverage: 100.0% of statements
+ok  	github.com/sttk/cliargs	0.425s	coverage: 97.6% of statements
+ok  	github.com/sttk/cliargs/errors	0.632s	coverage: 100.0% of statements
+ok  	github.com/sttk/cliargs/validators	0.327s	coverage: 100.0% of statements
 
 Now using version go1.19.13
 go version go1.19.13 darwin/amd64
-ok  	github.com/sttk/cliargs	0.915s	coverage: 97.6% of statements
-ok  	github.com/sttk/cliargs/errors	1.085s	coverage: 100.0% of statements
-ok  	github.com/sttk/cliargs/validators	0.569s	coverage: 100.0% of statements
+ok  	github.com/sttk/cliargs	0.416s	coverage: 97.6% of statements
+ok  	github.com/sttk/cliargs/errors	0.659s	coverage: 100.0% of statements
+ok  	github.com/sttk/cliargs/validators	0.331s	coverage: 100.0% of statements
 
 Now using version go1.20.14
 go version go1.20.14 darwin/amd64
-ok  	github.com/sttk/cliargs	0.559s	coverage: 97.6% of statements
-ok  	github.com/sttk/cliargs/errors	1.065s	coverage: 100.0% of statements
-ok  	github.com/sttk/cliargs/validators	1.590s	coverage: 100.0% of statements
+ok  	github.com/sttk/cliargs	0.614s	coverage: 97.6% of statements
+ok  	github.com/sttk/cliargs/errors	0.309s	coverage: 100.0% of statements
+ok  	github.com/sttk/cliargs/validators	0.895s	coverage: 100.0% of statements
 
 Now using version go1.21.13
 go version go1.21.13 darwin/amd64
-ok  	github.com/sttk/cliargs	1.613s	coverage: 97.6% of statements
-ok  	github.com/sttk/cliargs/errors	0.537s	coverage: 100.0% of statements
-ok  	github.com/sttk/cliargs/validators	1.061s	coverage: 100.0% of statements
+ok  	github.com/sttk/cliargs	0.315s	coverage: 97.6% of statements
+ok  	github.com/sttk/cliargs/errors	0.603s	coverage: 100.0% of statements
+ok  	github.com/sttk/cliargs/validators	0.886s	coverage: 100.0% of statements
 
-Now using version go1.22.6
-go version go1.22.6 darwin/amd64
-ok  	github.com/sttk/cliargs	0.607s	coverage: 97.6% of statements
-ok  	github.com/sttk/cliargs/errors	1.712s	coverage: 100.0% of statements
-ok  	github.com/sttk/cliargs/validators	1.160s	coverage: 100.0% of statements
+Now using version go1.22.12
+go version go1.22.12 darwin/amd64
+ok  	github.com/sttk/cliargs	0.316s	coverage: 97.6% of statements
+ok  	github.com/sttk/cliargs/errors	0.892s	coverage: 100.0% of statements
+ok  	github.com/sttk/cliargs/validators	0.605s	coverage: 100.0% of statements
 
-Now using version go1.23.0
-go version go1.23.0 darwin/amd64
-ok  	github.com/sttk/cliargs	1.743s	coverage: 97.6% of statements
-ok  	github.com/sttk/cliargs/errors	0.599s	coverage: 100.0% of statements
-ok  	github.com/sttk/cliargs/validators	1.160s	coverage: 100.0% of statements
+Now using version go1.23.10
+go version go1.23.10 darwin/amd64
+ok  	github.com/sttk/cliargs	0.635s	coverage: 97.6% of statements
+ok  	github.com/sttk/cliargs/errors	0.310s	coverage: 100.0% of statements
+ok  	github.com/sttk/cliargs/validators	0.937s	coverage: 100.0% of statements
 
-Back to go1.22.6
-Now using version go1.22.6
+Now using version go1.24.4
+go version go1.24.4 darwin/amd64
+ok  	github.com/sttk/cliargs	0.644s	coverage: 97.6% of statements
+ok  	github.com/sttk/cliargs/errors	0.936s	coverage: 100.0% of statements
+ok  	github.com/sttk/cliargs/validators	0.319s	coverage: 100.0% of statements
+
+Back to go1.24.4
+Now using version go1.24.4
 ```
 
 ## License
