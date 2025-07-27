@@ -83,17 +83,17 @@ Now using version go1.24.4
 
 ## License
 
-Copyright (C) 2023-2024 Takayuki Sato
+Copyright (C) 2023-2025 Takayuki Sato
 
 This program is free software under MIT License.<br>
 See the file LICENSE in this distribution for more details.
 
 
-[repo-url]: https://github.com/sttk/cliargs-go
+[repo-url]: https://github.com/sttk/cliargs
 [pkg-dev-img]: https://pkg.go.dev/badge/github.com/sttk/cliargs.svg
 [pkg-dev-url]: https://pkg.go.dev/github.com/sttk/cliargs
-[ci-img]: https://github.com/sttk/cliargs-go/actions/workflows/go.yml/badge.svg?branch=main
-[ci-url]: https://github.com/sttk/cliargs-go/actions
+[ci-img]: https://github.com/sttk/cliargs/actions/workflows/go.yml/badge.svg?branch=main
+[ci-url]: https://github.com/sttk/cliargs/actions?query=branch%3Amain
 [mit-img]: https://img.shields.io/badge/license-MIT-green.svg
 [mit-url]: https://opensource.org/licenses/MIT
 
